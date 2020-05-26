@@ -1,0 +1,209 @@
+<template>
+  <div class="withdrawal-list">
+    <div class="btn-list">
+      <el-button type="primary" size="mini">导出查询结果</el-button>
+      <el-button type="primary" size="mini">完成查询结果</el-button>
+    </div>
+
+    <el-table
+      ref="multipleTable"
+      header-row-class-name="table-head"
+      :data="list"
+      :height="tableHeight"
+      tooltip-effect="dark"
+      border
+      stripe
+      size="mini"
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
+      <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
+
+      <el-table-column
+        align="left"
+        fixed="left"
+        label="流水号"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+      </el-table-column>
+
+      <el-table-column align="left" min-width="120px" label="用户" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="提现金额" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      </el-table-column>
+      <el-table-column align="left" label="账户号" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      </el-table-column>
+      <el-table-column align="left" label="账户名" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      </el-table-column>
+      <el-table-column align="left" label="开户行" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      </el-table-column>
+      <el-table-column align="left" min-width="120px" label="提现时间" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+      </el-table-column>
+      <el-table-column align="left" min-width="120px" label="状态" show-overflow-tooltip>
+        <template>{{ "1:待处理；2:处理中；3:完成"}}</template>
+      </el-table-column>
+    </el-table>
+    <div class="page">
+      <el-pagination
+        v-if="data && data.pageSize"
+        :current-page="data.pageNum"
+        @current-change="pageChange"
+        :page-sizes="[20, 30, 50, 100]"
+        background
+        layout="total,prev, pager, next"
+        :page-size="data.pageSize"
+        :total="data.recordTotal"
+      ></el-pagination>
+    </div>
+    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+  </div>
+</template>
+
+<script>
+import API from "@/api";
+import searchBar from "@/components/SearchBar";
+import { getTableHeight } from "@/utils";
+export default {
+  data() {
+    return {
+      pageNum: 1,
+      simType: "A",
+      pageTotal: 1,
+      pageSize: 10,
+      importDialog: false,
+      tableHeight: null,
+      list: [],
+      data: null,
+      searchData: [
+        {
+          name: "simId1",
+          title: "提现流水号",
+          type: "inputText",
+          value: ""
+        },
+        {
+          name: "netStatus",
+          title: "用户",
+          type: "multiple",
+          values: [
+            { value: 1, key: "激活套餐" },
+            { value: 2, key: "叠加套餐" },
+            { value: 3, key: "特惠套餐" }
+          ],
+          active: [1, 2, 3]
+        },
+        {
+          name: "netStatus",
+          title: "状态",
+          type: "multiple",
+          values: [
+            { value: 1, key: "待处理" },
+            { value: 2, key: "处理中" },
+            { value: 3, key: "完成" }
+          ],
+          active: [1, 2, 3]
+        }
+      ]
+    };
+  },
+  props: {
+    type: String
+  },
+  components: {
+    searchBar
+  },
+  filters: {
+    comboType(type) {
+      type = type - 0;
+      let returnStr = "";
+      switch (type) {
+        case 1:
+          returnStr = "激活套餐";
+          break;
+        case 2:
+          returnStr = "叠加套餐";
+          break;
+        case 3:
+          returnStr = "特惠套餐";
+          break;
+      }
+      return returnStr;
+    },
+    simType(val) {
+      let types = val.split(",");
+      let returnStr = "";
+      for (let i = 0; i < types.length; i++) {
+        if (types[i] == "A") {
+          returnStr += "被叫卡";
+        }
+        if (types[i] == "B") {
+          returnStr += " 主叫卡";
+        }
+      }
+      return returnStr;
+    }
+  },
+  methods: {
+    pageChange() {
+      this.getlist();
+    },
+    editCombo(row) {
+      this.$router.push(`/simcombo/editinfo/${row.id}`);
+    },
+    getlist() {
+      this.axios({
+        method: "get",
+        params: {
+          page: this.pageNum,
+          limit: this.pageSize
+        },
+        url: API.SIMCOMBO.SIM_COMBO_LIST
+      }).then(r => {
+        this.data = r;
+        this.list = r.data;
+        this.pageTotal = r.data.count;
+      });
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    viewItem(item, column, event) {
+      const { type } = event;
+      // type === 'selection'表示是点击了选择框
+      type !== "selection" &&
+        this.$router.push(`/demand/demanddetail/${item.id}`);
+    }
+  },
+  mounted() {
+    this.getlist();
+  },
+  watch: {
+    type: function(newVal) {
+      this.simType = newVal;
+    }
+  },
+  created() {
+    this.simType = this.type;
+    this.tableHeight = getTableHeight();
+  }
+};
+</script>
+<style lang="scss">
+.withdrawal-list {
+  padding: 0 60px;
+  font-weight: 400;
+  .el-table__body-wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+</style>
