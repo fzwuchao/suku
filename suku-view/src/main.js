@@ -11,7 +11,7 @@ import router from './router'
 import store from './store'
 import axios from './utils/axiosPlugin'
 
-import './mock' // 该项目所有请求使用mockjs模拟
+// import './mock' // 该项目所有请求使用mockjs模拟
 
 Vue.use(axios)
 Vue.use(ElementUI, {
