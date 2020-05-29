@@ -25,6 +25,23 @@
           placeholder="请输入密码"
         ></el-input>
       </el-form-item>
+       <el-form-item prop="captchaCode">
+        <input type="text" name="captchaCode" style="display:none" />
+        <el-row>
+          <el-col :span="12">
+            <el-input
+              name="captchaCode"
+              type="text"
+              @keyup.enter.native="handleLogin"
+              v-model.trim="loginForm.captchaCode"
+              placeholder="请输入验证码"
+            ></el-input>
+          </el-col>
+          <el-col :span="12">
+            <span v-html="captchaSvg"></span>
+          </el-col>
+        </el-row>
+      </el-form-item>
       <div class="forget-password">
         <a style="display:none" @click="forgetPassword">忘记密码？</a>
       </div>
@@ -41,14 +58,16 @@
 </template>
 
 <script>
+import API from "@/api";
 export default {
   name: "login",
   data() {
     return {
       // 表单model
       loginForm: {
-        username: "",
-        password: ""
+        username: "youlan",
+        password: "123456",
+        captchaCode: ""
       },
       // 表单验证规则
       loginRules: {
@@ -63,8 +82,15 @@ export default {
             required: true,
             message: "请输入密码"
           }
+        ],
+        captchaCode: [
+          {
+            required: true,
+            message: "请输入验证码"
+          }
         ]
       },
+      captchaSvg: null,
       loading: false
     };
   },
@@ -111,6 +137,12 @@ export default {
   },
   mounted() {
     this.$refs.userNameInput.focus();
+    this.axios({
+      method: "get",
+      url: API.CAPTCHA.CAPTCHA_CODE
+    }).then(res => {
+      this.captchaSvg = res.data
+    })
   }
 };
 </script>
@@ -164,5 +196,6 @@ export default {
       }
     }
   }
+  
 }
 </style>

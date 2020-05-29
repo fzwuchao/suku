@@ -10,6 +10,10 @@ import router from '../router'
 import {
     removeIsLogin
 } from './auth'
+import token from './token'
+
+const { getToken, TOKEN_NAME } = token
+
 const Axios = axios.create({
     baseURL: '/', // 因为我本地做了反向代理
     timeout: 10000,
@@ -77,6 +81,9 @@ Axios
         if (config.contentType) {
             config.headers['Content-Type'] = config.contentType
         }
+
+        // 加上csrf token
+        config.headers[TOKEN_NAME] = getToken()
         return config
     }, error => {
         if (loading) {
