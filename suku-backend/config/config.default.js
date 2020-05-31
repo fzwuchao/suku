@@ -1,3 +1,5 @@
+/* eslint-disable eol-last */
+/* eslint-disable array-bracket-spacing */
 /* eslint valid-jsdoc: "off" */
 
 'use strict';
@@ -17,18 +19,16 @@ const MYSQL_PARAMS = {
  */
 module.exports = appInfo => {
   /**
-   * built-in config
-   * @type {Egg.EggAppConfig}
-   **/
+     * built-in config
+     * @type {Egg.EggAppConfig}
+     **/
   const config = exports = {};
 
   // use for cookie sign key, should change to your own and keep security
   config.keys = appInfo.name + '_1589425408323_5421';
-
   // add your middleware config here
   // 所有请求都会走checkToken（middleware/checkToken.js)
-  config.middleware = [ 'checkToken' ];
-
+  config.middleware = ['checkToken'];
   config.jwt = {
     secret: '123456', // 自定义 token 的加密条件字符串
   };
