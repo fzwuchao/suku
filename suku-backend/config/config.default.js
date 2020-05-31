@@ -38,25 +38,25 @@ module.exports = appInfo => {
     allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
   };
 
-  config.mysql = {
-    // 单数据库信息配置
-    client: {
-      // host
-      host: MYSQL_PARAMS.HOST,
-      // 端口号
-      port: MYSQL_PARAMS.PORT,
-      // 用户名
-      user: MYSQL_PARAMS.USER,
-      // 密码
-      password: MYSQL_PARAMS.PASSWORD,
-      // 数据库名
-      database: MYSQL_PARAMS.DATABASE,
-    },
-    // 是否加载到 app 上，默认开启
-    app: true,
-    // 是否加载到 agent 上，默认关闭
-    agent: false,
-  };
+  // config.mysql = {
+  //   // 单数据库信息配置
+  //   client: {
+  //     // host
+  //     host: MYSQL_PARAMS.HOST,
+  //     // 端口号
+  //     port: MYSQL_PARAMS.PORT,
+  //     // 用户名
+  //     user: MYSQL_PARAMS.USER,
+  //     // 密码
+  //     password: MYSQL_PARAMS.PASSWORD,
+  //     // 数据库名
+  //     database: MYSQL_PARAMS.DATABASE,
+  //   },
+  //   // 是否加载到 app 上，默认开启
+  //   app: true,
+  //   // 是否加载到 agent 上，默认关闭
+  //   agent: false,
+  // };
 
   config.sequelize = {
     dialect: 'mysql',
@@ -65,7 +65,7 @@ module.exports = appInfo => {
     // 端口号
     port: MYSQL_PARAMS.PORT,
     // 用户名
-    user: MYSQL_PARAMS.USER,
+    username: MYSQL_PARAMS.USER,
     // 密码
     password: MYSQL_PARAMS.PASSWORD,
     // 数据库名
