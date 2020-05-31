@@ -1,0 +1,69 @@
+@charset "utf-8";
+.htmlbanner {
+    width: 100%;
+    min-height: 180px;
+    margin: 0 auto;
+    background: url("../assets/banner.jpg") no-repeat;
+    background-size: 100% 100%;
+}
+
+.btn {
+    padding: 0 15px;
+    margin-bottom: 20px;
+    .van-button--primary {
+        color: #fff;
+        background-color: #f4af49;
+        border: 1px solid #f4af49;
+        height: 48px;
+        line-height: 48px;
+        font-size: 16px;
+    }
+}
+
+.van-nav-bar {
+    background: transparent;
+    .van-nav-bar__title {
+        color: #ffffff;
+    }
+    .van-nav-bar__arrow {
+        font-size: 26px;
+        color: #333;
+    }
+    .van-nav-bar__left {
+        padding: 0 8px;
+    }
+}
+
+.van-hairline--bottom::after {
+    border-bottom-width: 0px;
+}
+
+.van-cell {
+    font-size: 14px;
+}
+
+.van-tab--active {
+    color: #e9b021;
+}
+
+.van-tabs__line {
+    background-color: #e9b021;
+}
+
+.van-tab__text {
+    font-size: 12px;
+}
+
+.van-button--mini {
+    font-size: 12px;
+}
+
+.van-radio__icon {
+    height: 18px;
+    line-height: 18px;
+}
+
+.van-radio__icon .van-icon {
+    width: 18px;
+    height: 18px;
+}
