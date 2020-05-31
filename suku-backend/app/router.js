@@ -6,9 +6,9 @@
 module.exports = app => {
   const { router, controller } = app;
 
-  app.beforeStart(async () => {
-    await app.model.sync(); // model与数据库表同步，表不存在时自动创建，存在时忽略
-  })
+  // app.beforeStart(async () => {
+  //   await app.model.sync(); // model与数据库表同步，表不存在时自动创建，存在时忽略
+  // });
 
   // 登录
   router.post('/login', controller.login.login);
