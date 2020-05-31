@@ -24,4 +24,7 @@ module.exports = app => {
 
   // 导出
   router.post('/export', controller.user.exportFile);
+
+  // 获取角色的权限
+  router.get('/permission', controller.permission.getPermission);
 };

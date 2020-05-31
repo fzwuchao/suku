@@ -5,20 +5,6 @@ const BaseController = require('../core/base_controller');
 class CaptchaController extends BaseController {
   // 获取验证码
   async getCaptcha() {
-    // const { Role, Permission, RolePermissionMap } = this.app.model;
-    // Role.belongsToMany(Permission, {
-    //   through: RolePermissionMap,
-    //   // foreignKey: 'role_id',
-    // });
-    // Permission.belongsToMany(Role, {
-    //   through: RolePermissionMap,
-    //   // foreignKey: 'permission_id',
-    // });
-    // const allRoles = await Role.findAll({
-    //   include: Permission,
-    // });
-    // this.ctx.logger.info(allRoles);
-
     const { ctx } = this;
     const { response, session, service } = ctx;
     const captcha = await service.captcha.getCaptcha();

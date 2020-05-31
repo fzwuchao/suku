@@ -5,7 +5,7 @@
  */
 const Service = require('egg').Service;
 // 半个小时，毫秒
-const EXPIRE_TIME = 30 * 60 * 1000;
+const EXPIRE_TIME = 24 * 60 * 60 * 1000;
 
 class TokenService extends Service {
   async getToken(tokenName) {
