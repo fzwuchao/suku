@@ -30,5 +30,4 @@ class CaptchaController extends BaseController {
   }
 
 }
-
 module.exports = CaptchaController;
