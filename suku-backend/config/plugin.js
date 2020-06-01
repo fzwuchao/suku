@@ -32,4 +32,9 @@ module.exports = {
     enable: true,
     package: 'egg-sequelize',
   },
+  // 用于请求参数的检验
+  validate: {
+    enable: true,
+    package: 'egg-validate',
+  },
 };
