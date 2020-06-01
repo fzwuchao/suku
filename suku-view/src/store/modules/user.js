@@ -3,6 +3,7 @@ import {
     getToken,
     removeToken,
     setIsLogin,
+    setToken,
     removeIsLogin
 } from '@/utils/auth'
 import API from '@/api'
@@ -54,19 +55,22 @@ const user = {
                   localStorage.setItem('loginUsername', username)
                   resolve(username)
                 }) */
-            const password = MD5(username + userInfo.password + 'adtime.com')
+            const password =  MD5(username + userInfo.password + 'sukuwulian')
+            const captchaCode = userInfo.captchaCode
             return new Promise((resolve, reject) => {
                 request({
-                    url: API.USERS.LOGIN,
+                    url: API.LOGIN.LOGIN,
                     method: 'form',
                     hideError: true,
                     data: {
                         username,
-                        password
+                        password,
+                        captchaCode
                     }
                 }).then(response => {
                     if (response.code === 200) {
                         setIsLogin(true)
+                        setToken(response.token)
                         commit('SET_NAME', username)
                         localStorage.setItem('loginUsername', username)
                         localStorage.setItem('userInfo', JSON.stringify(response.data))

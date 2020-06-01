@@ -13,7 +13,7 @@ class LoginController extends BaseController {
     // 取得session中的验证码，对比用户传过来的
     const isSameCaptcha = await service.captcha.diffCaptcha(captchaCode);
     if (!isSameCaptcha) {
-      this.fail(null, '验证码错误');
+      this.fail(1002, null, '验证码错误');
       return;
     }
 
@@ -27,12 +27,12 @@ class LoginController extends BaseController {
       });
 
       const token = await ctx.service.token.getToken(username);
-      const permissions = await ctx.service.permission.getPermission(user.roleId);
+      // const permissions = await ctx.service.permission.getPermission(user.roleId);
 
       if (token === null) {
         this.fail(null, 'token设置失败');
       } else {
-        this.success(permissions, '登录成功', { token });
+        this.success(loginUserInfo, '登录成功', { token });
       }
 
       return;

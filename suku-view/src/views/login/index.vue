@@ -2,7 +2,7 @@
   <div class="login-container">
     <el-form class="login-form" :model="loginForm" :rules="loginRules" ref="loginForm">
       <div class="title-container">
-        <div class="logo">速酷电子</div>
+        <div class="logo">速酷物联</div>
       </div>
       <el-form-item prop="username" style="margin-top: 30px;">
         <input type="text" name="username" style="display:none" />
@@ -28,7 +28,7 @@
        <el-form-item prop="captchaCode">
         <input type="text" name="captchaCode" style="display:none" />
         <el-row>
-          <el-col :span="12">
+          <el-col :span="16" class="captcha-code-input">
             <el-input
               name="captchaCode"
               type="text"
@@ -37,8 +37,8 @@
               placeholder="请输入验证码"
             ></el-input>
           </el-col>
-          <el-col :span="12">
-            <span v-html="captchaSvg"></span>
+          <el-col :span="8" @click.native="getCaptchaSvg">
+            <span style="cursor: pointer;" v-html="captchaSvg"></span>
           </el-col>
         </el-row>
       </el-form-item>
@@ -133,16 +133,20 @@ export default {
           return false;
         }
       });
+    },
+    getCaptchaSvg () {
+      this.axios({
+        method: "get",
+        url: API.CAPTCHA.CAPTCHA_CODE
+      }).then(res => {
+        this.captchaSvg = res.data
+      })
     }
+
   },
   mounted() {
     this.$refs.userNameInput.focus();
-    this.axios({
-      method: "get",
-      url: API.CAPTCHA.CAPTCHA_CODE
-    }).then(res => {
-      this.captchaSvg = res.data
-    })
+    this.getCaptchaSvg()
   }
 };
 </script>
@@ -163,19 +167,19 @@ export default {
     transform: translate(-50%, -50%);
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2),
       0 26px 24px 0 rgba(12, 23, 44, 0.1);
-    padding: 48px 90px 0;
+    padding: 48px 80px 0;
     width: 430px;
     height: 500px;
     background: #fff;
     text-align: center;
     .title-container {
       .logo {
-        width: 121px;
+        width: 180px;
         // height: 135px;
         margin: 42px auto 90px;
         color: #409eff;
         font-style: italic;
-        font-size: 50px;
+        font-size: 42px;
         // background: url('../../assets/logo.png') no-repeat;
       }
     }
@@ -195,6 +199,12 @@ export default {
         text-decoration: none;
       }
     }
+    .el-input {
+        width: 100%;
+      }
+    .el-row{
+        line-height: 46px;
+      }
   }
   
 }

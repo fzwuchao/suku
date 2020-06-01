@@ -7,7 +7,8 @@ class PermissionController extends BaseController {
   async getPermission() {
     const { ctx } = this;
     const { service } = ctx;
-    const permissions = await service.permission.getPermission(1);
+    const user = ctx.helper.loginUser.parse(ctx.cookies.get('loginUserInfo')) || {};
+    const permissions = await service.permission.getPermission(user.roleId);
     this.success(permissions, '');
   }
 

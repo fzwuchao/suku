@@ -42,7 +42,9 @@ const parseLoginUser = jsonStr => {
 const stringfyLoginUser = loginUserInfo => {
   return encodeURIComponent(JSON.stringify(loginUserInfo));
 };
-
+const CONST = {
+  MD5_PWD: 'sukuwulian',
+};
 module.exports = {
   // 登录用户
   loginUser: {
@@ -50,4 +52,5 @@ module.exports = {
     parse: parseLoginUser,
     stringfy: stringfyLoginUser,
   },
+  CONST,
 };

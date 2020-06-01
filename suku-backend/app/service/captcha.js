@@ -10,7 +10,7 @@ const svgCaptcha = require('svg-captcha');
 class CaptchaService extends Service {
   // 获取验证码
   async getCaptcha() {
-    const captcha = svgCaptcha.create();
+    const captcha = svgCaptcha.create({ width: 100, height: 35 });
     // this.ctx.session.captcha = captcha;
 
     return captcha;

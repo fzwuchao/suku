@@ -1,39 +1,26 @@
-import Cookies from 'js-cookie'
+const _TOKEN_NAME = process.env.ACFTICKET
 
-const TokenKey = process.env.ACFTICKET
-const ACF_TICKET = process.env.ACFTICKET
-
-export function getToken() {
-    return Cookies.get(TokenKey)
+export const getToken = () => {
+  return window.localStorage.getItem(_TOKEN_NAME);
 }
 
-export function setToken(token) {
-    return Cookies.set(TokenKey, token)
+export const setToken = (tokenValue) => {
+  window.localStorage.setItem(_TOKEN_NAME, tokenValue)
 }
 
-export function removeToken() {
-    return Cookies.remove(TokenKey)
-}
-export function getAcfticket() {
-    return Cookies.get(ACF_TICKET)
-}
-
-export function setAcfticket(ticket) {
-    return Cookies.set(ACF_TICKET, ticket)
-}
-
-export function removeAcfticket() {
-    return Cookies.remove(ACF_TICKET)
+export const removeToken = () => {
+  window.localStorage.removeItem(_TOKEN_NAME)
 }
 
 export function setIsLogin(value) {
-    return Cookies.set('isLogin', value)
+  window.localStorage.setItemt('isLogin', value)
 }
 
 export function getIsLogin() {
-    return Cookies.get('isLogin')
+  window.localStorage.getItem('isLogin')
 }
 
 export function removeIsLogin() {
-    return Cookies.remove('isLogin')
+  window.localStorage.removeItem('isLogin')
 }
+

@@ -99,7 +99,7 @@ const permission = {
         }) {
             return new Promise((resolve, rj) => {
                 request({
-                    url: API.USERS.USER_PERMISSION,
+                    url: API.PERMISSION.GET_PERMISSION,
                     method: 'get',
                     data: {}
                 }).then(response => {

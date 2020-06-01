@@ -17,7 +17,7 @@ module.exports = app => {
       allowNull: false,
       unique: true,
     },
-    password: STRING(30), // '密码',
+    password: STRING(100), // '密码',
     phone: CHAR(11), // '手机号码',
     name: {
       type: STRING(30), // '用户名'

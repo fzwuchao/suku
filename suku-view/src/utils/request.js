@@ -8,11 +8,9 @@ import {
 import router from '../router'
 // import MsgInner from 'MsgInner'
 import {
-    removeIsLogin
+    removeIsLogin,
+    getToken
 } from './auth'
-import token from './token'
-
-const { getToken, TOKEN_NAME } = token
 
 const Axios = axios.create({
     baseURL: '/', // 因为我本地做了反向代理
@@ -83,7 +81,7 @@ Axios
         }
 
         // 加上csrf token
-        config.headers[TOKEN_NAME] = getToken()
+        config.headers['x-csrf-token'] = getToken()
         return config
     }, error => {
         if (loading) {
@@ -104,12 +102,13 @@ Axios
     .interceptors
     .response
     .use(res => {
+      debugger
         if (loading) {
             loading.close()
             loading = null
         }
         if (res.data && res.data.code !== 200) {
-            if (res.data.code === 10000) {
+            if (res.data.code === 1001) {
                 removeIsLogin()
                 router.push({
                     path: '/login'

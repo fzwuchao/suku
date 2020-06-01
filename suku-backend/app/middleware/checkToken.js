@@ -1,6 +1,6 @@
 // 验证token是否有效
 'use strict';
-
+const ERRORMSG = require('../extend/errorCode');
 module.exports = (options, app) => {
   return async function checkToken(ctx, next) {
     const { header, url } = ctx.request;
@@ -14,8 +14,9 @@ module.exports = (options, app) => {
 
       if (redisToken === null || requestToken !== redisToken) {
         ctx.body = {
+          code: ERRORMSG.TOKEN_PAST_DUE.CODE,
           success: false,
-          msg: 'token过期，请重新登录',
+          msg: ERRORMSG.TOKEN_PAST_DUE.MSG,
           data: null,
         };
         return;
