@@ -2,7 +2,7 @@
 
 // 权限表对象
 module.exports = app => {
-  const { STRING, DATE, BIGINT, TINYINT } = app.Sequelize;
+  const { STRING, DATE, BIGINT, TINYINT, VIRTUAL } = app.Sequelize;
 
   const Permission = app.model.define('permission', {
     id: {
@@ -68,6 +68,9 @@ module.exports = app => {
       type: STRING(30),
       field: 'menu_icon',
       comment: '',
+    },
+    subMenuList: {
+      type: VIRTUAL, // 这种类型的字段，不存在于表中，只在model中
     },
     createdAt: {
       type: DATE,
