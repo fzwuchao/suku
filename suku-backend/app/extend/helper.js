@@ -15,14 +15,15 @@ const isJSON = str => {
 };
 
 class LoginUser {
-  constructor(id, username, name) {
+  constructor(id, username, name, roleId) {
     this.id = id;
     this.username = username;
     this.name = name;
+    this.roleId = roleId;
   }
 }
 
-const createLoginUser = (id, username, name) => { return new LoginUser(id, username, name); };
+const createLoginUser = (id, username, name, roleId) => { return new LoginUser(id, username, name, roleId); };
 const parseLoginUser = jsonStr => {
   const decodeStr = decodeURIComponent(jsonStr);
   if (!isJSON(decodeStr)) return null;
@@ -30,9 +31,9 @@ const parseLoginUser = jsonStr => {
   const tmp = JSON.parse(decodeStr);
   const keys = Object.keys(tmp);
 
-  if (keys.includes('id') && keys.includes('username') && keys.includes('name')) {
-    const { id, username, name } = tmp;
-    return new LoginUser(id, username, name);
+  if (keys.includes('id') && keys.includes('username') && keys.includes('name') && keys.includes('roleId')) {
+    const { id, username, name, roleId } = tmp;
+    return new LoginUser(id, username, name, roleId);
   }
 
   return null;

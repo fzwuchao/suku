@@ -20,17 +20,19 @@ class LoginController extends BaseController {
     const user = await service.user.getLoginUser(username, password);
 
     if (user) {
-      const loginUserInfo = helper.loginUser.create(user.id, user.username, user.name)
+      const loginUserInfo = helper.loginUser.create(user.id, user.username, user.name, user.roleId);
 
       ctx.cookies.set('loginUserInfo', helper.loginUser.stringfy(loginUserInfo), {
         httpOnly: false,
       });
 
       const token = await ctx.service.token.getToken(username);
+      const permissions = await ctx.service.permission.getPermission(user.roleId);
+
       if (token === null) {
         this.fail(null, 'token设置失败');
       } else {
-        this.success(token, '登录成功');
+        this.success(permissions, '登录成功', { token });
       }
 
       return;

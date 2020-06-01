@@ -24,14 +24,32 @@ module.exports = app => {
       allowNull: false,
     },
     email: STRING(30), // '邮箱',
-    mch_id: STRING(30), // '商户号',
+    mchId: {
+      type: STRING(30), // '商户号',
+      field: 'mch_id',
+    },
     rate: DECIMAL(4, 2), // '分成率',
-    open_msg: STRING(200),
-    float_price: DECIMAL(10, 3),
+    openMsg: {
+      type: STRING(200),
+      field: 'open_msg',
+    },
+    floatPrice: {
+      type: DECIMAL(10, 3),
+      field: 'float_price',
+    },
     uuid: STRING(30),
-    role_id: INTEGER(20), // '角色id',
-    created_at: DATE, // '创建时间',
-    updated_at: DATE, // '更新时间',
+    roleId: {
+      type: INTEGER(20), // '角色id',
+      field: 'role_id',
+    },
+    createdAt: {
+      type: DATE, // '创建时间',
+      field: 'created_at',
+    },
+    updatedAt: {
+      type: DATE, // '更新时间',
+      field: 'updated_at',
+    },
   }, {
     timestamps: true,
     createdAt: 'created_at',
