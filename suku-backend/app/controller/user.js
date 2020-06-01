@@ -12,8 +12,5 @@ class UserController extends BaseController {
     // 删除不了，mysql用户创建的文件，其它用户没有权限
     // ctx.service.sheet.removeFile(filepath);
   }
-
-  
 }
-
 module.exports = UserController;
