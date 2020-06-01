@@ -102,7 +102,6 @@ Axios
     .interceptors
     .response
     .use(res => {
-      debugger
         if (loading) {
             loading.close()
             loading = null

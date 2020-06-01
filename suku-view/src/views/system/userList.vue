@@ -115,7 +115,7 @@ export default {
     }
   },
   mounted() {
-    this.getlist();
+   // this.getlist();
   }
 };
 </script>

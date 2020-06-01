@@ -103,7 +103,7 @@ const permission = {
                     method: 'get',
                     data: {}
                 }).then(response => {
-                    let data = response.data.data
+                    let data = response.data
                     let accessedRouters = []
                     getRouters(accessedRouters, data, '')
                     let redirect = accessedRouters[0].path

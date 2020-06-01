@@ -13,11 +13,11 @@ export const removeToken = () => {
 }
 
 export function setIsLogin(value) {
-  window.localStorage.setItemt('isLogin', value)
+  window.localStorage.setItem('isLogin', value)
 }
 
 export function getIsLogin() {
-  window.localStorage.getItem('isLogin')
+  return window.localStorage.getItem('isLogin')
 }
 
 export function removeIsLogin() {
