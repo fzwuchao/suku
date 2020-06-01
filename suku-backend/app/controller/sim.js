@@ -22,25 +22,24 @@ class SimController extends BaseController {
   async search() {
     const { ctx } = this;
     const { request, service } = ctx;
+    const rule = {
+      simId: {
+        type: 'string?', // 加问号表示这个参数非必要
+      },
+      pageNo: {
+        type: 'int',
+      },
+      pageSize: {
+        type: 'int',
+      },
+    };
+
+    // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
+    ctx.validate(rule, request.query);
     const { simId, pageNo, pageSize } = request.query;
-    // const rule = {
-    //   simId: {
-    //     type: 'string',
-    //   },
-    //   pageNo: {
-    //     type: 'number',
-    //   },
-    //   pageSize: {
-    //     type: 'number',
-    //   },
-    // };
-
-    // 校验参数
-    // const validateState = ctx.validate(rule, request.query);
-
     const pageData = await service.sim.getSimPageData({
-      pageNo: Number(pageNo),
-      pageSize: Number(pageSize),
+      pageNo,
+      pageSize,
       simId,
     });
     this.success(pageData, '');

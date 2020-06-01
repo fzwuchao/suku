@@ -96,6 +96,10 @@ module.exports = appInfo => {
     ],
   };
 
+  config.validate = {
+    convert: true, // 入参的数据类型自动转换
+  }
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',
