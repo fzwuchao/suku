@@ -2,6 +2,11 @@
 
 const { Controller } = require('egg');
 class BaseController extends Controller {
+  getCurUser() {
+
+    const curUser = this.ctx.helper.loginUser.parse(this.ctx.cookies.get('loginUserInfo')) || {};
+    return curUser;
+  }
   success(data, msg, otherParams) {
     this.ctx.body = {
       code: 200,

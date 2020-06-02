@@ -35,7 +35,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
   </div>
@@ -65,14 +65,14 @@ export default {
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize
         },
         url: API.USERS.ROLE_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {

@@ -2,6 +2,7 @@
 'use strict';
 
 // sim卡
+const moment = require('moment');
 module.exports = app => {
   const { STRING, DATE, TINYINT, DECIMAL, BIGINT } = app.Sequelize;
 
@@ -15,11 +16,17 @@ module.exports = app => {
     iccid: STRING(50),
     activeTime: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('activeTime')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'active_time',
       comment: '激活时间',
     },
     overdueTime: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('overdueTime')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'overdue_time',
       comment: '过期时间',
     },
@@ -169,11 +176,17 @@ module.exports = app => {
     },
     createdAt: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'created_at',
       comment: '创建时间',
     },
     updatedAt: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'updated_at',
       comment: '更新时间',
     },

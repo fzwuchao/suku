@@ -1,7 +1,7 @@
 'use strict';
 
 // 角色表对象
-
+const moment = require('moment');
 module.exports = app => {
   const { STRING, DATE, BIGINT, TINYINT } = app.Sequelize;
 
@@ -32,10 +32,16 @@ module.exports = app => {
     },
     created_at: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       comment: '创建时间',
     },
     updated_at: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       comment: '更新时间',
     },
   }, {

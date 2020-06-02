@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <el-button type="primary" size="mini">增加</el-button>
+      <el-button type="primary" size="mini" @click.native="addUser">增加</el-button>
       <el-button type="primary" size="mini">开通短信</el-button>
       <el-button type="primary" size="mini">开启自动转账（只有管理员才有权限）</el-button>
     </div>
@@ -64,7 +64,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
   </div>
@@ -90,6 +90,9 @@ export default {
     editUser(user) {
       this.$router.push(`/system/edituser/${user.id}`);
     },
+    addUser() {
+      this.$router.push(`/system/adduser`);
+    },
     getlist() {
       this.axios({
         method: "get",
@@ -99,9 +102,9 @@ export default {
         },
         url: API.USERS.USER_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {

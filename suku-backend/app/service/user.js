@@ -25,7 +25,7 @@ class UserService extends BaseService {
 
   async getUsersPage(pid, pageSize, pageNum) {
 
-    const result = this.findAndCountAll('User', pageSize, pageNum, { pid });
+    const result = await this.findAndCountAll('User', pageSize, pageNum, { pid });
     return result;
   }
 

@@ -12,7 +12,7 @@ class UserController extends BaseController {
     // 删除不了，mysql用户创建的文件，其它用户没有权限
     // ctx.service.sheet.removeFile(filepath);
   } */
-  async getUserlist() {
+  async getRolelist() {
     const { ctx } = this;
     const { request } = ctx;
     const rule = {
@@ -28,7 +28,8 @@ class UserController extends BaseController {
     ctx.validate(rule, request.query);
     const { pageNum, pageSize } = request.query;
     const user = this.getCurUser();
-    const result = await ctx.service.user.getUsersPage(user.id, pageSize, pageNum);
+    const role = await ctx.service.role.getRoleInfo(user.roleId);
+    const result = await ctx.service.role.getRolesPage(role.level, pageSize, pageNum);
     this.success(result, '');
   }
 }

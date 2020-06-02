@@ -36,4 +36,6 @@ module.exports = app => {
 
   // 获取用户列表
   router.get('/searchUser', controller.user.getUserlist);
+  // 获取权限列表
+  router.get('/searchRole', controller.role.getRolelist);
 };

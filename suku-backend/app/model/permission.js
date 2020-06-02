@@ -1,5 +1,5 @@
 'use strict';
-
+const moment = require('moment');
 // 权限表对象
 module.exports = app => {
   const { STRING, DATE, BIGINT, TINYINT, VIRTUAL } = app.Sequelize;
@@ -75,10 +75,16 @@ module.exports = app => {
     createdAt: {
       type: DATE,
       field: 'created_at',
+      get() {
+        return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       comment: '创建时间',
     },
     updatedAt: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'updated_at',
       comment: '更新时间',
     },
