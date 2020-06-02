@@ -42,6 +42,21 @@ const parseLoginUser = jsonStr => {
 const stringfyLoginUser = loginUserInfo => {
   return encodeURIComponent(JSON.stringify(loginUserInfo));
 };
+const pageQueryModel = (pageSize, pageNum) => {
+  return {
+    offset: (pageNum - 1) * pageSize,
+    limit: pageSize,
+  };
+};
+const pageModel = (data, pageSize, pageNum) => {
+  const { count, rows } = data;
+  return {
+    totalRecords: count,
+    list: rows,
+    pageNum,
+    pageSize,
+  };
+};
 const CONST = {
   MD5_PWD: 'sukuwulian',
 };
@@ -53,4 +68,6 @@ module.exports = {
     stringfy: stringfyLoginUser,
   },
   CONST,
+  pageQueryModel,
+  pageModel,
 };

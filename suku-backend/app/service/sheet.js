@@ -14,7 +14,7 @@ class SheetService extends Service {
     const { model } = this.app;
     const { User } = model;
     const { request, logger, service } = this.ctx;
-    let status = "";
+    const status = '';
     logger.info(`【上传文件总数：${request.files.length} 个】`);
     for (const index in request.files) {
       const { filename, filepath } = request.files[index];

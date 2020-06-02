@@ -94,8 +94,8 @@ export default {
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize
         },
         url: API.USERS.USER_LIST
       }).then(r => {
@@ -115,7 +115,7 @@ export default {
     }
   },
   mounted() {
-   // this.getlist();
+    this.getlist();
   }
 };
 </script>

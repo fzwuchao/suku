@@ -3,11 +3,11 @@
 /**
  * token服务
  */
-const Service = require('egg').Service;
+const BaseService = require('../core/baseService');
 // 一天小时，毫秒
 const EXPIRE_TIME = 24 * 60 * 60 * 1000;
 
-class TokenService extends Service {
+class TokenService extends BaseService {
   async getToken(tokenName) {
     const { app, ctx } = this;
 

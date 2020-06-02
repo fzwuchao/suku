@@ -3,7 +3,7 @@
 // const uuid = require('uuid');
 // const path = require('path');
 
-const Service = require('egg').Service;
+const BaseService = require('../core/baseService');
 
 // 导出文件所在路径
 // const FILE_PATH_PREFIX = '/var/tmp/';
@@ -11,7 +11,7 @@ const Service = require('egg').Service;
 // user表名
 // const TABLE_USER = 'user';
 
-class UserService extends Service {
+class UserService extends BaseService {
   async getLoginUser(username, password) {
     const [ user ] = await this.app.model.User.findAll({
       where: {
@@ -23,10 +23,9 @@ class UserService extends Service {
     return user;
   }
 
-  async getUsersByPid(pid) {
-    const result = await this.app.model.User.findAll({ where: {
-      pid,
-    } });
+  async getUsersPage(pid, pageSize, pageNum) {
+
+    const result = this.findAndCountAll('User', pageSize, pageNum, { pid });
     return result;
   }
 

@@ -1,6 +1,6 @@
 export default {
     USER_PERMISSION: "/admin/data",
-    USER_LIST: "/admin/user/list",
+    USER_LIST: "/searchUser",
     ROLE_LIST: "/admin/role/list",
     LOGIN: "/admin/login"
 }

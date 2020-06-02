@@ -3,9 +3,9 @@
 
 /**
  */
-const Service = require('egg').Service;
+const BaseService = require('../core/baseService');
 
-class SimService extends Service {
+class SimService extends BaseService {
   /**
    * sim卡列表
    * @param { object } - 参数对象如下：

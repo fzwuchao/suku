@@ -3,9 +3,9 @@
 /**
  * 权限
  */
-const Service = require('egg').Service;
+const BaseService = require('../core/baseService');
 
-class PermissionService extends Service {
+class PermissionService extends BaseService {
   // 获取权限
   async getPermission(roleId) {
     const permissions = [];

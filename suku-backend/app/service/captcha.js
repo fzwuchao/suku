@@ -4,10 +4,10 @@
  * 验证码服务
  * https://github.com/produck/svg-captcha
  */
-const Service = require('egg').Service;
+const BaseService = require('../core/baseService');
 const svgCaptcha = require('svg-captcha');
 
-class CaptchaService extends Service {
+class CaptchaService extends BaseService {
   // 获取验证码
   async getCaptcha() {
     const captcha = svgCaptcha.create({ width: 100, height: 35 });

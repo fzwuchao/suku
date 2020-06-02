@@ -20,10 +20,10 @@ module.exports = app => {
   router.get('/getCaptcha', controller.captcha.getCaptcha);
 
   // 导入
-  router.post('/import', controller.sheet.importFile);
+  // router.post('/import', controller.sheet.importFile);
 
   // 导出
-  router.post('/export', controller.user.exportFile);
+  // router.post('/export', controller.user.exportFile);
 
   // 获取角色的权限
   router.get('/permission', controller.permission.getPermission);
@@ -33,4 +33,7 @@ module.exports = app => {
 
   // 查询sim卡
   router.get('/searchSim', controller.sim.search);
+
+  // 获取用户列表
+  router.get('/searchUser', controller.user.getUserlist);
 };
