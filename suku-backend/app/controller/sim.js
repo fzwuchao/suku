@@ -22,11 +22,25 @@ class SimController extends BaseController {
   async search() {
     const { ctx } = this;
     const { request, service } = ctx;
+
     const rule = {
       simId: {
         type: 'string?', // 加问号表示这个参数非必要
       },
-      pageNo: {
+      simIdRange: {
+        type: 'array?',
+        itemType: 'string',
+      },
+      username: {
+        type: 'string?',
+      },
+      netStatus: {
+        type: 'int?',
+      },
+      isActive: {
+        type: 'int?',
+      },
+      pageNum: {
         type: 'int',
       },
       pageSize: {
@@ -34,14 +48,15 @@ class SimController extends BaseController {
       },
     };
 
-    // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
-    ctx.validate(rule, request.query);
-    const { simId, pageNo, pageSize } = request.query;
-    const pageData = await service.sim.getSimPageData({
-      pageNo,
-      pageSize,
-      simId,
-    });
+    const params = Object.keys(rule).reduce((acc, cur) => {
+      if (cur in request.query) {
+        acc[cur] = rule[cur].type.includes('array') ? request.queries[cur] : request.query[cur];
+      }
+      return acc;
+    }, {});
+
+    ctx.validate(rule, params);
+    const pageData = await service.sim.getSimPageData(params);
     this.success(pageData, '');
   }
 

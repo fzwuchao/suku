@@ -20,8 +20,8 @@ class SimService extends BaseService {
    * }
    * @return {{count, rows}} - 总条数，一页的数据
    */
-  async getSimPageData({ simId, simIdRange, username, netStatus, isActive, pageSize, pageNo }) {
-    const { Sequelize: { Op }, Sim } = this.app.model;
+  async getSimPageData({ simId, simIdRange, username, netStatus, isActive, pageSize, pageNum }) {
+    const { Sequelize: { Op } } = this.app.model;
     const condition = {};
 
     if (simId !== undefined) {
@@ -31,12 +31,19 @@ class SimService extends BaseService {
     }
 
     if (simIdRange && simIdRange.length > 0) {
-      condition['simId'] = [
-        ...condition['simId'],
-        {
+      if (simId !== undefined) {
+        condition['simId'] = {
+          [Op.or]: {
+            [Op.substring]: simId,
+            [Op.between]: simIdRange,
+          },
+        };
+      } else {
+        condition['simId'] = {
           [Op.between]: simIdRange,
-        },
-      ];
+        };
+
+      }
     }
 
     if (username !== undefined) {
@@ -57,22 +64,7 @@ class SimService extends BaseService {
       };
     }
 
-    const whereCondition = {};
-
-    if (Object.keys(condition).length > 0) {
-      whereCondition.where = {
-        ...condition,
-      };
-    }
-
-    // 分页
-    // 如: {offset: 10, limit: 5}: 跳过前10条，获取之后的5条数据
-    const pagnation = {
-      offset: pageSize * (pageNo - 1),
-      limit: pageSize,
-    };
-    const params = { ...whereCondition, ...pagnation };
-    const simData = await Sim.findAndCountAll(params);
+    const simData = await this.findAndCountAll('Sim', pageSize, pageNum, condition);
 
     return simData;
   }
