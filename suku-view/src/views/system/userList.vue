@@ -31,22 +31,22 @@
         <template slot-scope="scope">{{ scope.row.phone }}</template>
       </el-table-column>
       <el-table-column align="left" label="角色" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.role_name}}</template>
+        <template slot-scope="scope">{{ scope.row.role.displayName}}</template>
       </el-table-column>
       <el-table-column align="left" label="分成率" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.rate }}</template>
       </el-table-column>
       <el-table-column align="left" label="商户号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.mch_id }}</template>
+        <template slot-scope="scope">{{ scope.row.mchId }}</template>
       </el-table-column>
       <el-table-column align="left" label="短信" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.open_msg == 1? '已开通':'未开通' }}</template>
+        <template slot-scope="scope">{{ scope.row.openMsg == 1? '已开通':'未开通' }}</template>
       </el-table-column>
       <el-table-column align="left" label="自动转账" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.open_msg == 1? '已开通':'未开通' }}</template>
+        <template slot-scope="scope">{{ scope.row.autoTransfer == 1? '已开通':'未开通' }}</template>
       </el-table-column>
       <el-table-column align="left" label="上级" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.parent_name}}</template>
+        <template slot-scope="scope">{{ scope.row.pname}}</template>
       </el-table-column>
 
       <el-table-column fixed="right" label="操作" width="100">
@@ -82,6 +82,12 @@ export default {
       data: null,
       multipleSelection: []
     };
+  },
+  filters: {
+    getRoleName(role) {
+      debugger
+      return role.display_name;
+    }
   },
   methods: {
     pageChange() {

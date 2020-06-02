@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 /**
  * Created by jiachenpan on 16/11/18.
  */
@@ -38,5 +39,11 @@ export function validatAlphabets(str) {
 /* 手机号*/
 export function validateTel(str) {
   var reg = /^[1][3,4,5,7,8,9][0-9]{9}$/;
+  return reg.test(str.trim())
+}
+
+/* 邮箱*/
+export function validateEmail(str) {
+  var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
   return reg.test(str.trim())
 }

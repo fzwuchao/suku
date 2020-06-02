@@ -22,10 +22,24 @@ class UserService extends BaseService {
 
     return user;
   }
+  async getUserByUsername(username) {
+    const [ user ] = await this.app.model.User.findAll({
+      where: {
+        username,
+      },
+    });
 
+    return user;
+  }
   async getUsersPage(pid, pageSize, pageNum) {
-
-    const result = await this.findAndCountAll('User', pageSize, pageNum, { pid });
+    const attributes = [ 'id', 'pid', 'pname', 'name', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];
+    const result = await this.findAndCountAll('User', pageSize, pageNum, {
+      attributes,
+      where: { pid },
+      include: {
+        model: this.app.model.Role,
+      },
+    });
     return result;
   }
 

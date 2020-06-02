@@ -17,16 +17,18 @@ module.exports = app => {
       allowNull: false,
       comment: '角色英文名',
     },
-    guard_name: {
+    guardName: {
       type: STRING(30),
+      field: 'guard_name',
       comment: '',
     },
     level: {
       type: TINYINT(1),
       comment: '角色等级',
     },
-    display_name: {
+    displayName: {
       type: STRING(30),
+      field: 'display_name',
       allowNull: false,
       comment: '角色中文名',
     },

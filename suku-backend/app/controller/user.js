@@ -31,5 +31,17 @@ class UserController extends BaseController {
     const result = await ctx.service.user.getUsersPage(user.id, pageSize, pageNum);
     this.success(result, '');
   }
+  async getUserByUsername() {
+    const { ctx } = this;
+    const { request } = ctx;
+    const { username } = request.query;
+    const result = await ctx.service.user.getUserByUsername(username);
+    if (result) {
+      this.success({ exit: true }, '用户名已经存在');
+    } else {
+      this.success({ exit: false }, '用户名可用');
+    }
+
+  }
 }
 module.exports = UserController;
