@@ -21,7 +21,8 @@ class SimController extends BaseController {
   // 查询
   async search() {
     const { ctx } = this;
-    const { request, service } = ctx;
+    const { request, service, helper } = ctx;
+    const { pageRules } = helper.rules;
 
     const rule = {
       simId: {
@@ -46,12 +47,7 @@ class SimController extends BaseController {
       activeMenuName: {
         type: 'string?',
       },
-      pageNum: {
-        type: 'int',
-      },
-      pageSize: {
-        type: 'int',
-      },
+      ...pageRules,
     };
 
     const params = Object.keys(rule).reduce((acc, cur) => {
