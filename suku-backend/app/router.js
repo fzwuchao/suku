@@ -29,10 +29,10 @@ module.exports = app => {
   router.get('/permission', controller.permission.getPermission);
 
   // 创建sim卡
-  router.post('/saveSim', controller.sim.save);
+  router.post('/sim/save', controller.sim.save);
 
   // 查询sim卡
-  router.get('/searchSim', controller.sim.search);
+  router.get('/sim/search', controller.sim.search);
 
   // 获取用户列表
   router.get('/user/searchUser', controller.user.getUserlist);

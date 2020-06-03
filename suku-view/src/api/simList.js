@@ -1,4 +1,4 @@
 export default {
-    SIM_LIST: "/admin/sim/list",
+    SIM_LIST: "/sim/search",
     WRITE_LIST: "/admin/sim/writelist"
 }
