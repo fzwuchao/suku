@@ -48,7 +48,7 @@ module.exports = app => {
       field: 'float_price',
 
     },
-    uuid: STRING(30),
+    uuid: STRING(50),
     roleId: {
       type: INTEGER(20), // '角色id',
       field: 'role_id',

@@ -50,24 +50,24 @@
           placeholder="请选择"
         >
           <el-option
-            label="运营商"
-            :value="1"
-          >运营商</el-option>
-          <el-option
-            label="经销商"
-            :value="2"
-          >经销商</el-option>
+            :label="item.displayName"
+            v-for="(item,index) in roleList"
+            :key="index"
+            :value="item.id"
+          >{{item.displayName}}</el-option>
         </el-select>
       </el-form-item>
       <el-form-item
         label="密码"
         prop="password"
+        v-if="!user.id"
       >
         <el-input v-model="user.password"></el-input>
       </el-form-item>
       <el-form-item
         label="确认密码"
         prop="password2"
+        v-if="!user.id"
       >
         <el-input v-model="user.password2"></el-input>
       </el-form-item>
@@ -91,59 +91,57 @@ export default {
   },
   data() {
     let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
+      if (value && value.trim() && !validateTel(value)) {
         callback("请输入正确的手机号");
       } else {
         callback();
       }
     };
     let checkEmail = (rule, value, callback) => {
-      if (!validateEmail(value)) {
+      if (value && value.trim() && !validateEmail(value)) {
         callback("请输入正确的邮箱");
       } else {
         callback();
       }
     };
     let checkUsername = (rule, value, callback) => {
-      if(value.trim() == '') {
+      if((value && value.trim() == '') || !value) {
         callback("请输入用户名");
       }
-      this.axios({
-            method: "post",
-            data: {username:value},
-            url: API.USERS.GET_USER_BY_USERNAME
-          }).then((r) => {
-            if(r.data.exit) {
-              callback(r.msg);
-            } else {
-              callback();
-            }
-          });
+      if(!this.initUsername || this.initUsername != this.user.username){
+        this.axios({
+          method: "get",
+          params: {username:value},
+          url: API.USERS.GET_USER_BY_USERNAME
+        }).then((r) => {
+          if(r.data.exit) {
+            callback(r.msg);
+          } else {
+            callback();
+          }
+        });
+      }
+      callback();
     };
     return {
       user: {
-        "id": 1,
-        "name": "游lan",
-        "username": "youlan",
+        "id": null,
+        "name": "",
+        "username": "",
         "email": "",
         "mchId": "",
-        "rate": "0.00",
-        "password":'',
-        "password2":'',
-        "roleId":2      
+        "rate": "",
+        "password": '',
+        "password2": '',
+        "roleId": null      
       },
+      initUsername: '',
       rules: {
         username: [
-          {  validator: checkUsername,  trigger: "blur" }
+          { required: true, validator: checkUsername,  trigger: "blur" }
         ],
         name: [
           { required: true, message: "请输入昵称", trigger: "blur" }
-        ],
-        password: [
-          { required: true, message: "请输入密码", trigger: "blur" }
-        ],
-        password2: [
-          { required: true, message: "请输入密码", trigger: "blur" }
         ],
         phone:[
           {validator: checkPhone, trigger: 'blur'}
@@ -151,12 +149,13 @@ export default {
         email:[
           {validator: checkEmail, trigger: 'blur'}
         ]
-      }
+      },
+      roleList:[]
     };
   },
   methods: {
     checkPassword() {
-      if(this.user.password !== this.user.password2) {
+      if( this.user.password !== this.user.password2) {
         this.$message({
           showClose: true,
           message: '两次密码输入的值不一致，请重新输入',
@@ -166,18 +165,44 @@ export default {
       }
       return true;
     },
+    getUserInfo(id) {
+      this.axios({
+        method: "get",
+        params: {
+          id
+        },
+        url: API.USERS.GET_USER_BY_ID
+      }).then((r) => {
+        this.user = r.data
+      });
+    },
+    getRoles() {
+      this.axios({
+        method: "get",
+        url: API.USERS.GET_ROLES
+      }).then((r) => {
+        this.roleList = r.data
+        if(r.data && !this.user.roleId) {
+          this.user.roleId = this.roleList[0].id
+        }
+      });
+    },
     submit() {
       // this.$router.push("/system/userList");
       this.$refs["ruleForm"].validate(valid => {
+       
         if (valid && this.checkPassword()) {
           let data = this.user;
           delete this.user.password2;
+          if(this.user.id) {
+            delete this.user.password
+          }
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
+            url: API.USERS.USER_SAVE
           }).then(() => {
-            this.$router.push("/demand/list");
+            this.$router.push("/system/userList");
           });
         } else {
           return false;
@@ -185,7 +210,17 @@ export default {
       });
     }
   },
-  mounted() {}
+  mounted() {
+
+  },
+  created() {
+    let { id } = this.$route.params;
+    if(id) {
+      this.user.id = id;
+      this.getUserInfo(id)
+    }
+    this.getRoles()
+  }
 };
 </script>
 

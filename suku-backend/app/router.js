@@ -35,13 +35,17 @@ module.exports = app => {
   router.get('/searchSim', controller.sim.search);
 
   // 获取用户列表
-  router.get('/searchUser', controller.user.getUserlist);
+  router.get('/user/searchUser', controller.user.getUserlist);
   // 根据用户名获取用户
-  router.get('/getUserByUsername', controller.user.getUserByUsername);
+  router.get('/user/getUserByUsername', controller.user.getUserByUsername);
+  // 根据用户Id获取用户
+  router.get('/user/getUserById', controller.user.getUserById);
+  // 保存或者更新用户
+  router.post('/user/save', controller.user.save);
 
 
   // 获取权限列表
-  router.get('/searchRole', controller.role.getRolelist);
+  router.get('/role/searchRole', controller.role.getRolelist);
   // 获取当前用户的下级权限
-  router.get('/getRoles', controller.role.getAllRoles);
+  router.get('/role/getRoles', controller.role.getAllRoles);
 };

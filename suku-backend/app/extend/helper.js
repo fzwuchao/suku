@@ -1,5 +1,7 @@
 'use strict';
 
+const rules = require('./rules')();
+
 // 判断是否是json字符串
 const isJSON = str => {
   if (typeof str === 'string') {
@@ -70,4 +72,5 @@ module.exports = {
   CONST,
   pageQueryModel,
   pageModel,
+  rules,
 };

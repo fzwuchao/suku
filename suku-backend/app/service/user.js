@@ -1,6 +1,7 @@
 'use strict';
 
-// const uuid = require('uuid');
+const uuid = require('uuid');
+const MD5 = require('md5');
 // const path = require('path');
 
 const BaseService = require('../core/baseService');
@@ -31,8 +32,18 @@ class UserService extends BaseService {
 
     return user;
   }
+  async getUserById(id) {
+    const attributes = [ 'id', 'phone', 'name', 'username', 'email', 'mchId', 'rate' ];
+    const [ user ] = await this.app.model.User.findAll({ attributes,
+      where: {
+        id,
+      },
+    });
+
+    return user;
+  }
   async getUsersPage(pid, pageSize, pageNum) {
-    const attributes = [ 'id', 'pid', 'pname', 'name', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];
+    const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];
     const result = await this.findAndCountAll('User', pageSize, pageNum, {
       attributes,
       where: { pid },
@@ -41,6 +52,26 @@ class UserService extends BaseService {
       },
     });
     return result;
+  }
+
+  async create(user) {
+    //  try {
+    user.uuid = uuid();
+    user.password = MD5(user.username + user.password + 'sukuwulian');
+    await this.app.model.User.create(user);
+    // } catch (e) {
+    //   return false;
+    // }
+    return true;
+  }
+
+  async update(user) {
+    try {
+      await this.app.model.User.update(user, { where: { id: user.id } });
+    } catch (e) {
+      return false;
+    }
+    return true;
   }
 
   /*  // 导入数据
