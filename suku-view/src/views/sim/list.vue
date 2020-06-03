@@ -34,51 +34,59 @@
       <el-table-column
         align="left"
         fixed="left"
-        label="simk卡号"
+        label="Sim卡号"
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.sim_id}}</template>
+        <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
       <el-table-column align="left" label="状态" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.net_status }}</template>
+        <template slot-scope="scope">{{ scope.row.netStatus }}</template>
       </el-table-column>
-      <el-table-column align="left" label="开关机" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.openStatus}}</template>
+      <el-table-column align="left" label="流量服务关停状态" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.flowServStatus}}</template>
       </el-table-column>
       <el-table-column align="left" label="平台状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.cardStatus}}</template>
       </el-table-column>
-      <el-table-column align="left" label="套餐" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.menu_name}}</template>
+      <el-table-column align="left" label="激活套餐名" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.activeMenuName}}</template>
       </el-table-column>
-      <el-table-column align="left" label="总流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.month_sum_flow }}</template>
+
+      <el-table-column align="left" label="过期时间" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.activeTime }}</template>
       </el-table-column>
-      <el-table-column align="left" label="套餐流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.menu_flow }}</template>
+      <el-table-column align="left" label="激活时间" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.overdueTime }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="续费价格" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="用户" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.username }}</template>
+      </el-table-column>
+
+      <el-table-column align="left" label="当月流量阈" show-overflow-tooltip>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} ${scope.row.monthSumFlowThresholdUnit ? scope.row.monthSumFlowThresholdUnit : 'M'} ` }}</template>
       </el-table-column>
       <el-table-column align="left" label="叠加流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.overlap_flow }}</template>
-      </el-table-column>
-      <el-table-column align="left" label="已用流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.month_used_flow}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthOverlapFlow : 0} ${scope.row.monthOverlapFlowUnit ? scope.row.monthOverlapFlowUnit : 'M'}` }}</template>
       </el-table-column>
       <el-table-column align="left" label="剩余流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.shengyu_flow}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} ${scope.row.monthShengyuFlowUnit ? scope.row.monthSumFlowThresholdUnit : 'M'}`}}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType == 'B'" label="余额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.month_used_flow}}</template>
+        <template slot-scope="scope">{{ `¥: ${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType == 'B'" label="总语音" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.month_sum_flow }}</template>
+        <template slot-scope="scope">{{ `${scope.row.voice_flow} ${voiceFlowUnit}` }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType == 'B'" label="已用语音" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.menu_flow }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType == 'B'" label="剩余语音" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.overlap_flow }}</template>
+        <template slot-scope="scope">{{ `${scope.row.shengyuVoice} ${scope.row.shengyuVoiceUnit}` }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType == 'B'" label="语音状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.shengyu_flow}}</template>
@@ -92,18 +100,7 @@
       >
         <template slot-scope="scope">{{ scope.row.shengyu_flow}}</template>
       </el-table-column>
-      <el-table-column align="left" label="续费价格" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.renew_price}}</template>
-      </el-table-column>
-      <el-table-column align="left" label="过期时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.overdue_time}}</template>
-      </el-table-column>
-      <el-table-column align="left" label="激活时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.active_time}}</template>
-      </el-table-column>
-      <el-table-column align="left" label="用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.username}}</template>
-      </el-table-column>
+      
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
           <el-button type="text" @click="editSim(scope.row)" size="small">编辑</el-button>
@@ -119,7 +116,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -140,7 +137,6 @@ export default {
     return {
       pageNum: 1,
       simType: "A",
-      pageTotal: 1,
       pageSize: 10,
       importDialog: false,
       tableHeight: null,
@@ -154,20 +150,20 @@ export default {
           value: ""
         },
         {
-          name: "simIds",
+          name: "simIdRange",
           title: "sim卡段号",
           type: "inputRange",
           values: []
         },
 
         {
-          name: "menuCard",
+          name: "activeMenuName",
           title: "套餐",
           type: "inputText",
           values: ""
         },
         {
-          name: "userName",
+          name: "username",
           title: "用户",
           type: "inputText",
           values: ""
@@ -216,18 +212,21 @@ export default {
     editSim(row) {
       this.$router.push(`/sim/editinfo/${this.simType}/${row.sim_id}`);
     },
-    getlist() {
+    getlist(val) {
+      let params = {}
+      if (val) params = { ...val };
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          simType: this.simType,
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+          ...params,
         },
         url: API.SIMLIST.SIM_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = r.data.list;
       });
     },
     handleSelectionChange(val) {

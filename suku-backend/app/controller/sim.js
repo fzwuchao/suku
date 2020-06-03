@@ -40,6 +40,12 @@ class SimController extends BaseController {
       isActive: {
         type: 'int?',
       },
+      simType: {
+        type: 'string?',
+      },
+      activeMenuName: {
+        type: 'string?',
+      },
       pageNum: {
         type: 'int',
       },
@@ -49,8 +55,8 @@ class SimController extends BaseController {
     };
 
     const params = Object.keys(rule).reduce((acc, cur) => {
-      if (cur in request.query) {
-        acc[cur] = rule[cur].type.includes('array') ? request.queries[cur] : request.query[cur];
+      if (cur in request.query || cur in request.queries) {
+        acc[cur] = rule[cur].type.includes('array') ? request.queries[`${cur}`] : request.query[cur];
       }
       return acc;
     }, {});

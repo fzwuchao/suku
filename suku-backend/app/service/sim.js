@@ -20,7 +20,7 @@ class SimService extends BaseService {
    * }
    * @return {{count, rows}} - 总条数，一页的数据
    */
-  async getSimPageData({ simId, simIdRange, username, netStatus, isActive, pageSize, pageNum }) {
+  async getSimPageData({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
     const { Sequelize: { Op } } = this.app.model;
     const condition = {};
 
@@ -64,6 +64,17 @@ class SimService extends BaseService {
       };
     }
 
+    if (simType !== undefined) {
+      condition['simType'] = {
+        [Op.eq]: simType,
+      };
+    }
+
+    if (activeMenuName !== undefined) {
+      condition['activeMenuName'] = {
+        [Op.substring]: activeMenuName,
+      };
+    }
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, condition);
 
     return simData;
