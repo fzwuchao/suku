@@ -85,7 +85,6 @@ export default {
   },
   filters: {
     getRoleName(role) {
-      debugger
       return role.display_name;
     }
   },
