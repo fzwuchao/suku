@@ -32,6 +32,7 @@ function createRouter(item) {
     if (item.redirect) {
         router.redirect = item.redirect
     }
+    debugger
     // if (!item.subMenuList || item.subMenuList.length === 0) {
     if (item.menuView) {
         router.component = _import(item.menuView)

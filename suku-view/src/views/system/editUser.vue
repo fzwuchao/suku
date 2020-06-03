@@ -1,39 +1,81 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="user" :rules="rules" ref="ruleForm">
-      <el-form-item label="昵称" prop="name">
+    <el-form
+      label-width="130px"
+      :model="user"
+      :rules="rules"
+      ref="ruleForm"
+    >
+      <el-form-item
+        label="昵称"
+        prop="name"
+      >
         <el-input v-model="user.name"></el-input>
       </el-form-item>
-      <el-form-item label="用户名" prop="username">
+      <el-form-item
+        label="用户名"
+        prop="username"
+      >
         <el-input v-model="user.username"></el-input>
       </el-form-item>
-      <el-form-item label="手机号" prop="phone">
+      <el-form-item
+        label="手机号"
+        prop="phone"
+      >
         <el-input v-model="user.phone"></el-input>
       </el-form-item>
-      <el-form-item label="邮箱" prop="email">
+      <el-form-item
+        label="邮箱"
+        prop="email"
+      >
         <el-input v-model="user.email"></el-input>
       </el-form-item>
-      <el-form-item label="分成率" prop="rate">
+      <el-form-item
+        label="分成率"
+        prop="rate"
+      >
         <el-input v-model="user.rate"></el-input>
       </el-form-item>
-      <el-form-item label="商户号" prop="mch_id">
-        <el-input v-model="user.mch_id"></el-input>
+      <el-form-item
+        label="商户号"
+        prop="mchId"
+      >
+        <el-input v-model="user.mchId"></el-input>
       </el-form-item>
       <el-form-item label="权限">
-        <el-select v-model="user.role_id" clearable placeholder="请选择">
-          <el-option label="运营商" :value="1">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+        <el-select
+          v-model="user.roleId"
+          clearable
+          placeholder="请选择"
+        >
+          <el-option
+            label="运营商"
+            :value="1"
+          >运营商</el-option>
+          <el-option
+            label="经销商"
+            :value="2"
+          >经销商</el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="密码" prop="pws">
-        <el-input v-model="user.pws"></el-input>
+      <el-form-item
+        label="密码"
+        prop="password"
+      >
+        <el-input v-model="user.password"></el-input>
       </el-form-item>
-      <el-form-item label="确认密码" prop="pws2">
-        <el-input v-model="user.pws2"></el-input>
+      <el-form-item
+        label="确认密码"
+        prop="password2"
+      >
+        <el-input v-model="user.password2"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button
+          type="primary"
+          @click="submit"
+        >提交</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -41,54 +83,95 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
-// import { validateTel } from "../../utils/validate.js";
+import API from "@/api";
+import { validateTel ,validateEmail} from "../../utils/validate.js";
 export default {
   components: {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
+    let checkPhone = (rule, value, callback) => {
       if (!validateTel(value)) {
         callback("请输入正确的手机号");
       } else {
         callback();
       }
-    }; */
+    };
+    let checkEmail = (rule, value, callback) => {
+      if (!validateEmail(value)) {
+        callback("请输入正确的邮箱");
+      } else {
+        callback();
+      }
+    };
+    let checkUsername = (rule, value, callback) => {
+      if(value.trim() == '') {
+        callback("请输入用户名");
+      }
+      this.axios({
+            method: "post",
+            data: {username:value},
+            url: API.USERS.GET_USER_BY_USERNAME
+          }).then((r) => {
+            if(r.data.exit) {
+              callback(r.msg);
+            } else {
+              callback();
+            }
+          });
+    };
     return {
       user: {
-        id: 25,
-        pid: 2,
-        level: 2,
-        username: "test",
-        phone: "13707949965",
-        name: "系统管理员",
-        email: null,
-        open_msg: 1,
-        mch_id: "1230000109",
-        rate: 0.5,
-        float_price: "0.00",
-        uuid: "deaff25c-335d-35e0-bad4-3d359461ac3c",
-        created_at: "2019-08-22 15:08:13",
-        updated_at: "2019-10-31 17:18:41",
-        role_id: 1,
-        parent_name: "系统管理员",
-        open_msg_text: "<span style='color:green'>已开通</span>",
-        role_name: "1"
+        "id": 1,
+        "name": "游lan",
+        "username": "youlan",
+        "email": "",
+        "mchId": "",
+        "rate": "0.00",
+        "password":'',
+        "password2":'',
+        "roleId":2      
       },
       rules: {
         username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
+          {  validator: checkUsername,  trigger: "blur" }
+        ],
+        name: [
+          { required: true, message: "请输入昵称", trigger: "blur" }
+        ],
+        password: [
+          { required: true, message: "请输入密码", trigger: "blur" }
+        ],
+        password2: [
+          { required: true, message: "请输入密码", trigger: "blur" }
+        ],
+        phone:[
+          {validator: checkPhone, trigger: 'blur'}
+        ],
+        email:[
+          {validator: checkEmail, trigger: 'blur'}
         ]
       }
     };
   },
   methods: {
+    checkPassword() {
+      if(this.user.password !== this.user.password2) {
+        this.$message({
+          showClose: true,
+          message: '两次密码输入的值不一致，请重新输入',
+          type: 'error'
+        });
+        return false;
+      }
+      return true;
+    },
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
-        if (valid) {
+      // this.$router.push("/system/userList");
+      this.$refs["ruleForm"].validate(valid => {
+        if (valid && this.checkPassword()) {
           let data = this.user;
+          delete this.user.password2;
           this.axios({
             method: "post",
             data: data,
@@ -99,7 +182,7 @@ export default {
         } else {
           return false;
         }
-      }); */
+      });
     }
   },
   mounted() {}

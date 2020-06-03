@@ -30,7 +30,7 @@ class LoginController extends BaseController {
       // const permissions = await ctx.service.permission.getPermission(user.roleId);
 
       if (token === null) {
-        this.fail(null, 'token设置失败');
+        this.fail(1002, null, 'token设置失败');
       } else {
         this.success(loginUserInfo, '登录成功', { token });
       }
@@ -38,7 +38,7 @@ class LoginController extends BaseController {
       return;
     }
 
-    this.fail(null, '用户名或密码错误');
+    this.fail(1002, null, '用户名或密码错误');
   }
 
   // 退出

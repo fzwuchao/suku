@@ -32,5 +32,13 @@ class UserController extends BaseController {
     const result = await ctx.service.role.getRolesPage(role.level, pageSize, pageNum);
     this.success(result, '');
   }
+
+  async getAllRoles() {
+    const { ctx } = this;
+    const user = this.getCurUser();
+    const role = await ctx.service.role.getRoleInfo(user.roleId);
+    const result = await ctx.service.role.getRoles(role.level);
+    this.success(result, '');
+  }
 }
 module.exports = UserController;
