@@ -1,6 +1,6 @@
 'use strict';
 
-const BaseController = require('../core/base_controller');
+const BaseController = require('../core/baseController');
 
 class PermissionController extends BaseController {
   // 获取验证码

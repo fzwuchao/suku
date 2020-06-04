@@ -77,28 +77,16 @@
         <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} ${scope.row.monthShengyuFlowUnit ? scope.row.monthSumFlowThresholdUnit : 'M'}`}}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType == 'B'" label="余额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `¥: ${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="总语音" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.voice_flow} ${voiceFlowUnit}` }}</template>
+      <el-table-column align="left" v-if="simType == 'B'" label="当月语间时长阈" show-overflow-tooltip>
+        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} ${scope.row.monthVoiceDurationThresholdUnit ? scope.row.monthVoiceDurationThresholdUnit : 'Min'}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="已用语音" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.menu_flow }}</template>
+      <el-table-column align="left" v-if="simType == 'B'" label="当月剩余语音时长" show-overflow-tooltip>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0} ${scope.row.monthShengyuVoiceDurationUnit ? scope.row.monthShengyuVoiceDurationUnit : 'Min'}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="剩余语音" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.shengyuVoice} ${scope.row.shengyuVoiceUnit}` }}</template>
-      </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="语音状态" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.shengyu_flow}}</template>
-      </el-table-column>
-      <el-table-column
-        align="left"
-        v-if="simType == 'b'"
-        min-width="120px"
-        label="平台语音状态"
-        show-overflow-tooltip
-      >
-        <template slot-scope="scope">{{ scope.row.shengyu_flow}}</template>
+      <el-table-column align="left" v-if="simType == 'B'" label="语音服务关停状态" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.voiceServStatus}}</template>
       </el-table-column>
       
       <el-table-column fixed="right" label="操作" width="100">
@@ -121,7 +109,7 @@
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
 
-    <el-dialog :title="'导入'+ (simType == 'b' ? '主叫卡': '被叫卡')" :visible.sync="importDialog">
+    <el-dialog :title="'导入'+ (simType == 'B' ? '主叫卡': '被叫卡')" :visible.sync="importDialog">
       <com-import :type="simType"></com-import>
     </el-dialog>
   </div>
@@ -244,7 +232,9 @@ export default {
   },
   watch: {
     type: function(newVal) {
+      const isSame = this.simType === newVal;
       this.simType = newVal;
+      !isSame && this.getlist();
     }
   },
   created() {

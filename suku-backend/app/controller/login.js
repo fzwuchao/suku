@@ -1,6 +1,6 @@
 'use strict';
 
-const BaseController = require('../core/base_controller');
+const BaseController = require('../core/baseController');
 
 class LoginController extends BaseController {
   // 登录
