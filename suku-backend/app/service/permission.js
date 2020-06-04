@@ -12,18 +12,20 @@ class PermissionService extends BaseService {
     const { Role, Permission, RolePermissionMap } = this.app.model;
     Role.belongsToMany(Permission, {
       through: RolePermissionMap,
-      foreignKey: 'role_id',
+      foreignKey: 'roleId',
     });
     Permission.belongsToMany(Role, {
       through: RolePermissionMap,
-      foreignKey: 'permission_id',
+      foreignKey: 'permissionId',
     });
     const [ role ] = await Role.findAll({
       where: {
         id: roleId,
       },
       include: Permission,
-      through: { attributes: [] },
+      through: {
+        attributes: [],
+      },
     });
     const map = {};
     if (role) {
