@@ -51,6 +51,44 @@ class UserController extends BaseController {
     }
   }
 
+  async updateOpenmsg() {
+    const { ctx } = this;
+    const { request } = ctx;
+    const rule = {
+      ids: {
+        type: 'array',
+        itemType: 'int',
+      },
+      openMsg: {
+        type: 'int',
+      },
+    };
+    // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
+    ctx.validate(rule, request.body);
+    const { ids, openMsg } = request.body;
+    const result = await ctx.service.user.bulkUpdate(ids, openMsg, 'openMsg');
+    this.success(result, '');
+  }
+
+  async updateAutoTransfer() {
+    const { ctx } = this;
+    const { request } = ctx;
+    const rule = {
+      ids: {
+        type: 'array',
+        itemType: 'int',
+      },
+      autoTransfer: {
+        type: 'int',
+      },
+    };
+    // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
+    ctx.validate(rule, request.body);
+    const { ids, autoTransfer } = request.body;
+    const result = await ctx.service.user.bulkUpdate(ids, autoTransfer, 'autoTransfer');
+    this.success(result, '');
+  }
+
   async getUserByUsername() {
     const { ctx } = this;
     const { request } = ctx;

@@ -3,8 +3,9 @@
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
       <el-button type="primary" size="mini" @click.native="addUser">增加</el-button>
-      <el-button type="primary" size="mini">开通短信</el-button>
-      <el-button type="primary" size="mini">开启自动转账（只有管理员才有权限）</el-button>
+      <el-button type="primary" size="mini" @click.native="openMsg">开通短信</el-button>
+      <el-button type="primary" size="mini" @click.native="openAutoTransfer(1)">开启自动转账</el-button>
+      <el-button type="primary" size="mini" @click.native="openAutoTransfer(0)">关闭自动转账</el-button>
     </div>
 
     <el-table
@@ -98,6 +99,41 @@ export default {
     addUser() {
       this.$router.push(`/system/adduser`);
     },
+    openAutoTransfer(value) {
+      this.axios({
+        method: "post",
+        data: {
+          ids: this.multipleSelection,
+          autoTransfer: value
+        },
+        url: API.USERS.UPDATE_AUTO_TRANSFER
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: '设置成功',
+          type: 'success'
+        });
+      });
+    },
+    openMsg(){
+      this.axios({
+        method: "post",
+        data: {
+          ids: this.multipleSelection,
+          openMsg: 1
+        },
+        url: API.USERS.UPDATE_OPENMSG
+      }).then(() => {
+        debugger
+        this.$message({
+          showClose: true,
+          message: '设置成功',
+          type: 'success',
+          duration: 0
+        });
+      });
+      
+    },
     getlist() {
       this.axios({
         method: "get",
@@ -113,7 +149,10 @@ export default {
       });
     },
     handleSelectionChange(val) {
-      this.multipleSelection = val;
+      this.multipleSelection = [];
+      for(let i = 0;i < val.length; i++) {
+        this.multipleSelection.push(val[i].id)
+      }
     },
     viewItem(item, column, event) {
       const { type } = event;

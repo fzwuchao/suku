@@ -5,5 +5,8 @@ export default {
     USER_SAVE: "user/save",
     GET_ROLES: "/role/getRoles",
     GET_USER_BY_USERNAME: "/user/getUserByUsername",
-    GET_USER_BY_ID: "/user/getUserById"
+    GET_USER_BY_ID: "/user/getUserById",
+    UPDATE_OPENMSG:"/user/updateOpenmsg",
+    UPDATE_AUTO_TRANSFER:"/user/updateAutoTransfer"
+    
 }

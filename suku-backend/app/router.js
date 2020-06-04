@@ -42,7 +42,10 @@ module.exports = app => {
   router.get('/user/getUserById', controller.user.getUserById);
   // 保存或者更新用户
   router.post('/user/save', controller.user.save);
-
+  // 批量开启短讯
+  router.post('/user/updateOpenmsg', controller.user.updateOpenmsg);
+  // 启用停用自动转账
+  router.post('/user/updateAutoTransfer', controller.user.updateAutoTransfer);
 
   // 获取权限列表
   router.get('/role/searchRole', controller.role.getRolelist);

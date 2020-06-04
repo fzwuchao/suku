@@ -202,6 +202,11 @@ export default {
             data: data,
             url: API.USERS.USER_SAVE
           }).then(() => {
+            this.$message({
+              showClose: true,
+              message: '保存成功',
+              type: 'success'
+            });
             this.$router.push("/system/userList");
           });
         } else {
