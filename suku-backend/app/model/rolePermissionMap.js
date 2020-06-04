@@ -6,20 +6,24 @@ module.exports = app => {
   const { DATE, BIGINT } = app.Sequelize;
 
   const RolePermissionMap = app.model.define('role_permission_map', {
-    role_id: {
+    roleId: {
       type: BIGINT(20),
+      field: 'role_id',
       comment: '角色id',
     },
-    permission_id: {
+    permissionId: {
       type: BIGINT(20),
+      field: 'permission_id',
       comment: '权限id',
     },
-    created_at: {
+    createdAt: {
       type: DATE,
+      field: 'created_at',
       comment: '创建时间',
     },
-    updated_at: {
+    updatedAt: {
       type: DATE,
+      field: 'updated_at',
       comment: '更新时间',
     },
   }, {

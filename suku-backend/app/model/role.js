@@ -32,15 +32,17 @@ module.exports = app => {
       allowNull: false,
       comment: '角色中文名',
     },
-    created_at: {
+    createdAt: {
       type: DATE,
+      field: 'created_at',
       get() {
         return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
       },
       comment: '创建时间',
     },
-    updated_at: {
+    updatedAt: {
       type: DATE,
+      field: 'updated_at',
       get() {
         return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
       },

@@ -22,7 +22,6 @@ module.exports = (options, app) => {
         return;
       }
 
-      // 未过期的话，再重新设置超时时间为半个小时
       ctx.service.token.resetExpire(tokenName);
     }
 
