@@ -754,7 +754,7 @@ export default {
                 "menuStatus": null,
                 "menuOrder": 1,
                 "parentId": 5,
-                "menuType": 1, // 1:菜单，2:按钮
+                "menuType": 2, // 1:菜单，2:按钮
                 "status": 0,
                 subMenuList: []
             }]

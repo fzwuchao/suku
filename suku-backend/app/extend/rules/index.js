@@ -1,5 +1,6 @@
 'use strict';
 const user = require('./user');
+const onelink = require('./onelink');
 const pageRules = {
   pageNum: {
     type: 'int',
@@ -9,5 +10,5 @@ const pageRules = {
   },
 };
 module.exports = () => {
-  return { pageRules, user };
+  return { pageRules, user, onelink };
 };

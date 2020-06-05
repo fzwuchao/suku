@@ -113,6 +113,7 @@ export default {
           message: '设置成功',
           type: 'success'
         });
+        this.getlist();
       });
     },
     openMsg(){
@@ -124,13 +125,12 @@ export default {
         },
         url: API.USERS.UPDATE_OPENMSG
       }).then(() => {
-        debugger
         this.$message({
           showClose: true,
           message: '设置成功',
-          type: 'success',
-          duration: 0
+          type: 'success'
         });
+        this.getlist();
       });
       
     },

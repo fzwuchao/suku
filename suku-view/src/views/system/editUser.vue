@@ -62,14 +62,14 @@
         prop="password"
         v-if="!user.id"
       >
-        <el-input v-model="user.password"></el-input>
+        <el-input type="password" v-model="user.password"></el-input>
       </el-form-item>
       <el-form-item
         label="确认密码"
         prop="password2"
         v-if="!user.id"
       >
-        <el-input v-model="user.password2"></el-input>
+        <el-input type="password" v-model="user.password2"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button

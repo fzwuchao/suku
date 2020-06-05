@@ -1,30 +1,24 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="user" :rules="rules" ref="ruleForm">
+    <el-form label-width="130px" :model="onelink" :rules="rules" ref="ruleForm">
       <el-form-item label="名称" prop="name">
-        <el-input v-model="user.name"></el-input>
+        <el-input v-model="onelink.name" placeholder="请输入平台名称"></el-input>
       </el-form-item>
-      <el-form-item label="appid" prop="username">
-        <el-input v-model="user.username"></el-input>
+      <el-form-item label="appId" prop="appId">
+        <el-input v-model="onelink.appId" placeholder="请输入appId"></el-input>
       </el-form-item>
-      <el-form-item label="密钥" prop="phone">
-        <el-input v-model="user.phone"></el-input>
+      <el-form-item label="密钥" prop="secretKey">
+        <el-input v-model="onelink.secretKey" placeholder="请输入接口密钥"></el-input>
       </el-form-item>
-      <el-form-item label="接口版本号" prop="email">
-        <el-input v-model="user.email"></el-input>
+      <el-form-item label="apiHost" prop="apiHost">
+        <el-input v-model="onelink.apiHost" placeholder="请输入接口地址"></el-input>
       </el-form-item>
-      <el-form-item label="token_key" prop="rate">
-        <el-input v-model="user.rate"></el-input>
+      <el-form-item label="接口版本号" prop="apiVersion">
+        <el-input v-model="onelink.apiVersion" placeholder="请输入接口版本号"></el-input>
       </el-form-item>
-      <el-form-item label="transid_key" prop="mch_id">
-        <el-input v-model="user.mch_id"></el-input>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select v-model="user.role_id" clearable placeholder="请选择">
-          <el-option label="启用" :value="1">启用</el-option>
-          <el-option label="停用" :value="2">停用</el-option>
-        </el-select>
+      <el-form-item v-if="!onelink.id" label="nameKey" prop="nameKey">
+        <el-input v-model="onelink.nameKey" placeholder="请输入redis关键字"></el-input>
       </el-form-item>
 
       <el-form-item>
@@ -36,68 +30,101 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
-// import { validateTel } from "../../utils/validate.js";
+import API from "@/api";
 export default {
   components: {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
+    let checkNamekey = (rule, value, callback) => {
+        this.axios({
+          method: "get",
+          params: {nameKey:value},
+          url: API.ONELINK.GET_ONELINK_BY_NAMEKEY
+        }).then((r) => {
+          if(r.data.exit) {
+            callback(r.msg);
+          } else {
+            callback();
+          }
+        });
+    };
     return {
-      user: {
-        id: 25,
-        pid: 2,
-        level: 2,
-        username: "test",
-        phone: "13707949965",
-        name: "系统管理员",
-        email: null,
-        open_msg: 1,
-        mch_id: "1230000109",
-        rate: 0.5,
-        float_price: "0.00",
-        uuid: "deaff25c-335d-35e0-bad4-3d359461ac3c",
-        created_at: "2019-08-22 15:08:13",
-        updated_at: "2019-10-31 17:18:41",
-        role_id: 1,
-        parent_name: "系统管理员",
-        open_msg_text: "<span style='color:green'>已开通</span>",
-        role_name: "1"
+      onelink: {
+        id: null,
+        apiHost: "",
+        apiVersion: "",
+        appId: "",
+        name: "",
+        secretKey: "",
+        nameKey: "",
       },
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
-        ]
+        apiHost: [
+          { required: true, message: "请输入接口地址", trigger: "blur" },
+          {  max: 100, message: '长度不能大于100个字符', trigger: 'blur' }
+        ],
+        apiVersion: [
+          { required: true, message: "请输入接口版本号", trigger: "blur" },
+          {  max: 30, message: '长度不能大于30个字符', trigger: 'blur' }
+        ],
+        appId: [
+          { required: true, message: "请输入接口版本号", trigger: "blur" },
+          {  max: 100, message: '长度不能大于100个字符', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: "请输入平台名称", trigger: "blur" },
+          {  max: 30, message: '长度不能大于30个字符', trigger: 'blur' }
+        ],
+        secretKey: [
+          { required: true, message: "请输入接口密钥", trigger: "blur" },
+          {  max: 100, message: '长度不能大于100个字符', trigger: 'blur' }
+        ],
+        nameKey: [
+          { required: true, message: "请输入redis关键字", trigger: "blur" },
+          {  max: 50, message: '长度不能大于50个字符', trigger: 'blur' },
+          { required: true, validator: checkNamekey,  trigger: "blur" }
+        ],
       }
     };
   },
   methods: {
+    getInfo(id) {
+      this.axios({
+        method: "get",
+        params: {
+          id
+        },
+        url: API.ONELINK.GET_ONELINK_BY_ID
+      }).then((r) => {
+        this.onelink = r.data
+      });
+    },
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          let data = this.onelink;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
+            url: API.ONELINK.SAVE
           }).then(() => {
-            this.$router.push("/demand/list");
+            this.$router.push("/system/onelinklist");
           });
         } else {
           return false;
         }
-      }); */
+      });
     }
   },
-  mounted() {}
+  mounted() {},
+  created() {
+    let { id } = this.$route.params;
+    if(id) {
+      this.onelink.id = id;
+      this.getInfo(id)
+    }
+  }
 };
 </script>
 
