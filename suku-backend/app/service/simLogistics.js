@@ -20,10 +20,23 @@ class SimLogisticsService extends BaseService {
     return simLogistics;
   }
 
-  async getSimLogisticsPage(pageSize, pageNum) {
+  async getSimLogisticsPage(query) {
     const attributes = [ 'id', 'flowNo', 'sender', 'receiver', 'total', 'logisticsNo', 'phone', 'address', 'createdAt', 'updatedAt' ];
+    const { pageSize, pageNum, flowNo, sender, receiver } = query;
+    const Op = this.getOp();
+    const where = {};
+    if (flowNo) {
+      where.flowNo = { [Op.substring]: flowNo };
+    }
+    if (sender) {
+      where.sender = { [Op.substring]: sender };
+    }
+    if (receiver) {
+      where.receiver = { [Op.substring]: receiver };
+    }
     const result = await this.findAndCountAll('SimLogistics', pageSize, pageNum, {
       attributes,
+      where,
     });
     return result;
   }

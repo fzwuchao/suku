@@ -10,8 +10,7 @@ class SimLogisticsController extends BaseController {
     const rule = helper.rules.pageRules;
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.query);
-    const { pageNum, pageSize } = request.query;
-    const result = await ctx.service.simLogistics.getSimLogisticsPage(pageSize, pageNum);
+    const result = await ctx.service.simLogistics.getSimLogisticsPage(request.query);
     this.success(result, '');
   }
 
@@ -41,7 +40,7 @@ class SimLogisticsController extends BaseController {
     const rule = helper.rules.simLogistics([ 'id' ]);
     ctx.validate(rule, request.query);
     const { id } = request.query;
-    const result = await ctx.service.simLogistics.getUserById(id);
+    const result = await ctx.service.simLogistics.getSimLogisticsById(id);
     this.success(result, '成功');
   }
 }

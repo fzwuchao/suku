@@ -21,7 +21,7 @@
         align="left"
         fixed="left"
         label="流水号"
-        min-width="120px"
+        min-width="150px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.flowNo}}</template>
@@ -36,16 +36,16 @@
       <el-table-column align="left" label="数量" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.total}}</template>
       </el-table-column>
-      <el-table-column align="left" label="物流单号" show-overflow-tooltip>
+      <el-table-column align="left" min-width="150px" label="物流单号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.logisticsNo}}</template>
       </el-table-column>
-      <el-table-column align="left" label="手机号" show-overflow-tooltip>
+      <el-table-column align="left" min-width="120px" label="手机号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.phone}}</template>
       </el-table-column>
       <el-table-column align="left" label="地址" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.address}}</template>
       </el-table-column>
-      <el-table-column align="left" label="添加时间" show-overflow-tooltip>
+      <el-table-column align="left" label="添加时间" min-width="120px" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
@@ -78,10 +78,8 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
       pageSize: 10,
-      importDialog: false,
       tableHeight: null,
       list: [],
       data: null,
@@ -120,13 +118,15 @@ export default {
     editCombo(row) {
       this.$router.push(`/warehouse/editInfo/${row.id}`);
     },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {};
+      }
+      params.pageNum = this.pageNum;
+      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize
-        },
+        params,
         url: API.SIMLOGISTICS.GET_SIMLOGISTICS_LIST
       }).then(r => {
         this.data = r.data;
@@ -136,12 +136,6 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-    },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
     }
   },
   mounted() {

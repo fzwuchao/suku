@@ -2,6 +2,7 @@
 const user = require('./user');
 const sim = require('./sim');
 const onelink = require('./onelink');
+const simLogistics = require('./simLogistics');
 
 const pageRules = {
   pageNum: {
@@ -30,5 +31,6 @@ module.exports = () => {
     user: createRule(user),
     sim: createRule(sim),
     onelink: createRule(onelink),
+    simLogistics: createRule(simLogistics),
   };
 };

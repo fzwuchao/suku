@@ -32,12 +32,20 @@
 
 <script>
 import EditBar from "../../components/EditBar";
+import { validateTel } from "../../utils/validate.js";
 import API from "@/api";
 export default {
   components: {
     EditBar
   },
   data() {
+    let checkPhone = (rule, value, callback) => {
+      if (value && value.trim() && !validateTel(value)) {
+        callback("请输入正确的手机号");
+      } else {
+        callback();
+      }
+    };
     return {
       simLogistics: {
         address: '',
@@ -48,6 +56,11 @@ export default {
         receiver: "",
         sender: "",
         total: null,
+      },
+      rules: {
+        phone:[
+          {validator: checkPhone, trigger: 'blur'}
+        ]
       }
     };
   },

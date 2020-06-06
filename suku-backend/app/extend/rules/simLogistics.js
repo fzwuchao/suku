@@ -3,6 +3,9 @@ const SimLogisticsRules = {
   id: {
     type: 'int?',
   },
+  flowNo: {
+    type: 'string?',
+  },
   sender: {
     type: 'string?', // 发卡人
   },
@@ -34,12 +37,4 @@ const SimLogisticsRules = {
     type: 'dateTime?',
   },
 };
-module.exports = retuires => {
-  const newRules = JSON.parse(JSON.stringify(SimLogisticsRules));
-  for (let i = 0; i < retuires.length; i++) {
-    const attr = retuires[i];
-    const type = newRules[attr].type;
-    newRules[attr].type = type.substr(0, type.length - 1);
-  }
-  return newRules;
-};
+module.exports = SimLogisticsRules;
