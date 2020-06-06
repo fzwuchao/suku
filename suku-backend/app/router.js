@@ -51,6 +51,8 @@ module.exports = app => {
   router.post('/user/updateOpenmsg', controller.user.updateOpenmsg);
   // 启用停用自动转账
   router.post('/user/updateAutoTransfer', controller.user.updateAutoTransfer);
+  // 获取所有用户作为查询条件
+  router.post('/user/getSelectUsers', controller.user.getSelectUsers);
 
 
   // 获取onelink配置列表
