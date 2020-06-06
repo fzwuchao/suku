@@ -31,17 +31,17 @@
         <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
       <el-table-column align="left" label="所属套餐" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simcombo}}</template>
+        <template slot-scope="scope">{{ scope.row.simCombo ? scope.row.simCombo.name : ''}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} ${scope.row.monthSumFlowThresholdUnit ? scope.row.monthSumFlowThresholdUnit : 'M'}`}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="时长" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthMin}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} ${scope.row.monthVoiceDurationThresholdUnit ? scope.row.monthVoiceDurationThresholdUnit : 'Min'}`}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="添加时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthMin}}</template>
+        <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
@@ -58,7 +58,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -73,31 +73,20 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
-      pageTotal: 1,
       pageSize: 10,
+      comboType: 1,
       importDialog: false,
       tableHeight: null,
       list: [],
       data: null,
       searchData: [
         {
-          name: "simId",
+          name: "name",
           title: "套餐包名",
           type: "inputText",
           value: ""
         },
-        {
-          name: "isActive",
-          title: "套餐",
-          type: "select",
-          values: [
-            { value: "", key: "全部" },
-            { value: "A", key: "被叫卡" },
-            { value: "B", key: "主叫卡" }
-          ],
-          active: ["A", "B"]
-        }
+        
       ]
     };
   },
@@ -115,18 +104,21 @@ export default {
     editPack(row) {
       this.$router.push(`/simcombo/editIncreasePack/${row.id}`);
     },
-    getlist() {
+    getlist(val) {
+      let params = {};
+      if (val) params = {...val};
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+          comboType: this.comboType,
+          ...params,
         },
         url: API.SIMCOMBO.COMBO_PACK_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = r.data.list;
       });
     },
     handleSelectionChange(val) {
