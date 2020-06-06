@@ -62,6 +62,11 @@ const pageModel = (data, pageSize, pageNum) => {
 const CONST = {
   MD5_PWD: 'sukuwulian',
 };
+// 获取区域内的随机整数
+function rnd(n, m) {
+  const random = Math.floor(Math.random() * (m - n + 1) + n);
+  return random;
+}
 module.exports = {
   // 登录用户
   loginUser: {
@@ -73,4 +78,5 @@ module.exports = {
   pageQueryModel,
   pageModel,
   rules,
+  rnd,
 };

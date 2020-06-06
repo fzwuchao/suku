@@ -65,6 +65,14 @@ module.exports = app => {
   router.post('/onelink/updateStatus', controller.onelinkPlatform.updateStatus);
 
 
+  // 获取sim流水
+  router.get('/simLogistics/getSimLogisticslist', controller.simLogistics.getSimLogisticslist);
+  // 根据ID获取SIM流水
+  router.get('/simLogistics/getSimLogisticsById', controller.simLogistics.getSimLogisticsById);
+  // 保存或者更新SIM流水
+  router.post('/simLogistics/save', controller.simLogistics.save);
+
+
   // 获取权限列表
   router.get('/role/searchRole', controller.role.getRolelist);
   // 获取当前用户的下级权限

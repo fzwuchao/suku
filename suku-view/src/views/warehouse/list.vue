@@ -21,32 +21,32 @@
         align="left"
         fixed="left"
         label="流水号"
-        min-width="120px"
+        min-width="150px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.flowNo}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="发卡用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.sender}}</template>
       </el-table-column>
       <el-table-column align="left" label="收卡用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.receiver}}</template>
       </el-table-column>
       <el-table-column align="left" label="数量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.total}}</template>
       </el-table-column>
-      <el-table-column align="left" label="物流单号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="150px" label="物流单号" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.logisticsNo}}</template>
       </el-table-column>
-      <el-table-column align="left" label="手机号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="120px" label="手机号" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.phone}}</template>
       </el-table-column>
       <el-table-column align="left" label="地址" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.address}}</template>
       </el-table-column>
-      <el-table-column align="left" label="添加时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" label="添加时间" min-width="120px" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
@@ -63,7 +63,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -78,28 +78,26 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
       pageSize: 10,
-      importDialog: false,
       tableHeight: null,
       list: [],
       data: null,
       searchData: [
         {
-          name: "simId1",
+          name: "flowNo",
           title: "流水号",
           type: "inputText",
           value: ""
         },
         {
-          name: "netStatus",
+          name: "sender",
           title: "发卡用户",
           type: "inputText",
           value: ""
         },
         {
-          name: "netStatus",
+          name: "receiver",
           title: "收卡用户",
           type: "inputText",
           value: ""
@@ -113,37 +111,6 @@ export default {
   components: {
     searchBar
   },
-  filters: {
-    comboType(type) {
-      type = type - 0;
-      let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
-        case 2:
-          returnStr = "叠加套餐";
-          break;
-        case 3:
-          returnStr = "特惠套餐";
-          break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
-      }
-      return returnStr;
-    }
-  },
   methods: {
     pageChange() {
       this.getlist();
@@ -151,28 +118,24 @@ export default {
     editCombo(row) {
       this.$router.push(`/warehouse/editInfo/${row.id}`);
     },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {};
+      }
+      params.pageNum = this.pageNum;
+      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params: {
-          page: this.pageNum,
-          limit: this.pageSize
-        },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        params,
+        url: API.SIMLOGISTICS.GET_SIMLOGISTICS_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-    },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
     }
   },
   mounted() {

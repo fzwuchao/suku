@@ -19,6 +19,7 @@
     "moment": "^2.26.0",
     "mysql2": "^2.1.0",
     "svg-captcha": "^1.4.0",
+    "uniqid": "^5.2.0",
     "xlsx": "^0.16.1"
   },
   "devDependencies": {

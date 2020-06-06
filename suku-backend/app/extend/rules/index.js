@@ -4,6 +4,7 @@ const sim = require('./sim');
 const onelink = require('./onelink');
 const simCombo = require('./simCombo');
 const comboPack = require('./comboPack');
+const simLogistics = require('./simLogistics');
 
 const pageRules = {
   pageNum: {
@@ -34,5 +35,6 @@ module.exports = () => {
     onelink: createRule(onelink),
     simCombo: createRule(simCombo),
     comboPack: createRule(comboPack),
+    simLogistics: createRule(simLogistics),
   };
 };
