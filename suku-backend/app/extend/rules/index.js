@@ -2,6 +2,8 @@
 const user = require('./user');
 const sim = require('./sim');
 const onelink = require('./onelink');
+const simCombo = require('./simCombo');
+const comboPack = require('./comboPack');
 const simLogistics = require('./simLogistics');
 const messageSend = require('./messageSend');
 
@@ -32,6 +34,8 @@ module.exports = () => {
     user: createRule(user),
     sim: createRule(sim),
     onelink: createRule(onelink),
+    simCombo: createRule(simCombo),
+    comboPack: createRule(comboPack),
     simLogistics: createRule(simLogistics),
     messageSend: createRule(messageSend),
   };

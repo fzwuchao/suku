@@ -15,9 +15,14 @@ module.exports = app => {
     },
     iccid: STRING(50),
     imei: STRING(50),
+    userId: {
+      type: BIGINT(20),
+      field: 'user_id',
+      comment: '用户id',
+    },
     username: {
       type: STRING(30),
-      comment: '账户名',
+      comment: '用户名',
     },
     simType: {
       type: CHAR(1),

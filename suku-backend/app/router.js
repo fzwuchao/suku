@@ -30,9 +30,14 @@ module.exports = app => {
 
   // 创建sim卡
   router.post('/sim/save', controller.sim.save);
-
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);
+
+  // 查询套餐
+  router.get('/simCombo/search', controller.simCombo.search);
+
+  // 套餐包
+  router.get('/comboPack/search', controller.comboPack.search);
 
   // 获取用户列表
   router.get('/user/searchUser', controller.user.getUserlist);

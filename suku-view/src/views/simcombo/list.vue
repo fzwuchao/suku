@@ -28,23 +28,23 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="适用卡类型" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.belongsToSimType | simType }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="套餐月流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} ${monthSumFlowThresholdUnit ? monthSumFlowThresholdUnit : 'M'}`}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="月通话时长" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthMin}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} ${monthVoiceDurationThresholdUnit ? monthVoiceDurationThresholdUnit : 'Min'}`}}</template>
       </el-table-column>
       <el-table-column align="left" label="月份长度" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.month }}</template>
+        <template slot-scope="scope">{{ scope.row.months }}</template>
       </el-table-column>
       <el-table-column align="left" label="月租" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthPrice }}</template>
+        <template slot-scope="scope">{{ scope.row.monthRent }}</template>
       </el-table-column>
       <el-table-column align="left" label="续费价格" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
@@ -64,7 +64,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -79,22 +79,21 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
-      pageTotal: 1,
       pageSize: 10,
       importDialog: false,
+      comboType: 1,
       tableHeight: null,
       list: [],
       data: null,
       searchData: [
         {
-          name: "simId",
+          name: "name",
           title: "套餐名称",
           type: "inputText",
           value: ""
         },
         {
-          name: "isActive",
+          name: "belongsToSimType",
           title: "适用卡类型",
           type: "select",
           values: [
@@ -151,18 +150,21 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
-    getlist() {
+    getlist(val) {
+      let params = {}
+      if (val) params = { ...val };
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+          comboType: this.comboType,
+          ...params
         },
         url: API.SIMCOMBO.SIM_COMBO_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = r.data.list;
       });
     },
     handleSelectionChange(val) {
@@ -180,7 +182,7 @@ export default {
   },
   watch: {
     type: function(newVal) {
-      this.simType = newVal;
+      this.comboType = newVal;
     }
   },
   created() {

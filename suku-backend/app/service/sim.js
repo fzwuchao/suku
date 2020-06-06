@@ -6,6 +6,10 @@
 const BaseService = require('../core/baseService');
 
 class SimService extends BaseService {
+  async getSimBySimId(simId) {
+    return this.app.model.Sim.findByPk(simId);
+  }
+
   /**
    * sim卡列表
    * @param { object } - 参数对象如下：

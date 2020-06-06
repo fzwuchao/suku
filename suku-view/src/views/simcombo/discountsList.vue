@@ -28,14 +28,14 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="适用卡类型" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.belongsToSimType | simType }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="添加时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.created_at}}</template>
+        <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
@@ -52,7 +52,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -67,8 +67,8 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
+      comboType: 3,
       pageSize: 10,
       importDialog: false,
       tableHeight: null,
@@ -76,13 +76,13 @@ export default {
       data: null,
       searchData: [
         {
-          name: "simId",
+          name: "name",
           title: "套餐名称",
           type: "inputText",
           value: ""
         },
         {
-          name: "isActive",
+          name: "belongsToSimType",
           title: "适用卡类型",
           type: "select",
           values: [
@@ -139,18 +139,21 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editDiscounts/${row.id}`);
     },
-    getlist() {
+    getlist(val) {
+      let params = {}
+      if (val) params = { ...val };
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+          comboType: this.comboType,
+          ...params
         },
         url: API.SIMCOMBO.SIM_COMBO_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = r.data.list;
       });
     },
     handleSelectionChange(val) {
