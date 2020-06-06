@@ -25,6 +25,13 @@ class UserController extends BaseController {
     this.success(result, '');
   }
 
+  async getSelectUsers() {
+    const { ctx } = this;
+    const user = this.getCurUser();
+    const result = await ctx.service.user.getAllUsers(user.id);
+    this.success(result, '');
+  }
+
   async save() {
     const { ctx } = this;
     const { request, helper } = ctx;

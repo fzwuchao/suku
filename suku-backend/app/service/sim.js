@@ -76,7 +76,7 @@ class SimService extends BaseService {
       };
     }
 
-    const whereCondition = {}
+    const whereCondition = {};
 
     if (Object.keys(condition).length > 0) whereCondition.where = condition;
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-trailing-spaces */
 /* eslint-disable dot-notation */
 'use strict';
 
@@ -8,9 +9,9 @@ class SimComboService extends BaseService {
    * 获取套餐信息
    * @param {object} - 参数对像
    * object: {
-   *  simType: sim类型，主叫卡，被叫卡
-   *  name: 套餐名称
-   *  comboType: 套餐类型
+   *  simType: sim类型，主叫卡，被叫卡,
+   * name: 套餐名称,
+   *  comboType: 套餐类型,
    * } 
    */
   async getSimComboPageData({ simType, name, comboType, pageSize, pageNum }) {

@@ -42,6 +42,16 @@ class UserService extends BaseService {
 
     return user;
   }
+  async getAllUsers(pid) {
+    const attributes = [[ 'id', 'value' ], [ 'name', 'key' ]];
+    const [ user ] = await this.app.model.User.findAll({ attributes,
+      where: {
+        pid,
+      },
+    });
+
+    return user;
+  }
   async getUsersPage(pid, pageSize, pageNum) {
     const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];
     const result = await this.findAndCountAll('User', pageSize, pageNum, {
@@ -49,6 +59,7 @@ class UserService extends BaseService {
       where: { pid },
       include: {
         model: this.app.model.Role,
+        attributes: [ 'displayName' ],
       },
     });
     return result;
