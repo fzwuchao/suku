@@ -1,27 +1,27 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="user" :rules="rules" ref="ruleForm">
-      <el-form-item label="发卡用户" prop="name">
-        <span>{{user.name}}</span>
+    <el-form label-width="130px" :model="simLogistics" :rules="rules" ref="ruleForm">
+      <el-form-item label="流水号" prop="flowNo">
+        <span>{{simLogistics.flowNo}}</span>
       </el-form-item>
-      <el-form-item label="收卡用户" prop="name">
-        <span>{{user.name}}</span>
+      <el-form-item label="发卡用户" prop="sender">
+        <span>{{simLogistics.sender}}</span>
       </el-form-item>
-      <el-form-item label="流水号" prop="username">
-        <span>{{user.name}}</span>
+      <el-form-item label="收卡用户" prop="receiver">
+        <span>{{simLogistics.receiver}}</span>
       </el-form-item>
-      <el-form-item label="数量" prop="phone">
-        <span>{{user.name}}</span>
+      <el-form-item label="数量" prop="total">
+        <span>{{simLogistics.total}}</span>
       </el-form-item>
-      <el-form-item label="物流单号" prop="phone">
-        <el-input v-model="user.phone"></el-input>
+      <el-form-item label="物流单号" prop="logisticsNo">
+        <el-input v-model="simLogistics.logisticsNo"></el-input>
       </el-form-item>
       <el-form-item label="手机" prop="phone">
-        <el-input v-model="user.phone"></el-input>
+        <el-input v-model="simLogistics.phone"></el-input>
       </el-form-item>
-      <el-form-item label="地址" prop="phone">
-        <el-input v-model="user.phone"></el-input>
+      <el-form-item label="地址" prop="address">
+        <el-input v-model="simLogistics.address"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submit">提交</el-button>
@@ -32,68 +32,61 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
-// import { validateTel } from "../../utils/validate.js";
+import API from "@/api";
 export default {
   components: {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
-      user: {
-        id: 25,
-        pid: 2,
-        level: 2,
-        username: "test",
-        phone: "13707949965",
-        name: "系统管理员",
-        email: null,
-        open_msg: 1,
-        mch_id: "1230000109",
-        rate: 0.5,
-        float_price: "0.00",
-        uuid: "deaff25c-335d-35e0-bad4-3d359461ac3c",
-        created_at: "2019-08-22 15:08:13",
-        updated_at: "2019-10-31 17:18:41",
-        role_id: 1,
-        parent_name: "系统管理员",
-        open_msg_text: "<span style='color:green'>已开通</span>",
-        role_name: "1"
-      },
-      rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
-        ]
+      simLogistics: {
+        address: '',
+        id: null,
+        flowNo: '',
+        logisticsNo: '',
+        phone: '',
+        receiver: "",
+        sender: "",
+        total: null,
       }
     };
   },
   methods: {
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          let data = this.simLogistics;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
+            url: API.SIMLOGISTICS.SAVE
           }).then(() => {
-            this.$router.push("/demand/list");
+            this.$router.push("/warehouse/list");
           });
         } else {
           return false;
         }
-      }); */
+      });
+    },
+    getInfo(id) {
+      this.axios({
+        method: "get",
+        params: {
+          id
+        },
+        url: API.SIMLOGISTICS.GET_SIMLOGISTICS_BY_ID
+      }).then((r) => {
+        this.simLogistics = r.data
+      });
     }
   },
-  mounted() {}
+  mounted() {
+    let { id } = this.$route.params;
+    if(id) {
+      this.simLogistics.id = id;
+      this.getInfo(id)
+    }
+  }
 };
 </script>
 

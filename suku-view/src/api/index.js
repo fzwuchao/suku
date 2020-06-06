@@ -5,6 +5,7 @@ import CAPTCHA from './captcha'
 import LOGIN from './login'
 import PERMISSION from './permission'
 import ONELINK from './onelink'
+import SIMLOGISTICS from './simLogistics'
 export default {
     SIMCOMBO,
     SIMLIST,
@@ -12,5 +13,6 @@ export default {
     CAPTCHA,
     LOGIN,
     PERMISSION,
-    ONELINK
+    ONELINK,
+    SIMLOGISTICS
 }
