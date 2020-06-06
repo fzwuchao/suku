@@ -2,40 +2,44 @@
 'use strict';
 
 const BaseService = require('../core/baseService');
-
+const _ = require('lodash');
 class SimComboService extends BaseService {
   /**
    * 获取套餐信息
    * @param {object} - 参数对像
    * object: {
-   *  simType: sim类型，主叫卡，被叫卡
+   *  belongsToSimType: 适用sim类型
    *  name: 套餐名称
    *  comboType: 套餐类型
    * } 
    */
-  async getSimComboPageData({ simType, name, comboType, pageSize, pageNum }) {
+  async getSimComboPageData({ belongsToSimType, name, comboType, pageSize, pageNum }) {
     const { Sequelize: { Op } } = this.app.model;
     const condition = {};
 
-    if (simType !== undefined) {
-      condition['simType'] = {
-        [Op.eq]: simType,
+    if (!_.isUndefined(belongsToSimType)) {
+      condition['belongsToSimType'] = {
+        [Op.substring]: belongsToSimType,
       };
     }
 
-    if (name !== undefined) {
+    if (!_.isUndefined(name)) {
       condition['name'] = {
         [Op.substring]: name,
       };
     }
 
-    if (comboType !== undefined) {
+    if (!_.isUndefined(comboType)) {
       condition['comboType'] = {
         [Op.eq]: comboType,
       };
     }
 
-    const result = await this.findAndCountAll('SimCombo', pageSize, pageNum, condition);
+    const whereCondition = {};
+
+    if (Object.keys(condition).length > 0) whereCondition.where = condition;
+
+    const result = await this.findAndCountAll('SimCombo', pageSize, pageNum, whereCondition);
 
     return result;
   }

@@ -46,11 +46,6 @@ module.exports = app => {
       field: 'renew_price',
       comment: '续费价格',
     },
-    monthFlow: {
-      type: DECIMAL(10, 3),
-      field: 'month_flow',
-      comment: '套餐月流量',
-    },
     monthVoiceDurationThreshold: {
       type: DECIMAL(10, 3),
       field: 'month_voice_duration_threshold',
@@ -60,6 +55,10 @@ module.exports = app => {
       type: STRING(10),
       field: 'month_voice_duration_threshold_unit',
       comment: '当月语音时长阈的单位',
+    },
+    months: {
+      type: TINYINT,
+      comment: '月份长度',
     },
     createdAt: {
       type: DATE,

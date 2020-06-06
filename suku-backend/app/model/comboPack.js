@@ -6,7 +6,7 @@ const moment = require('moment');
 module.exports = app => {
   const { STRING, DATE, DECIMAL, BIGINT } = app.Sequelize;
 
-  const ComboPack = app.model.define('sim_combo', {
+  const ComboPack = app.model.define('combo_pack', {
     id: {
       type: BIGINT(20),
       primaryKey: true,
@@ -18,6 +18,7 @@ module.exports = app => {
     },
     comboId: {
       type: BIGINT(20),
+      field: 'combo_id',
       comment: '套餐id',
     },
     money: {
