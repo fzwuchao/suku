@@ -54,12 +54,6 @@ const UserRules = {
     type: 'dateTime?',
   },
 };
-module.exports = retuires => {
-  const newRules = JSON.parse(JSON.stringify(UserRules));
-  for (let i = 0; i < retuires.length; i++) {
-    const attr = retuires[i];
-    const type = newRules[attr].type;
-    newRules[attr].type = type.substr(0, type.length - 1);
-  }
-  return newRules;
-};
+
+module.exports = UserRules;
+
