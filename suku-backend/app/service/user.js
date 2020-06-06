@@ -55,13 +55,13 @@ class UserService extends BaseService {
   }
 
   async create(user) {
-    //  try {
-    user.uuid = uuid();
-    user.password = MD5(user.username + user.password + 'sukuwulian');
-    await this.app.model.User.create(user);
-    // } catch (e) {
-    //   return false;
-    // }
+    try {
+      user.uuid = uuid();
+      user.password = MD5(user.username + user.password + 'sukuwulian');
+      await this.app.model.User.create(user);
+    } catch (e) {
+      return false;
+    }
     return true;
   }
 
@@ -71,6 +71,17 @@ class UserService extends BaseService {
     } catch (e) {
       return false;
     }
+    return true;
+  }
+
+  async bulkUpdate(ids, value, oper) {
+    // try {
+    const values = {};
+    values[oper] = value;
+    await this.app.model.User.update(values, { where: { id: { [this.getOp().in]: ids } } });
+    // } catch (e) {
+    //   return false;
+    // }
     return true;
   }
 

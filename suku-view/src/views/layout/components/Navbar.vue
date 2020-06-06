@@ -102,7 +102,7 @@ export default {
   border-bottom: 2px solid #041f40;
   border-radius: 0px !important;
   padding-right: 60px;
-  z-index: 9999999;
+  z-index: 1000;
   .hamburger-container {
     fill: #fff;
     line-height: 68px;

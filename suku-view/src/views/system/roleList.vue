@@ -17,7 +17,7 @@
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column align="left" label="名称" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.display_name}}</template>
+        <template slot-scope="scope">{{ scope.row.displayName}}</template>
       </el-table-column>
       <el-table-column align="left" label="创建时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.created_at }}</template>

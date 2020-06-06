@@ -2,9 +2,9 @@
   <div class="dashboard-container">
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <el-button type="primary" size="mini">增加</el-button>
-      <el-button type="primary" size="mini">启用</el-button>
-      <el-button type="primary" size="mini">停用</el-button>
+      <el-button type="primary" size="mini" @click="addOnelink">增加</el-button>
+      <el-button type="primary" size="mini" @click="openStatus(1)">启用</el-button>
+      <el-button type="primary" size="mini" @click="openStatus(0)">停用</el-button>
     </div>
 
     <el-table
@@ -22,30 +22,20 @@
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column align="left" label="名称" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.username}}</template>
+        <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
-      <el-table-column align="left" label="appid" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.name }}</template>
+      <el-table-column align="left" label="appId" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.appId }}</template>
       </el-table-column>
-      <el-table-column align="left" label="密钥" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.rate }}</template>
-      </el-table-column>
-      <el-table-column align="left" label="api_host" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.role_name}}</template>
+      <el-table-column align="left" label="apiHost" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.apiHost}}</template>
       </el-table-column>
       <el-table-column align="left" label="接口版本号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.phone }}</template>
-      </el-table-column>
-      <el-table-column align="left" label="token_key" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.mch_id }}</template>
-      </el-table-column>
-      <el-table-column align="left" label="transid_key" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.open_msg == 1? '已开通':'未开通' }}</template>
+        <template slot-scope="scope">{{ scope.row.apiVersion }}</template>
       </el-table-column>
       <el-table-column align="left" label="状态" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.parent_name}}</template>
+        <template slot-scope="scope">{{ scope.row.status == 1? '已启用':'已停用'}}</template>
       </el-table-column>
-
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
           <el-button type="text" @click="editOnelink(scope.row)" size="small">编辑</el-button>
@@ -87,29 +77,46 @@ export default {
     editOnelink(user) {
       this.$router.push(`/system/editonelink/${user.id}`);
     },
+    addOnelink() {
+      this.$router.push(`/system/addonelink`);
+    },
+    openStatus(value) {
+      this.axios({
+        method: "post",
+        data: {
+          ids: this.multipleSelection,
+          status: value
+        },
+        url: API.ONELINK.UPDATE_STATUS
+      }).then(() => {
+        this.$message({
+          showClose: true,
+          message: '设置成功',
+          type: 'success'
+        });
+        this.getlist();
+      });
+    },
     getlist() {
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize
         },
-        url: API.USERS.USER_LIST
+        url: API.ONELINK.SEARCH_ONELINK
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {
-      this.multipleSelection = val;
+      this.multipleSelection = [];
+      for(let i = 0;i < val.length; i++) {
+        this.multipleSelection.push(val[i].id)
+      }
     },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
-    }
   },
   mounted() {
     this.getlist();

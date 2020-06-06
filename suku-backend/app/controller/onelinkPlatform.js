@@ -2,7 +2,7 @@
 
 const BaseController = require('../core/baseController');
 
-class UserController extends BaseController {
+class OnelinkPlatformController extends BaseController {
   /* async exportFile() {
     const ctx = this.ctx;
     const filepath = await ctx.service.user.exportData();
@@ -12,7 +12,7 @@ class UserController extends BaseController {
     // 删除不了，mysql用户创建的文件，其它用户没有权限
     // ctx.service.sheet.removeFile(filepath);
   } */
-  async getUserlist() {
+  async getOnelinklist() {
     const { ctx } = this;
     const { request, helper } = ctx;
     const rule = helper.rules.pageRules;
@@ -20,8 +20,7 @@ class UserController extends BaseController {
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.query);
     const { pageNum, pageSize } = request.query;
-    const user = this.getCurUser();
-    const result = await ctx.service.user.getUsersPage(user.id, pageSize, pageNum);
+    const result = await ctx.service.onelinkPlatform.getOnelinkPage(pageSize, pageNum);
     this.success(result, '');
   }
 
@@ -31,27 +30,24 @@ class UserController extends BaseController {
     const { id } = request.body;
     let rule = null;
     if (id && id !== null) {
-      rule = helper.rules.user([ 'username', 'name' ]);
+      rule = helper.rules.onelink([ 'name', 'appId', 'apiHost', 'apiVersion', 'secretKey' ]);
     } else {
-      rule = helper.rules.user([ 'username', 'name', 'password' ]);
+      rule = helper.rules.onelink([ 'name', 'appId', 'apiHost', 'apiVersion', 'secretKey', 'nameKey' ]);
     }
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.body);
 
-    const curUser = this.getCurUser();
-    const user = request.body;
-    user.pid = curUser.id;
-    user.pname = curUser.name;
+    const onelink = request.body;
     if (id && id !== null) {
-      const result = await ctx.service.user.update(user);
+      const result = await ctx.service.onelinkPlatform.update(onelink);
       this.success(result, '');
     } else {
-      const result = await ctx.service.user.create(user);
+      const result = await ctx.service.onelinkPlatform.create(onelink);
       this.success(result, '');
     }
   }
 
-  async updateOpenmsg() {
+  async updateStatus() {
     const { ctx } = this;
     const { request } = ctx;
     const rule = {
@@ -59,56 +55,38 @@ class UserController extends BaseController {
         type: 'array',
         itemType: 'int',
       },
-      openMsg: {
+      status: {
         type: 'int',
       },
     };
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.body);
-    const { ids, openMsg } = request.body;
-    const result = await ctx.service.user.bulkUpdate(ids, openMsg, 'openMsg');
+    const { ids, status } = request.body;
+    const result = await ctx.service.onelinkPlatform.bulkUpdate(ids, status, 'status');
     this.success(result, '');
   }
 
-  async updateAutoTransfer() {
+  async getOnelinkByNameKey() {
     const { ctx } = this;
     const { request } = ctx;
-    const rule = {
-      ids: {
-        type: 'array',
-        itemType: 'int',
-      },
-      autoTransfer: {
-        type: 'int',
-      },
-    };
-    // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
-    ctx.validate(rule, request.body);
-    const { ids, autoTransfer } = request.body;
-    const result = await ctx.service.user.bulkUpdate(ids, autoTransfer, 'autoTransfer');
-    this.success(result, '');
-  }
-
-  async getUserByUsername() {
-    const { ctx } = this;
-    const { request } = ctx;
-    const { username } = request.query;
-    const result = await ctx.service.user.getUserByUsername(username);
+    const { nameKey } = request.query;
+    const result = await ctx.service.onelinkPlatform.getOnelinkByNameKey(nameKey);
     if (result) {
-      this.success({ exit: true }, '用户名已经存在');
+      this.success({ exit: true }, 'name Key 已经存在');
     } else {
-      this.success({ exit: false }, '用户名可用');
+      this.success({ exit: false }, 'name Key 可用');
     }
   }
-  async getUserById() {
+
+  async getOnelinkById() {
     const { ctx } = this;
     const { request, helper } = ctx;
-    const rule = helper.rules.user([ 'id' ]);
+    const rule = helper.rules.onelink([ 'id' ]);
     ctx.validate(rule, request.query);
     const { id } = request.query;
-    const result = await ctx.service.user.getUserById(id);
+    const result = await ctx.service.onelinkPlatform.getOnelinkById(id);
     this.success(result, '成功');
 
   }
 }
-module.exports = UserController;
+module.exports = OnelinkPlatformController;

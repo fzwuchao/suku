@@ -42,6 +42,22 @@ module.exports = app => {
   router.get('/user/getUserById', controller.user.getUserById);
   // 保存或者更新用户
   router.post('/user/save', controller.user.save);
+  // 批量开启短讯
+  router.post('/user/updateOpenmsg', controller.user.updateOpenmsg);
+  // 启用停用自动转账
+  router.post('/user/updateAutoTransfer', controller.user.updateAutoTransfer);
+
+
+  // 获取onelink配置列表
+  router.get('/onelink/searchOnelink', controller.onelinkPlatform.getOnelinklist);
+  // 根据nameKey获取配置
+  router.get('/onelink/getOnelinkByNameKey', controller.onelinkPlatform.getOnelinkByNameKey);
+  // 根据ID获取配置
+  router.get('/onelink/getOnelinkById', controller.onelinkPlatform.getOnelinkById);
+  // 保存或者更新onelink配置
+  router.post('/onelink/save', controller.onelinkPlatform.save);
+  // 批量开启/关闭平台
+  router.post('/onelink/updateStatus', controller.onelinkPlatform.updateStatus);
 
 
   // 获取权限列表

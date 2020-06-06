@@ -1,6 +1,7 @@
 'use strict';
 const user = require('./user');
 const sim = require('./sim');
+const onelink = require('./onelink');
 
 const pageRules = {
   pageNum: {
@@ -28,5 +29,6 @@ module.exports = () => {
     pageRules,
     user: createRule(user),
     sim: createRule(sim),
+    onelink: createRule(onlink);
   };
 };
