@@ -6,6 +6,10 @@
 const BaseService = require('../core/baseService');
 
 class SimService extends BaseService {
+  async getSimBySimId(simId) {
+    return this.app.model.Sim.findByPk(simId);
+  }
+
   /**
    * sim卡列表
    * @param { object } - 参数对象如下：
@@ -76,7 +80,7 @@ class SimService extends BaseService {
       };
     }
 
-    const whereCondition = {}
+    const whereCondition = {};
 
     if (Object.keys(condition).length > 0) whereCondition.where = condition;
 
