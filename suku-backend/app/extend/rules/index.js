@@ -29,6 +29,6 @@ module.exports = () => {
     pageRules,
     user: createRule(user),
     sim: createRule(sim),
-    onelink: createRule(onlink);
+    onelink: createRule(onelink),
   };
 };
