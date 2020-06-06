@@ -33,7 +33,7 @@ class SimService extends BaseService {
     if (simIdRange && simIdRange.length > 0) {
       if (simId !== undefined) {
         condition['simId'] = {
-          [Op.or]: {
+          [Op.and]: {
             [Op.substring]: simId,
             [Op.between]: simIdRange,
           },

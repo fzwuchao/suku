@@ -7,13 +7,20 @@ class SimController extends BaseController {
   async save() {
     const { ctx } = this;
     const { request, service } = ctx;
-    const { simId } = request.body;
-    const state = await service.sim.bulkCreate([{ simId }]);
+    const { simId, activeMenuName } = request.body;
+    let state = null;
+    let err = null;
+    try {
+      state = await service.sim.bulkCreate([{ simId, activeMenuName }]);
+    } catch (error) {
+      err = error;
+      ctx.logger.error(error);
+    }
 
     if (state) {
       this.success(null, '创建成功');
     } else {
-      this.fail(null, '创建失败');
+      this.fail(null, `${err ? err.message : '创建失败'}`);
     }
 
   }
@@ -22,31 +29,10 @@ class SimController extends BaseController {
   async search() {
     const { ctx } = this;
     const { request, service, helper } = ctx;
-    const { pageRules } = helper.rules;
+    const { pageRules, sim } = helper.rules;
 
     const rule = {
-      simId: {
-        type: 'string?', // 加问号表示这个参数非必要
-      },
-      simIdRange: {
-        type: 'array?',
-        itemType: 'string',
-      },
-      username: {
-        type: 'string?',
-      },
-      netStatus: {
-        type: 'int?',
-      },
-      isActive: {
-        type: 'int?',
-      },
-      simType: {
-        type: 'string?',
-      },
-      activeMenuName: {
-        type: 'string?',
-      },
+      ...sim(),
       ...pageRules,
     };
 

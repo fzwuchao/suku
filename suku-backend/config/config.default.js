@@ -98,7 +98,8 @@ module.exports = appInfo => {
 
   config.validate = {
     convert: true, // 入参的数据类型自动转换
-  }
+    widelyUndefined: true, // 值为空字符串、NaN、Null转换成undefined
+  };
 
   // add your user config here
   const userConfig = {
