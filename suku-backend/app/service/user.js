@@ -42,15 +42,31 @@ class UserService extends BaseService {
 
     return user;
   }
+
+  async getAllUserIds(pid) {
+    const attributes = [ 'id' ];
+    const users = await this.app.model.User.findAll({ attributes,
+      where: {
+        pid,
+      },
+    });
+    const ids = [];
+    for (let i = 0; i < users.length; i++) {
+      ids.push(users[i].id);
+    }
+    ids.push(pid);
+    return ids;
+  }
+
   async getAllUsers(pid) {
     const attributes = [[ 'id', 'value' ], [ 'name', 'key' ]];
-    const [ user ] = await this.app.model.User.findAll({ attributes,
+    const users = await this.app.model.User.findAll({ attributes,
       where: {
         pid,
       },
     });
 
-    return user;
+    return users;
   }
   async getUsersPage(pid, pageSize, pageNum) {
     const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];

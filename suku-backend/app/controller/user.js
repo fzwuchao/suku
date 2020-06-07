@@ -29,6 +29,7 @@ class UserController extends BaseController {
     const { ctx } = this;
     const user = this.getCurUser();
     const result = await ctx.service.user.getAllUsers(user.id);
+    result.push({ value: user.id, key: user.name });
     this.success(result, '');
   }
 
