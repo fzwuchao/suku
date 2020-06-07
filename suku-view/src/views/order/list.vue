@@ -57,7 +57,7 @@
       <el-table-column align="left" label="微信流水号" min-width="120px" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
       </el-table-column>
-      <el-table-column align="left" label="交易时间" show-overflow-tooltip>
+      <el-table-column align="left" label="创建时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="提现流水号" show-overflow-tooltip>
@@ -95,7 +95,7 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
+      orderType: 1,
       pageTotal: 1,
       pageSize: 10,
       withdrawalDialog: false,
@@ -163,29 +163,13 @@ export default {
     };
   },
   props: {
-    type: String
+    type: Number
   },
   components: {
     searchBar,
     Withdrawal
   },
   filters: {
-    comboType(type) {
-      type = type - 0;
-      let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
-        case 2:
-          returnStr = "叠加套餐";
-          break;
-        case 3:
-          returnStr = "特惠套餐";
-          break;
-      }
-      return returnStr;
-    },
     simType(val) {
       let types = val.split(",");
       let returnStr = "";
@@ -210,18 +194,21 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {}
+      }
+      params.orderType = this.orderType;
+      params.pageNum = this.pageNum;
+      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params: {
-          page: this.pageNum,
-          limit: this.pageSize
-        },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        params,
+        url: API.ORDER.GET_SIMORDER_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {
@@ -239,11 +226,11 @@ export default {
   },
   watch: {
     type: function(newVal) {
-      this.simType = newVal;
+      this.orderType = newVal;
     }
   },
   created() {
-    this.simType = this.type;
+    this.orderType = this.type;
     this.tableHeight = getTableHeight();
   }
 };

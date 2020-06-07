@@ -83,4 +83,7 @@ module.exports = app => {
   router.get('/role/searchRole', controller.role.getRolelist);
   // 获取当前用户的下级权限
   router.get('/role/getRoles', controller.role.getAllRoles);
+
+  // 查询订单
+  router.get('/simOrder/getSimOrderlist', controller.simOrder.getSimOrderlist);
 };
