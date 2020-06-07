@@ -23,19 +23,29 @@ class SimComboController extends BaseController {
     const { ctx } = this;
     const { service, request, helper } = ctx;
     const { simCombo } = helper.rules;
-
-    const attrs = [
+    const comboTypeStr = request.body.comboType;
+    const commonAttrs = [
       'name',
       'belongsToSimType',
-      'monthSumFlowThreshold',
-      'monthSumFlowThresholdUnit',
-      'monthVoiceDurationThreshold',
-      'monthVoiceDurationThresholdUnit',
-      'monthRent',
-      'months',
-      'renewPrice',
       'comboType',
     ];
+    let comboTypeAttrs = [];
+    // 激活套餐
+    // 非激活套餐（叠加套餐、特惠套餐，只包含套餐名和适用类型）
+    if (comboTypeStr === '1') {
+      comboTypeAttrs = [
+        'monthSumFlowThreshold',
+        'monthSumFlowThresholdUnit',
+        'monthVoiceDurationThreshold',
+        'monthVoiceDurationThresholdUnit',
+        'monthRent',
+        'months',
+        'renewPrice',
+      ];
+    }
+
+    const attrs = commonAttrs.concat(comboTypeAttrs);
+    // 更新操作，要用到id
     if (request.body.id) {
       attrs.push('id');
     }
