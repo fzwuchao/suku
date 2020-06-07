@@ -2,7 +2,7 @@
   <div class="discounts-list">
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <el-button type="primary" size="mini">新增</el-button>
+      <el-button type="primary" size="mini" @click="editCombo()">新增</el-button>
       <el-button type="primary" size="mini">删除</el-button>
     </div>
 
@@ -137,7 +137,11 @@ export default {
       this.getlist();
     },
     editCombo(row) {
-      this.$router.push(`/simcombo/editDiscounts/${row.id}`);
+      if (row === undefined) {
+        this.$router.push(`/simcombo/editDiscounts`);
+      } else {
+        this.$router.push(`/simcombo/editDiscounts/${row.id}`);
+      }
     },
     getlist(val) {
       let params = {}
