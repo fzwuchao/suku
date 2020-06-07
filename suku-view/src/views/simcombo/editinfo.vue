@@ -1,33 +1,85 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="simCombo" :rules="rules" ref="ruleForm">
-      <el-form-item label="套餐名称" prop="comboName">
-        <el-input v-model="simCombo.comboName"></el-input>
+    <el-form
+      label-width="130px"
+      :model="simCombo"
+      :rules="rules"
+      ref="ruleForm"
+    >
+      <el-form-item
+        label="套餐名称"
+        prop="name"
+      >
+        <el-input v-model="simCombo.name"></el-input>
       </el-form-item>
-      <el-form-item label="适用卡类型" prop="simType">
-        <el-checkbox-group v-model="simTypes">
+      <el-form-item
+        label="适用卡类型"
+        prop="belongsToSimType"
+      >
+        <el-checkbox-group v-model="belongsToSimType">
           <el-checkbox label="A">被叫卡</el-checkbox>
           <el-checkbox label="B">主叫卡</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="套餐月流量" prop="monthFlow">
-        <el-input v-model="simCombo.monthFlow"></el-input>
+      <el-form-item
+        label="套餐月流量"
+        prop="monthSumFlowThreshold"
+      >
+        <el-input-number
+          :precision="2"
+          :controls="false"
+          v-model="simCombo.monthSumFlowThreshold"
+        ></el-input-number>
+        <span class="unit">{{simCombo.monthSumFlowThresholdUnit}}</span>
       </el-form-item>
-      <el-form-item label="月通话时长" prop="monthMin">
-        <el-input v-model="simCombo.monthMin"></el-input>
+      <el-form-item
+        label="月通话时长"
+        prop="monthVoiceDurationThreshold"
+      >
+        <el-input-number
+          v-model="simCombo.monthVoiceDurationThreshold"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">{{simCombo.monthVoiceDurationThresholdUnit}}</span>
       </el-form-item>
-      <el-form-item label="月租" prop="monthPrice">
-        <el-input v-model="simCombo.monthPrice"></el-input>
+      <el-form-item
+        label="月租"
+        prop="monthRent"
+      >
+        <el-input-number
+          v-model="simCombo.monthRent"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">元</span>
       </el-form-item>
-      <el-form-item label="月数" prop="month">
-        <el-input v-model="simCombo.month"></el-input>
+      <el-form-item
+        label="月份长度"
+        prop="month"
+      >
+        <el-input-number
+          v-model="simCombo.months"
+          :controls="false"
+          :precision="0"
+        ></el-input-number>
       </el-form-item>
-      <el-form-item label="续费价格" prop="renewPrice">
-        <el-input v-model="simCombo.renewPrice" readonly="true"></el-input>
+      <el-form-item
+        label="续费价格"
+        prop="renewPrice"
+      >
+        <el-input-number
+          :controls="false"
+          :precision="2"
+          v-model="renewPrice"
+          :disabled="true"
+        ></el-input-number>
+        <span class="unit">元</span>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button
+          type="primary"
+          @click="submit"
+        >提交</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -35,64 +87,106 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
+import API from "@/api";
 // import { validateTel } from "../../utils/validate.js";
 export default {
   components: {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
       simTypes: [],
+      belongsToSimType: [],
       simCombo: {
-        id: 16,
-        type: 1, // 1:激活套餐，2: 叠加套餐，3:充送套餐
-        delStatus: 0, // 1:已删除；0:未删除
-        comboName: "被叫卡激活套餐",
-        monthFlow: "60.00",
-        monthMin: "0.00",
-        month: 6,
-        simType: "A",
-        monthPrice: "20.00",
-        renewPrice: "120.00",
-        created_at: "2019-08-15 21:01:56",
-        updated_at: "2019-08-15 21:01:56"
+        id: '',
+        name: "",
+        belongsToSimType: "",
+        monthSumFlowThreshold: 0,
+        monthSumFlowThresholdUnit: "M",
+        monthVoiceDurationThreshold: 0,
+        monthVoiceDurationThresholdUnit: "分",
+        monthRent: 0,
+        months: 1,
+        renewPrice: 0,
+        comboType: 1
       },
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
-        ]
+        name: [{ required: true, message: "请输入套餐名称", trigger: "blur" }],
+        belongsToSimType: [
+          { required: true, message: "请勾选适用卡类型", trigger: "blur" }
+        ],
+        monthSumFlowThreshold: [
+          { required: true, message: "请输入套餐月流量", trigger: "blur" }
+        ],
+        monthVoiceDurationThreshold: [
+          { required: true, message: "请输入月通话时长", trigger: "blur" }
+        ],
+        monthRent: [{ required: true, message: "请输入月租", trigger: "blur" }],
+        months: [{ required: true, message: "请输入月份长度", trigger: "blur" }]
       }
     };
   },
   methods: {
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          this.simCombo.renewPrice = this.renewPrice;
+          let data = this.simCombo;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
-          }).then(() => {
-            this.$router.push("/demand/list");
+            url: API.SIMCOMBO.SIM_COMBO_SAVE
+          }).then(res => {
+            if (res.success) {
+              this.$router.push("/simcombo/list");
+            } else {
+              !res.success &&
+                this.$message({
+                  message: res.msg,
+                  type: "warning"
+                });
+            }
           });
         } else {
           return false;
         }
-      }); */
+      });
+    },
+    getSimCombo() {
+      this.axios({
+        method: "get",
+        params: {
+          id: this.$route.params.id,
+        },
+        url: API.SIMCOMBO.SIM_COMBO_GET_BY_ID
+      }).then(r => {
+        this.simCombo = r.data;
+        this.renewPrice = this.simCombo.renewPrice;
+        this.belongsToSimType = this.simCombo.belongsToSimType.split(',');
+      });
+    },
+    initBelongsToSimType(val) {
+      if (val !== undefined) {
+        this.simCombo.belongsToSimType = val;
+      } else {
+        this.simCombo.belongsToSimType = this.belongsToSimType.join(",");
+      }
+    }
+  },
+  watch: {
+    belongsToSimType(newVal) {
+      this.initBelongsToSimType(newVal.join(","));
+    }
+  },
+  computed: {
+    renewPrice() {
+      const { monthRent, months } = this.simCombo;
+      return monthRent * months;
     }
   },
   mounted() {
-    this.simTypes = this.simCombo.simType.split(",");
+    this.initBelongsToSimType();
+    this.getSimCombo();
   }
 };
 </script>
@@ -141,6 +235,9 @@ export default {
         width: 200px;
       }
     }
+  }
+  .unit {
+    color: #f56c6c;
   }
 }
 </style>

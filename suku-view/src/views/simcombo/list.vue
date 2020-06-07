@@ -1,8 +1,7 @@
 <template>
   <div class="sim-list">
     <div class="btn-list">
-      <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <el-button type="primary" size="mini">新增</el-button>
+      <el-button type="primary" size="mini" @click="addCombo()">新增</el-button>
       <el-button type="primary" size="mini">删除</el-button>
     </div>
 
@@ -19,7 +18,6 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
-      <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column
         align="left"
@@ -147,6 +145,9 @@ export default {
     pageChange() {
       this.getlist();
     },
+    addCombo() {
+      this.$router.push('/simcombo/addInfo');
+    },
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
@@ -170,12 +171,6 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
-    }
   },
   mounted() {
     this.getlist();
