@@ -7,6 +7,7 @@ import PERMISSION from './permission'
 import ONELINK from './onelink'
 import SIMLOGISTICS from './simLogistics'
 import MESSAGE from './message'
+import ORDER from './order'
 export default {
     SIMCOMBO,
     SIMLIST,
@@ -16,5 +17,6 @@ export default {
     PERMISSION,
     ONELINK,
     SIMLOGISTICS,
-    MESSAGE
+    MESSAGE,
+    ORDER
 }

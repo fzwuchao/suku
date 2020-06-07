@@ -27,38 +27,35 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.uname}}</template>
       </el-table-column>
       <el-table-column align="left" label="套餐" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.cname}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="套餐包" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+        <template slot-scope="scope">{{ scope.row.cpname}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="交易金额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthMin}}</template>
-      </el-table-column>
-      <el-table-column align="left" min-width="120px" label="分流金额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthMin}}</template>
+        <template slot-scope="scope">{{ scope.row.dealAmount}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="续增金额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthMin}}</template>
+        <template slot-scope="scope">{{ scope.row.renewIncrAmount}}</template>
       </el-table-column>
       <el-table-column align="left" label="订单号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.month }}</template>
+        <template slot-scope="scope">{{ scope.row.orderId }}</template>
       </el-table-column>
       <el-table-column align="left" label="订单状态" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthPrice }}</template>
+        <template slot-scope="scope">{{ scope.row.orderStatus | orderStatus }}</template>
       </el-table-column>
       <el-table-column align="left" label="微信流水号" min-width="120px" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
+        <template slot-scope="scope">{{ scope.row.wxSerialNum }}</template>
       </el-table-column>
-      <el-table-column align="left" label="交易时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
+      <el-table-column align="left" label="创建时间" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.createdAt }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="提现流水号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
@@ -82,7 +79,7 @@
     <el-dialog title="提现" :visible.sync="withdrawalDialog">
       <withdrawal :money="withdrawalMoney"></withdrawal>
     </el-dialog>
-    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+    <search-bar ref="searchBar" :searchData="searchData" @handleGetList="getlist"></search-bar>
   </div>
 </template>
 
@@ -95,7 +92,7 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
+      orderType: 1,
       pageTotal: 1,
       pageSize: 10,
       withdrawalDialog: false,
@@ -110,92 +107,51 @@ export default {
           value: ""
         },
         {
-          name: "simId1",
-          title: "提现流水号",
-          type: "inputText",
-          value: ""
-        },
-        {
-          name: "netStatus",
+          name: "uid",
           title: "用户",
-          type: "multiple",
+          type: "select",
           values: [
             { value: 1, key: "激活套餐" },
             { value: 2, key: "叠加套餐" },
             { value: 3, key: "特惠套餐" }
           ],
-          active: [1, 2, 3]
+          active: []
         },
         {
-          name: "isActive",
-          title: "套餐",
-          type: "select",
-          values: [
-            { value: "", key: "全部" },
-            { value: "A", key: "被叫卡" },
-            { value: "B", key: "主叫卡" }
-          ],
-          active: ["A", "B"]
-        },
-        {
-          name: "isActive1",
+          name: "orderStatus",
           title: "订单状态",
           type: "select",
           values: [
             { value: "", key: "全部" },
-            { value: "A", key: "被叫卡" },
-            { value: "B", key: "主叫卡" }
+            { value: "2", key: "成功" },
+            { value: "0", key: "失败" },
+            { value: "1", key: "未支付" }
           ],
-          active: ["A", "B"]
-        },
-        {
-          name: "isActive2",
-          title: "提现状态",
-          type: "select",
-          values: [
-            { value: "", key: "全部" },
-            { value: "A", key: "被叫卡" },
-            { value: "B", key: "主叫卡" }
-          ],
-          active: ["A", "B"]
+          active: []
         }
       ]
     };
   },
   props: {
-    type: String
+    type: Number
   },
   components: {
     searchBar,
     Withdrawal
   },
   filters: {
-    comboType(type) {
-      type = type - 0;
+    orderStatus(val) {
       let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
+      switch (val) {
         case 2:
-          returnStr = "叠加套餐";
+          returnStr = "成功";
           break;
-        case 3:
-          returnStr = "特惠套餐";
+        case 0:
+          returnStr = "失败";
           break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
+        case 1:
+          returnStr = "未支付";
+          break;
       }
       return returnStr;
     }
@@ -210,40 +166,49 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {}
+      }
+      params.orderType = this.orderType;
+      params.pageNum = this.pageNum;
+      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params: {
-          page: this.pageNum,
-          limit: this.pageSize
-        },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        params,
+        url: API.ORDER.GET_SIMORDER_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
+    getUsers() {
+      this.axios({
+        method: "get",
+        url: API.USERS.GET_SELECT_USERS
+      }).then(r => {
+        r.data.splice(0,0,{value: '',key:'全部'})
+        this.searchData[1].values = r.data
+      });
     }
   },
   mounted() {
     this.getlist();
+    this.getUsers();
   },
   watch: {
     type: function(newVal) {
-      this.simType = newVal;
+      this.orderType = newVal;
+      this.getlist()
+      this.$refs.searchBar.empty();
     }
   },
   created() {
-    this.simType = this.type;
+    this.orderType = this.type;
     this.tableHeight = getTableHeight();
   }
 };
