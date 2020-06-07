@@ -15,7 +15,7 @@ class MessageSendController extends BaseController {
     };
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.query);
-    const result = await ctx.service.simOrder.getSimOrderlist(request.query);
+    const result = await ctx.service.simOrder.getSimOrderPage(request.query);
     this.success(result, '');
   }
 

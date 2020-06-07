@@ -19,7 +19,7 @@ class SimOrderService extends BaseService {
   }
 
   async getSimOrderPage(query) {
-    const attributes = [ 'id', 'orderId', 'simId', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'orderStatus', 'createdAt', 'retcode' ];
+    const attributes = [ 'id', 'orderId', 'simId', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'cpname', 'wxSerialNum', 'orderStatus', 'createdAt' ];
     const { pageSize, pageNum, orderId, simId, uid, orderStatus, orderType } = query;
     const Op = this.getOp();
     const where = {};
@@ -39,7 +39,7 @@ class SimOrderService extends BaseService {
         [Op.in]: ids,
       };
     }
-    if (orderStatus) {
+    if (orderStatus !== undefined) {
       where.orderStatus = orderStatus;
     }
     if (orderType) {
