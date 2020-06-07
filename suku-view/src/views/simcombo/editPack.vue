@@ -1,25 +1,63 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="simCombo" :rules="rules" ref="ruleForm">
-      <el-form-item label="套餐包名" prop="comboName">
-        <el-input v-model="simCombo.comboName"></el-input>
+    <el-form
+      label-width="130px"
+      :model="simCombo"
+      :rules="rules"
+      ref="ruleForm"
+    >
+      <el-form-item
+        label="套餐包名"
+        prop="name"
+      >
+        <el-input v-model="simCombo.name"></el-input>
       </el-form-item>
-      <el-form-item label="所属套餐" prop="type">
-        <el-select v-model="simCombo.type" clearable placeholder="请选择">
-          <el-option label="运营商" :value="1">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+      <el-form-item
+        label="所属套餐"
+        prop="comboId"
+      >
+        <el-select
+          v-model="simCombo.comboId"
+          clearable
+          placeholder="请选择"
+        >
+        
+          <el-option
+            v-for="item in simComboList"
+            :label="item.label"
+            :value="item.value"
+            :key="item.value"
+          ></el-option>
+        
         </el-select>
       </el-form-item>
-      <el-form-item label="金额" prop="monthFlow">
-        <el-input v-model="simCombo.monthFlow"></el-input>
+      <el-form-item
+        label="金额"
+        prop="money"
+      >
+        <el-input-number
+          v-model="simCombo.money"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">元</span>
       </el-form-item>
-      <el-form-item label="赠送金额" prop="monthMin">
-        <el-input v-model="simCombo.monthMin"></el-input>
+      <el-form-item
+        label="赠送金额"
+        prop="awardMoney"
+      >
+        <el-input-number
+          v-model="simCombo.awardMoney"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">元</span>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button
+          type="primary"
+          @click="submit"
+        >提交</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -27,64 +65,89 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
+import API from "@/api";
 // import { validateTel } from "../../utils/validate.js";
 export default {
   components: {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
-      simTypes: [],
+      simComboList: [],
       simCombo: {
-        id: 16,
-        type: 1, // 1:激活套餐，2: 叠加套餐，3:充送套餐
-        delStatus: 0, // 1:已删除；0:未删除
-        comboName: "被叫卡激活套餐",
-        monthFlow: "60.00",
-        monthMin: "0.00",
-        month: 6,
-        simType: "A",
-        monthPrice: "20.00",
-        renewPrice: "120.00",
-        created_at: "2019-08-15 21:01:56",
-        updated_at: "2019-08-15 21:01:56"
+        id: null,
+        money: 0,
+        awardMoney: 0,
+        comboId: "",
+        comboType: 1
       },
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
+        name: [{ required: true, message: "请输入套餐包名", trigger: "blur" }],
+        money: [{ required: true, message: "请输入金额", trigger: "blur" }],
+        awardMoney: [
+          { required: true, message: "请输入赠送金额", trigger: "blur" }
+        ],
+        comboId: [
+          { required: true, message: "请选择所属套餐", trigger: "blur" }
         ]
       }
     };
   },
   methods: {
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          const data = this.simCombo;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
-          }).then(() => {
-            this.$router.push("/demand/list");
+            url: API.SIMCOMBO.COMBO_PACK_SAVE
+          }).then((res) => {
+            if (res.success) {
+              this.$router.push("/simcombo/comboPackList");
+            } else {
+              !res.success &&
+                this.$message({
+                  message: res.msg,
+                  type: "warning"
+                });
+            }
           });
         } else {
           return false;
         }
-      }); */
+      });
+    },
+    getSimCombo() {
+      this.axios({
+        method: "get",
+        params: {
+          comboType: this.simCombo.comboType
+        },
+        url: API.SIMCOMBO.SIM_COMBO_GET_BY_COMBO_TYPE
+      }).then(res => {
+        this.simComboList = res.data.map(item => {
+          return { value: item.id, label: item.name }
+        });
+      });
+    },
+    getComboPack() {
+      this.axios({
+        method: "get",
+        params: {
+          id: this.$route.params.id
+        },
+        url: API.SIMCOMBO.COMBO_PACK_GET_BY_ID
+      }).then(res => {
+        this.simCombo = res.data;
+      });
     }
   },
   mounted() {
-    this.simTypes = this.simCombo.simType.split(",");
+    this.getSimCombo();
+    if (this.$route.params.id !== undefined) {
+      this.getComboPack();
+    }
   }
 };
 </script>

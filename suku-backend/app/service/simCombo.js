@@ -45,6 +45,16 @@ class SimComboService extends BaseService {
     return result;
   }
 
+  async getSimComboByComboType(comboType) {
+    const result = await this.app.model.SimCombo.findAll({
+      where: {
+        comboType,
+      },
+    });
+
+    return result;
+  }
+
   async save(params) {
     try {
       if (params.id !== undefined) {

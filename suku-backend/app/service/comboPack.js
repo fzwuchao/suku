@@ -45,6 +45,27 @@ class SimComboService extends BaseService {
     return result;
   }
 
+  async save(params) {
+    try {
+      if (params.id !== undefined) {
+        const id = params.id;
+        delete params.id;
+        await this.app.model.ComboPack.update(params, { where: { id } });
+      } else {
+        await this.app.model.ComboPack.create(params);
+      }
+      return true;
+    } catch (error) {
+      this.ctx.logger.error(`【创建套餐包失败-失败原因】${error.message}`);
+      return false;
+    }
+
+  }
+
+  async getComboPackById(id) {
+    const result = await this.app.model.ComboPack.findByPk(id);
+    return result;
+  }
 }
 
 module.exports = SimComboService;
