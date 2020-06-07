@@ -45,6 +45,26 @@ class SimComboService extends BaseService {
     return result;
   }
 
+  async save({ id, name, belongsToSimType, monthSumFlowThreshold, monthSumFlowThresholdUnit, monthVoiceDurationThreshold, monthVoiceDurationThresholdUnit, monthRent, months, renewPrice, comboType }) {
+    const params = { name, belongsToSimType, monthSumFlowThreshold, monthSumFlowThresholdUnit, monthVoiceDurationThreshold, monthVoiceDurationThresholdUnit, monthRent, months, renewPrice, comboType };
+    try {
+      if (id !== undefined) {
+        await this.app.model.SimCombo.update(params, { where: { id } });
+      } else {
+        await this.app.model.SimCombo.create(params);
+      }
+      return true;
+    } catch (error) {
+      this.ctx.logger.error(`【创建SimCombo失败-失败原因】${error.message}`)
+      return false;
+    }
+
+  }
+
+  async getSimComboById(id) {
+    const result = await this.app.model.SimCombo.findByPk(id);
+    return result;
+  }
 }
 
 module.exports = SimComboService;
