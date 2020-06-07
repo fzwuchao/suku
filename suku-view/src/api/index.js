@@ -6,6 +6,7 @@ import LOGIN from './login'
 import PERMISSION from './permission'
 import ONELINK from './onelink'
 import SIMLOGISTICS from './simLogistics'
+import MESSAGE from './message'
 export default {
     SIMCOMBO,
     SIMLIST,
@@ -14,5 +15,6 @@ export default {
     LOGIN,
     PERMISSION,
     ONELINK,
-    SIMLOGISTICS
+    SIMLOGISTICS,
+    MESSAGE
 }

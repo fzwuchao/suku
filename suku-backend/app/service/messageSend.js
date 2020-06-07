@@ -10,19 +10,26 @@ const BaseService = require('../core/baseService');
 
 class MessageSendService extends BaseService {
 
-  async getSimLogisticsPage(query) {
+  async getMessageSendPage(query) {
     const attributes = [ 'id', 'simId', 'senderId', 'sender', 'orderNo', 'retmesg', 'content', 'gwid', 'createdAt', 'retcode' ];
-    const { pageSize, pageNum, senderId, simId, retmesg } = query;
+    const { pageSize, pageNum, senderId, simId, retcode } = query;
     const Op = this.getOp();
     const where = {};
+
     if (simId) {
       where.simId = { [Op.substring]: simId };
     }
     if (senderId) {
       where.senderId = senderId;
+    } else {
+      const curUser = this.getCurUser();
+      const ids = await this.ctx.service.user.getAllUserIds(curUser.id);
+      where.senderId = {
+        [Op.in]: ids,
+      };
     }
-    if (retmesg) {
-      where.retmesg = retmesg;
+    if (retcode) {
+      where.retcode = retcode;
     }
     const result = await this.findAndCountAll('MessageSend', pageSize, pageNum, {
       attributes,

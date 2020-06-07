@@ -56,7 +56,7 @@ module.exports = app => {
   // 启用停用自动转账
   router.post('/user/updateAutoTransfer', controller.user.updateAutoTransfer);
   // 获取所有用户作为查询条件
-  router.post('/user/getSelectUsers', controller.user.getSelectUsers);
+  router.get('/user/getSelectUsers', controller.user.getSelectUsers);
 
 
   // 获取onelink配置列表
@@ -78,6 +78,10 @@ module.exports = app => {
   // 保存或者更新SIM流水
   router.post('/simLogistics/save', controller.simLogistics.save);
 
+  // 获取sim流水
+  router.get('/messageSend/getMessageSendlist', controller.messageSend.getMessageSendlist);
+  // 保存或者更新SIM流水
+  router.post('/messageSend/save', controller.messageSend.save);
 
   // 获取权限列表
   router.get('/role/searchRole', controller.role.getRolelist);

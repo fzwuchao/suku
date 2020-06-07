@@ -12,7 +12,6 @@
       stripe
       size="mini"
       style="width: 100%"
-      @selection-change="handleSelectionChange"
     >
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
@@ -23,29 +22,29 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="发送人" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.sender }}</template>
       </el-table-column>
       <el-table-column align="left" label="平台ID" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.orderNo}}</template>
       </el-table-column>
-      <el-table-column align="left" label="状态" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="150px" label="接口返回状态" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.retcode | retcodeType}}</template>
       </el-table-column>
-      <el-table-column align="left" label="信息" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="150px" label="接口返回描述" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.retmesg }}</template>
       </el-table-column>
       <el-table-column align="left" label="短信内容" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.content}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="接口流水号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+        <template slot-scope="scope">{{ scope.row.gwid}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="添加时间" show-overflow-tooltip>
-        <template>{{ "1:待处理；2:处理中；3:完成"}}</template>
+        <template slot-scope="scope">{{scope.row.createdAt}}</template>
       </el-table-column>
     </el-table>
     <div class="page">
@@ -72,7 +71,6 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
       pageSize: 10,
       importDialog: false,
@@ -81,31 +79,37 @@ export default {
       data: null,
       searchData: [
         {
-          name: "simId1",
+          name: "simId",
           title: "SIM卡号",
           type: "inputText",
           value: ""
         },
         {
-          name: "netStatus",
-          title: "用户",
-          type: "multiple",
+          name: "senderId",
+          title: "发送人",
+          type: "select",
           values: [
             { value: 1, key: "激活套餐" },
             { value: 2, key: "叠加套餐" },
             { value: 3, key: "特惠套餐" }
           ],
-          active: [1, 2, 3]
+          active: []
         },
         {
-          name: "netStatus",
-          title: "状态",
-          type: "multiple",
+          name: "retcode",
+          title: "接口返回状态",
+          type: "select",
           values: [
-            { value: 1, key: "成功" },
-            { value: 2, key: "失败" }
+            { value: "", key: "全部" },
+            { value: '00', key: "成功" },
+            { value: '01', key: "失败" },
+            { value: '02', key: "接收方号码为空" },
+            { value: '03', key: "接收方号码错误" },
+            { value: '04', key: "短信内容为空" },
+            { value: '05', key: "鉴权ID为空" },
+            { value: '06', key: "鉴权失败" }
           ],
-          active: [1, 2, 3]
+          active: []
         }
       ]
     };
@@ -117,32 +121,31 @@ export default {
     searchBar
   },
   filters: {
-    comboType(type) {
-      type = type - 0;
+    retcodeType(type) {
       let returnStr = "";
+      // 00：成功 01：失败 02：接收方号码为空 03：接收方号码错误 04：短信内容为空 05：鉴权ID 为空 06：鉴权失败'
       switch (type) {
-        case 1:
-          returnStr = "激活套餐";
+        case '00':
+          returnStr = "成功";
           break;
-        case 2:
-          returnStr = "叠加套餐";
+        case '01':
+          returnStr = "失败";
           break;
-        case 3:
-          returnStr = "特惠套餐";
+        case '02':
+          returnStr = "接收方号码为空";
           break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
+        case '03':
+          returnStr = "接收方号码错误";
+          break;
+        case '04':
+          returnStr = "短信内容为空";
+          break;
+        case '05':
+          returnStr = "鉴权ID为空";
+          break;
+        case '06':
+          returnStr = "鉴权失败";
+          break;
       }
       return returnStr;
     }
@@ -154,40 +157,37 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {};
+      }
+      params.pageNum = this.pageNum;
+      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params: {
-          page: this.pageNum,
-          limit: this.pageSize
-        },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        params,
+        url: API.MESSAGE.GET_MESSAGE_SEND_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
+    getUsers() {
+      this.axios({
+        method: "get",
+        url: API.USERS.GET_SELECT_USERS
+      }).then(r => {
+        r.data.splice(0,0,{value: '',key:'全部'})
+        this.searchData[1].values = r.data
+      });
     }
   },
   mounted() {
     this.getlist();
-  },
-  watch: {
-    type: function(newVal) {
-      this.simType = newVal;
-    }
+    this.getUsers();
   },
   created() {
-    this.simType = this.type;
     this.tableHeight = getTableHeight();
   }
 };
