@@ -1,9 +1,12 @@
 'use strict';
 
 const ComboPackRules = {
-  comboId: {
+  comboType: {
     type: 'int?',
   },
+  name: {
+    type: 'string?',
+  }
 };
 
 module.exports = ComboPackRules;

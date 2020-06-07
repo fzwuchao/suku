@@ -4,7 +4,7 @@
 // 套餐表
 const moment = require('moment');
 module.exports = app => {
-  const { STRING, DATE, DECIMAL, BIGINT } = app.Sequelize;
+  const { STRING, DATE, DECIMAL, BIGINT, TINYINT } = app.Sequelize;
 
   const ComboPack = app.model.define('combo_pack', {
     id: {
@@ -15,6 +15,11 @@ module.exports = app => {
     name: {
       type: STRING(30),
       comment: '套餐包名称',
+    },
+    comboType: {
+      type: TINYINT(2),
+      field: 'combo_type',
+      comment: '类型: 1-激活套餐，2-叠加套餐，3-特惠套餐',
     },
     comboId: {
       type: BIGINT(20),
@@ -29,6 +34,26 @@ module.exports = app => {
       type: DECIMAL(10, 3),
       field: 'award_money',
       comment: '赠送金额',
+    },
+    monthSumFlowThreshold: {
+      type: DECIMAL(10, 3),
+      field: 'month_sum_flow_threshold',
+      comment: '当月流量阈',
+    },
+    monthSumFlowThresholdUnit: {
+      type: STRING(10),
+      field: 'month_sum_flow_threshold_unit',
+      comment: '当月流量阈的单位',
+    },
+    monthVoiceDurationThreshold: {
+      type: DECIMAL(10, 3),
+      field: 'month_voice_duration_threshold',
+      comment: '当月语音时长阈',
+    },
+    monthVoiceDurationThresholdUnit: {
+      type: STRING(10),
+      field: 'month_voice_duration_threshold_unit',
+      comment: '当月语音时长阈的单位',
     },
     createdAt: {
       type: DATE,
@@ -51,6 +76,12 @@ module.exports = app => {
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   });
+
+  ComboPack.associate = () => {
+    const { SimCombo, ComboPack } = app.model;
+    SimCombo.hasMany(ComboPack, { foreignKey: 'comboId' });
+    ComboPack.belongsTo(SimCombo, { as: 'simCombo', foreignKey: 'comboId' });
+  };
 
   return ComboPack;
 };

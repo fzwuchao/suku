@@ -8,33 +8,34 @@ class SimComboService extends BaseService {
    * 获取套餐包信息
    * @param {object} - 参数对像
    * object: {
-   *  comboId: 套餐id
+   *  comboType: 套餐类型
    * } 
    */
-  async getComboPackPageData({ comboId, pageSize, pageNum }) {
-    const { Sequelize: { Op }, SimCombo, ComboPack } = this.app.model;
+  async getComboPackPageData({ comboType, name, pageSize, pageNum }) {
+    const { Sequelize: { Op }, SimCombo } = this.app.model;
     const condition = {};
 
-    if (!_.isUndefined(comboId)) {
-      condition['comboId'] = {
-        [Op.eq]: comboId,
+    if (!_.isUndefined(comboType)) {
+      condition['comboType'] = {
+        [Op.eq]: comboType,
       };
     }
 
-    SimCombo.hasMany(ComboPack, { foreignKey: 'comboId' });
-    ComboPack.belongsTo(SimCombo, {
-      // as: 'SimCombo',
-      foreignKey: 'comboId',
-    });
+    if (!_.isUndefined(name)) {
+      condition['name'] = {
+        [Op.substring]: name,
+      };
+    }
 
     let whereCondition = {};
 
     if (Object.keys(condition).length > 0) {
       whereCondition = {
         where: condition,
-        include: [{
+        include: {
           model: SimCombo,
-        }],
+          as: 'simCombo',
+        },
       };
 
     }
