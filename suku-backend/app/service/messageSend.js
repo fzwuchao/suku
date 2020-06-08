@@ -23,7 +23,7 @@ class MessageSendService extends BaseService {
       where.senderId = senderId;
     } else {
       const curUser = this.getCurUser();
-      const ids = await this.ctx.service.user.getAllUserIds(curUser.id);
+      const ids = await this.ctx.service.user.getAllUserIds([ curUser.id ]);
       where.senderId = {
         [Op.in]: ids,
       };

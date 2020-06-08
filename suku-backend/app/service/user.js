@@ -43,36 +43,63 @@ class UserService extends BaseService {
     return user;
   }
 
-  async getAllUserIds(pid) {
+  async getAllUserIds(pids, ids) {
     const attributes = [ 'id' ];
+    const Op = this.getOp();
+    if (typeof pids === 'number') {
+      pids = [ pids ];
+    }
     const users = await this.app.model.User.findAll({ attributes,
       where: {
-        pid,
+        pid: { [Op.in]: pids },
       },
     });
-    const ids = [];
-    for (let i = 0; i < users.length; i++) {
-      ids.push(users[i].id);
+    if (!ids) {
+      ids = [];
+      Array.prototype.push.apply(ids, pids);
     }
-    ids.push(pid);
+    if (users.length !== 0) {
+      const newPids = [];
+      for (let i = 0; i < users.length; i++) {
+        ids.push(users[i].id);
+        newPids.push(users[i].id);
+      }
+      await this.getAllUserIds(newPids, ids);
+    }
     return ids;
   }
 
-  async getAllUsers(pid) {
+  async getAllUsers(pids, users) {
     const attributes = [[ 'id', 'value' ], [ 'name', 'key' ]];
-    const users = await this.app.model.User.findAll({ attributes,
+    if (typeof pids === 'number') {
+      pids = [ pids ];
+    }
+    const Op = this.getOp();
+    if (!users) {
+      users = [];
+    }
+    const curUsers = await this.app.model.User.findAll({ attributes,
       where: {
-        pid,
+        pid: { [Op.in]: pids },
       },
     });
-
+    if (users.length !== 0) {
+      const newPids = [];
+      for (let i = 0; i < curUsers.length; i++) {
+        newPids.push(curUsers[i].id);
+      }
+      Array.prototype.push.apply(users, curUsers);
+      await this.getAllUserIds(newPids, users);
+    }
     return users;
   }
   async getUsersPage(pid, pageSize, pageNum) {
     const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];
+    const ids = await this.getAllUserIds([ pid ]);
+    const Op = this.getOp();
     const result = await this.findAndCountAll('User', pageSize, pageNum, {
       attributes,
-      where: { pid },
+      where: { id: { [Op.in]: ids } },
       include: {
         model: this.app.model.Role,
         attributes: [ 'displayName' ],

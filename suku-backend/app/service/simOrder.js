@@ -34,7 +34,7 @@ class SimOrderService extends BaseService {
       where.uid = uid;
     } else {
       const curUser = this.getCurUser();
-      const ids = await this.ctx.service.user.getAllUserIds(curUser.id);
+      const ids = await this.ctx.service.user.getAllUserIds([ curUser.id ]);
       where.uid = {
         [Op.in]: ids,
       };
