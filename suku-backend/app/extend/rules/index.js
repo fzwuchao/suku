@@ -7,6 +7,7 @@ const comboPack = require('./comboPack');
 const simLogistics = require('./simLogistics');
 const messageSend = require('./messageSend');
 const simOrder = require('./simOrder');
+const writeList = require('./writeList');
 
 const pageRules = {
   pageNum: {
@@ -40,5 +41,6 @@ module.exports = () => {
     simLogistics: createRule(simLogistics),
     messageSend: createRule(messageSend),
     simOrder: createRule(simOrder),
+    writeList: createRule(writeList),
   };
 };

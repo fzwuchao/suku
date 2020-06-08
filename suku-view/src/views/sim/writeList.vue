@@ -2,7 +2,7 @@
   <div class="sim-write-list">
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <el-button type="primary" size="mini">删除</el-button>
+      <!--<el-button type="primary" size="mini">删除</el-button> -->
     </div>
 
     <el-table
@@ -21,17 +21,17 @@
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column align="left" label="simk卡号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.sim_id}}</template>
+        <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
       <el-table-column align="left" label="用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.name }}</template>
+        <template slot-scope="scope">{{ scope.row.uname }}</template>
       </el-table-column>
       <el-table-column align="left" label="手机号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.phone}}</template>
       </el-table-column>
       <el-table-column align="left" label="添加时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.created_at}}</template>
+        <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
     </el-table>
     <div class="page">
@@ -43,7 +43,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -88,18 +88,20 @@ export default {
     editSim(row) {
       this.$router.push(`/sim/editinfo/${this.simType}/${row.sim_id}`);
     },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {};
+      }
+      params.pageSize = this.pageSize;
+      params.pageNum = this.pageNum;
       this.axios({
         method: "get",
-        params: {
-          page: this.pageNum,
-          limit: this.pageSize
-        },
+        params,
         url: API.SIMLIST.WRITE_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {

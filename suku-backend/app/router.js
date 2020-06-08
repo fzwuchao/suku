@@ -96,4 +96,9 @@ module.exports = app => {
 
   // 查询订单
   router.get('/simOrder/getSimOrderlist', controller.simOrder.getSimOrderlist);
+
+
+  // 查询白名单记录
+  router.get('/writeList/getWriteList', controller.writeList.getWriteList);
+
 };
