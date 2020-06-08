@@ -1,11 +1,14 @@
 'use strict';
 const SimRules = {
+  id: {
+    type: 'int?',
+  },
   simId: {
-    type: 'string?', // 加问号表示这个参数非必要
+    type: 'int?', // 加问号表示这个参数非必要
   },
   simIdRange: {
     type: 'array?',
-    itemType: 'string',
+    itemType: 'int',
   },
   username: {
     type: 'string?',

@@ -7,9 +7,14 @@ module.exports = app => {
   const { STRING, DATE, TINYINT, DECIMAL, CHAR, BIGINT } = app.Sequelize;
 
   const Sim = app.model.define('sim', {
-    simId: {
+    id: {
       type: BIGINT(20),
       primaryKey: true,
+      autoIncrement: true,
+      comment: '主键',
+    },
+    simId: {
+      type: BIGINT(20),
       field: 'sim_id',
       comment: 'sim卡号',
     },
