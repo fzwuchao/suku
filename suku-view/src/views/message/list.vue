@@ -56,7 +56,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
