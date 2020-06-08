@@ -3,6 +3,20 @@
 const BaseController = require('../core/baseController');
 
 class SimComboController extends BaseController {
+  async getSimComboByComboType() {
+    const { ctx } = this;
+    const { service, request, helper } = ctx;
+    const { simCombo } = helper.rules;
+    const rule = {
+      ...simCombo([ 'comboType' ]),
+    };
+
+    const params = request.query;
+    ctx.validate(rule, params);
+    const result = await service.simCombo.getSimComboByComboType(params.comboType);
+    this.success(result, '');
+  }
+
   async search() {
     const { ctx } = this;
     const { service, request, helper } = ctx;

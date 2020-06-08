@@ -31,7 +31,7 @@ export default {
       // if (first && first.name !== 'dashboard') {
       //  matched = [{ path: '/dashboard', meta: { title: 'Dashboard' }}].concat(matched)
       // }
-      console.log(matched);
+      // console.log(matched);
       this.levelList = matched;
     }
   }

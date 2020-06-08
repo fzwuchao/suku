@@ -1,8 +1,7 @@
 <template>
   <div class="combo-pack-list">
     <div class="btn-list">
-      <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <el-button type="primary" size="mini">新增</el-button>
+      <el-button type="primary" size="mini" @click="editPack()">新增</el-button>
       <el-button type="primary" size="mini">删除</el-button>
     </div>
 
@@ -19,7 +18,6 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
-      <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column
         align="left"
@@ -100,7 +98,11 @@ export default {
       this.getlist();
     },
     editPack(row) {
-      this.$router.push(`/simcombo/editPack/${row.id}`);
+      if (row === undefined) {
+        this.$router.push(`/simcombo/editPack`);
+      } else {
+        this.$router.push(`/simcombo/editPack/${row.id}`);
+      }
     },
     getlist(val) {
       let params = {};

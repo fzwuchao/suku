@@ -37,11 +37,17 @@ module.exports = app => {
   router.get('/simCombo/search', controller.simCombo.search);
   // 通过id,查询套餐
   router.get('/simCombo/getSimComboById', controller.simCombo.getSimComboById);
+  // 通过comboType,查询套餐
+  router.get('/simCombo/getSimComboByComboType', controller.simCombo.getSimComboByComboType);
   // 创建套餐
   router.post('/simCombo/save', controller.simCombo.save);
 
   // 套餐包
   router.get('/comboPack/search', controller.comboPack.search);
+  // 保存
+  router.post('/comboPack/save', controller.comboPack.save);
+  // 通过id,查询套餐包
+  router.get('/comboPack/getComboPackById', controller.comboPack.getComboPackById);
 
   // 获取用户列表
   router.get('/user/searchUser', controller.user.getUserlist);
