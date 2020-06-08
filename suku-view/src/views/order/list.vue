@@ -73,7 +73,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <el-dialog title="提现" :visible.sync="withdrawalDialog">
