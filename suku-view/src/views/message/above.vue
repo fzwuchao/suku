@@ -1,5 +1,7 @@
 <template>
   <div class="withdrawal-list">
+    <div class="btn-list"></div>
+
     <el-table
       ref="multipleTable"
       header-row-class-name="table-head"
@@ -20,17 +22,18 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.uname }}</template>
       </el-table-column>
-      <el-table-column align="left" label="内容" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      
+      <el-table-column align="left" label="短信内容" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.content}}</template>
       </el-table-column>
-      <el-table-column align="left" label="上行时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="120px" label="添加时间" show-overflow-tooltip>
+        <template slot-scope="scope">{{scope.row.createdAt}}</template>
       </el-table-column>
     </el-table>
     <div class="page">
@@ -42,7 +45,7 @@
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
@@ -57,7 +60,6 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
       pageSize: 10,
       importDialog: false,
@@ -66,21 +68,21 @@ export default {
       data: null,
       searchData: [
         {
-          name: "simId1",
+          name: "simId",
           title: "SIM卡号",
           type: "inputText",
           value: ""
         },
         {
-          name: "netStatus",
+          name: "uid",
           title: "用户",
-          type: "multiple",
+          type: "select",
           values: [
             { value: 1, key: "激活套餐" },
             { value: 2, key: "叠加套餐" },
             { value: 3, key: "特惠套餐" }
           ],
-          active: [1, 2, 3]
+          active: []
         }
       ]
     };
@@ -91,78 +93,41 @@ export default {
   components: {
     searchBar
   },
-  filters: {
-    comboType(type) {
-      type = type - 0;
-      let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
-        case 2:
-          returnStr = "叠加套餐";
-          break;
-        case 3:
-          returnStr = "特惠套餐";
-          break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
-      }
-      return returnStr;
-    }
-  },
   methods: {
     pageChange() {
       this.getlist();
     },
-    editCombo(row) {
-      this.$router.push(`/simcombo/editinfo/${row.id}`);
-    },
-    getlist() {
+    getlist(params) {
+      if(!params) {
+        params = {};
+      }
+      params.pageNum = this.pageNum;
+      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params: {
-          page: this.pageNum,
-          limit: this.pageSize
-        },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        params,
+        url: API.MESSAGE.GET_MESSAGE_UPGOING_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
+    getUsers() {
+      this.axios({
+        method: "get",
+        url: API.USERS.GET_SELECT_USERS
+      }).then(r => {
+        r.data.splice(0,0,{value: '',key:'全部'})
+        this.searchData[1].values = r.data
+      });
     }
   },
   mounted() {
     this.getlist();
-  },
-  watch: {
-    type: function(newVal) {
-      this.simType = newVal;
-    }
+    this.getUsers();
   },
   created() {
-    this.simType = this.type;
     this.tableHeight = getTableHeight();
   }
 };

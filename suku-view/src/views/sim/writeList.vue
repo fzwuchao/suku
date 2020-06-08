@@ -15,15 +15,12 @@
       stripe
       size="mini"
       style="width: 100%"
-      @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column align="left" label="simk卡号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
-
       <el-table-column align="left" label="用户" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.uname }}</template>
       </el-table-column>
@@ -58,7 +55,6 @@ export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
       pageSize: 10,
       importDialog: false,
@@ -85,9 +81,6 @@ export default {
     pageChange() {
       this.getlist();
     },
-    editSim(row) {
-      this.$router.push(`/sim/editinfo/${this.simType}/${row.sim_id}`);
-    },
     getlist(params) {
       if(!params) {
         params = {};
@@ -103,15 +96,6 @@ export default {
         this.list = this.data.list;
         this.pageTotal = this.data.totalRecords;
       });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
     }
   },
   mounted() {

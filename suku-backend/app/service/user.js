@@ -83,13 +83,13 @@ class UserService extends BaseService {
         pid: { [Op.in]: pids },
       },
     });
-    if (users.length !== 0) {
+    if (curUsers.length !== 0) {
       const newPids = [];
       for (let i = 0; i < curUsers.length; i++) {
-        newPids.push(curUsers[i].id);
+        newPids.push(curUsers[i].dataValues.value);
       }
       Array.prototype.push.apply(users, curUsers);
-      await this.getAllUserIds(newPids, users);
+      await this.getAllUsers(newPids, users);
     }
     return users;
   }

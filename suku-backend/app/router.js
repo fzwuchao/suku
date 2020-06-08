@@ -84,10 +84,12 @@ module.exports = app => {
   // 保存或者更新SIM流水
   router.post('/simLogistics/save', controller.simLogistics.save);
 
-  // 获取sim流水
+  // 短信发送记录
   router.get('/messageSend/getMessageSendlist', controller.messageSend.getMessageSendlist);
-  // 保存或者更新SIM流水
+  // 新建短信发送记录
   router.post('/messageSend/save', controller.messageSend.save);
+  // 短信上行记录
+  router.get('/messageUpgoing/getMessageUpgoinglist', controller.messageUpgoing.getMessageUpgoinglist);
 
   // 获取权限列表
   router.get('/role/searchRole', controller.role.getRolelist);
