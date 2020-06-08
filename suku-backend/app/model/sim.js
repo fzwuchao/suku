@@ -16,6 +16,7 @@ module.exports = app => {
     simId: {
       type: BIGINT(20),
       field: 'sim_id',
+      unique: true,
       comment: 'sim卡号',
     },
     iccid: STRING(50),
