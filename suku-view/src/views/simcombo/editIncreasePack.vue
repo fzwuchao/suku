@@ -2,20 +2,50 @@
   <div class="add-person">
     <edit-bar></edit-bar>
     <el-form label-width="130px" :model="simCombo" :rules="rules" ref="ruleForm">
-      <el-form-item label="套餐包名" prop="comboName">
-        <el-input v-model="simCombo.comboName"></el-input>
+      <el-form-item label="套餐包名" prop="name">
+        <el-input v-model="simCombo.name"></el-input>
       </el-form-item>
-      <el-form-item label="所属套餐" prop="type">
-        <el-select v-model="simCombo.type" clearable placeholder="请选择">
-          <el-option label="运营商" :value="1">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+      <el-form-item
+        label="所属套餐"
+        prop="comboId"
+      >
+        <el-select
+          v-model="simCombo.comboId"
+          clearable
+          placeholder="请选择"
+          @change="comboChange"
+        >
+        
+          <el-option
+            v-for="item in simComboList"
+            :label="item.label"
+            :value="item.value"
+            :key="item.value"
+          ></el-option>
+        
         </el-select>
       </el-form-item>
-      <el-form-item label="流量" prop="monthPrice">
-        <el-input v-model="simCombo.monthPrice"></el-input>
+      <el-form-item
+        label="流量"
+        prop="monthSumFlowThreshold"
+      >
+        <el-input-number
+          :precision="2"
+          :controls="false"
+          v-model="simCombo.monthSumFlowThreshold"
+        ></el-input-number>
+        <span class="unit">{{simCombo.monthSumFlowThresholdUnit}}</span>
       </el-form-item>
-      <el-form-item label="语音时长" prop="month">
-        <el-input v-model="simCombo.month"></el-input><span>如果选择的叠加套餐适用卡类型包含被叫卡，则此输入项禁用</span>
+      <el-form-item
+        label="语音时长"
+        prop="monthVoiceDurationThreshold"
+        v-if="isShow"
+      >
+        <el-input-number
+          v-model="simCombo.monthVoiceDurationThreshold"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">{{simCombo.monthVoiceDurationThresholdUnit}}</span>
       </el-form-item>
 
       <el-form-item>
@@ -27,7 +57,7 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
+import API from "@/api";
 // import { validateTel } from "../../utils/validate.js";
 export default {
   components: {
@@ -42,49 +72,105 @@ export default {
       }
     }; */
     return {
-      simTypes: [],
+      simComboList: [],
+      isShow: true,
       simCombo: {
-        id: 16,
-        type: 1, // 1:激活套餐，2: 叠加套餐，3:充送套餐
-        delStatus: 0, // 1:已删除；0:未删除
-        comboName: "被叫卡激活套餐",
-        monthFlow: "60.00",
-        monthMin: "0.00",
-        month: 6,
-        simType: "A",
-        monthPrice: "20.00",
-        renewPrice: "120.00",
-        created_at: "2019-08-15 21:01:56",
-        updated_at: "2019-08-15 21:01:56"
+        id: null,
+        name: "",
+        monthSumFlowThreshold: 0,
+        monthSumFlowThresholdUnit: 'M',
+        monthVoiceDurationThreshold: 0,
+        monthVoiceDurationThresholdUnit: '分',
+        comboId: "",
+        comboType: 2,
       },
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
-        ]
+        name: [{ required: true, message: "请输入套餐包名", trigger: "blur" }],
+        comboId: [
+          { required: true, message: "请选择所属套餐", trigger: "blur" }
+        ],
+        monthSumFlowThreshold: [
+          { required: true, message: "请输入流量", trigger: "blur" }
+        ],
+        monthVoiceDurationThreshold: [
+          { required: true, message: "请输入语音时长", trigger: "blur" }
+        ],
       }
     };
   },
   methods: {
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          let data = this.simCombo;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
-          }).then(() => {
-            this.$router.push("/demand/list");
+            url: API.SIMCOMBO.COMBO_PACK_SAVE
+          }).then((res) => {
+            if (res.success) {
+              this.$router.push("/simcombo/increasePackList");
+            } else {
+              !res.success &&
+                this.$message({
+                  message: res.msg,
+                  type: "warning"
+                });
+            }
           });
         } else {
           return false;
         }
-      }); */
+      });
+    },
+    comboChange(val) {
+      // const belongsToSimType = this.simComboList.filter(combo => combo.value === val)[0].belongsToSimType;
+      // if (belongsToSimType.includes('A')) {
+      //   this.isShow = false;
+      // } else {
+      //   this.isShow = true;
+      // }
+      this.setVoiceIsShow(val);
+    },
+    setVoiceIsShow(val) {
+      const belongsToSimType = this.simComboList.filter(combo => combo.value === val)[0].belongsToSimType;
+      if (belongsToSimType.includes('A')) {
+        this.isShow = false;
+      } else {
+        this.isShow = true;
+      }
+    },
+    getSimCombo() {
+      this.axios({
+        method: "get",
+        params: {
+          comboType: this.simCombo.comboType
+        },
+        url: API.SIMCOMBO.SIM_COMBO_GET_BY_COMBO_TYPE
+      }).then(res => {
+        this.simComboList = res.data.map(item => {
+          return { value: item.id, label: item.name, belongsToSimType: item.belongsToSimType }
+        });
+      });
+    },
+    getComboPack() {
+      this.axios({
+        method: "get",
+        params: {
+          id: this.$route.params.id
+        },
+        url: API.SIMCOMBO.COMBO_PACK_GET_BY_ID
+      }).then(res => {
+        this.simCombo = res.data;
+        this.setVoiceIsShow(this.simCombo.comboId);
+      });
     }
   },
   mounted() {
-    this.simTypes = this.simCombo.simType.split(",");
+    this.getSimCombo();
+    if (this.$route.params.id !== undefined) {
+      this.getComboPack();
+    }
   }
 };
 </script>
