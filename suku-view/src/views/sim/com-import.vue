@@ -188,6 +188,7 @@ export default {
       this.$refs["ruleForm"].validate(valid => {
         if (valid) {
           this.sim.otherMenuIds = this.increaseMenuIds. concat(this.discountsMenuIds).join(',');
+          this.sim.simType = this.type;
           let data = this.sim;
           this.axios({
             method: "post",
