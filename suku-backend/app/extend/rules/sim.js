@@ -25,6 +25,24 @@ const SimRules = {
   activeMenuName: {
     type: 'string?',
   },
+  onelinkId: {
+    type: 'int?',
+  },
+  onelinkName: {
+    type: 'string?',
+  },
+  activeMenuId: {
+    type: 'int?',
+  },
+  userId: {
+    type: 'int?',
+  },
+  otherMenuIds: {
+    type: 'string?',
+  },
+  filepath: {
+    type: 'string?',
+  }
 };
 
 module.exports = SimRules;

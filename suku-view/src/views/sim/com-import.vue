@@ -1,122 +1,262 @@
 <template>
   <div class="add-person">
-    <el-form label-width="130px" :model="sim" :rules="rules" ref="ruleForm">
-      <el-form-item label="选择激活套餐">
-        <el-select v-model="sim.menu_id" clearable placeholder="请选择">
-          <el-option label="半年卡50m" :value="1">半年卡50m</el-option>
-          <el-option label="3G年卡" :value="2">3G年卡</el-option>
+    <el-form
+      label-width="130px"
+      :model="sim"
+      :rules="rules"
+      ref="ruleForm"
+    >
+      <el-form-item label="选择激活套餐" prop="activeMenuId">
+        <el-select
+          v-model="sim.activeMenuId"
+          clearable
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="activeMenu in activeMenuList"
+            :key="activeMenu.value"
+            :label="activeMenu.label"
+            :value="activeMenu.value"
+          ></el-option>
+
         </el-select>
       </el-form-item>
       <el-form-item label="选择叠加套餐">
-        <el-select v-model="value2" multiple placeholder="请选择">
+        <el-select
+          v-model="increaseMenuIds"
+          multiple
+          placeholder="请选择"
+        >
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            v-for="increaseMenu in increaseMenuList"
+            :key="increaseMenu.value"
+            :label="increaseMenu.label"
+            :value="increaseMenu.value"
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item v-if="type=='B'" label="选择特惠套餐">
-        <el-select v-model="value" multiple placeholder="请选择">
+      <el-form-item
+        v-if="type === 'B'"
+        label="选择特惠套餐"
+      >
+        <el-select
+          v-model="discountsMenuIds"
+          multiple
+          placeholder="请选择"
+        >
           <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
+            v-for="discountsMenu in discountsMenuList"
+            :key="discountsMenu.value"
+            :label="discountsMenu.label"
+            :value="discountsMenu.value"
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="选择用户">
-        <el-select v-model="sim.uuid" clearable placeholder="请选择">
-          <el-option label="运营商" :value="1">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+      <el-form-item label="选择用户" prop="userId">
+        <el-select
+          v-model="sim.userId"
+          clearable
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="user in userList"
+            :key="user.value"
+            :label="user.label"
+            :value="user.value"
+          ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="选择onelink平台">
-        <el-select v-model="sim.uuid" clearable placeholder="请选择">
-          <el-option label="运营商" :value="1">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+      <el-form-item label="选择onelink平台" prop="onelinkId">
+        <el-select
+          v-model="sim.onelinkId"
+          clearable
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="onelink in onelinkList"
+            :key="onelink.value"
+            :label="onelink.label"
+            :value="onelink.value"
+          ></el-option>
+
         </el-select>
       </el-form-item>
       <el-form-item label="物流单号">
-        <el-inpit v-model="sim.uuid" placeholder="请输入物流单号"></el-inpit>
+        <el-input
+          v-model="sim.uuid"
+          placeholder="请输入物流单号"
+        ></el-input>
       </el-form-item>
-      <el-form-item label="导入文件">
+      <el-form-item label="导入文件" prop="filepath">
         <el-upload
           class="upload-demo"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="handlePreview"
-          :on-remove="handleRemove"
-          :before-remove="beforeRemove"
-          :on-exceed="handleExceed"
+          action="/sheet/upload"
+          :headers="uploadHeaders"
+          :on-success="handleSuccess"
         >
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传execl/cvs文件</div>
+          <el-button
+            size="small"
+            type="primary"
+          >点击上传</el-button>
+          <div
+            slot="tip"
+            class="el-upload__tip"
+          >只能上传execl/cvs文件</div>
         </el-upload>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button
+          type="primary"
+          @click="submit"
+        >提交</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script>
-// import API from "@/api";
+import API from "@/api";
+import { getToken } from '@/utils/auth'
 export default {
   data() {
     return {
-      sim: {
-        username: "\u963f\u6e29",
-        sim_type: "A",
-        menu_name: "30M\u5e74\u5361",
-        menu_id: 17,
-        uuid: "1"
+      uploadHeaders: {
+        'x-csrf-token': getToken(),
       },
-      value2: [],
-      value: [],
-      options: [
-        {
-          value: "选项1",
-          label: "流量叠加1"
-        },
-        {
-          value: "选项2",
-          label: "流量叠加2"
-        }
-      ],
+      sim: {
+        username: "",
+        userId: "",
+        activeMenuId: "",
+        activeMenuName: "",
+        otherMenuIds: "",
+        onelinkId: "",
+        onelinkName: "",
+        simType: "A",
+        uuid: "",
+        filepath: '',
+      },
+      increaseMenuIds: [],
+      discountsMenuIds: [],
+      activeMenuList: [],
+      increaseMenuList: [],
+      discountsMenuList: [],
+      userList: [],
+      onelinkList: [],
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
-        ]
+        userId: [
+          { required: true, message: "请选择用户", trigger: "blur" }
+        ],
+        activeMenuId: [
+          { required: true, message: "请选择激活套餐", trigger: "blur" }
+        ],
+        onelinkId: [
+          { required: true, message: "请选择onelink", trigger: "blur" }
+        ],
+        filepath: [
+          { required: true, message: "请上传文件", trigger: "blur" }
+        ],
       }
     };
   },
   props: {
     type: String
   },
+  watch: {
+    'sim.activeMenuId'(val) {
+      this.sim.activeMenuName = this.getLabel(this.activeMenuList, val);
+    },
+    'sim.userId'(val) {
+      this.sim.username = this.getLabel(this.userList, val);
+    },
+    'sim.onelinkId'(val) {
+      this.sim.onelinkName = this.getLabel(this.onelinkList, val);
+    }
+  },
   methods: {
+    getLabel(list, val) {
+      return list.filter(item => item.value === val)[0].label;
+    },
+    handleSuccess(response) {
+      if (response.success) {
+        this.sim.filepath = response.data.filepath
+      } else {
+        this.$message.error(response.msg)
+      }
+    },
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          this.sim.otherMenuIds = this.increaseMenuIds. concat(this.discountsMenuIds).join(',');
+          let data = this.sim;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
-          }).then(() => {
-            this.$router.push("/demand/list");
+            url: API.SIMLIST.SIM_IMPORT_SIMS
+          }).then((r) => {
+            if (r.success) {
+              this.$refs["ruleForm"].resetFields();
+              this.$emit('close');
+            } else {
+              this.$message({
+                type: 'error',
+                message: r.msg
+              })
+            }
           });
         } else {
           return false;
         }
-      }); */
+      });
+    },
+    getSimComboByComboType(comboType) {
+      return this.axios({
+        method: "get",
+        params: {
+          pageNum: 1,
+          pageSize: 9999,
+          comboType,
+          belongsToSimType: this.type
+        },
+        url: API.SIMCOMBO.SIM_COMBO_LIST
+      });
+    },
+    getOnelink() {
+      this.axios({
+        method: "get",
+        url: API.ONELINK.GET_ALL_ONELINK
+      }).then(r => {
+        this.onelinkList = (r.data || []).map(item => {
+          return { label: item.name, value: item.id }
+        });
+      });
+    },
+    getChildUsers() {
+      this.axios({
+        method: "get",
+        url: API.USERS.GET_CHILD_USERS
+      }).then(r => {
+        this.userList = (r.data || []).map(item => {
+          return { label: item.name, value: item.id }
+        });
+      });
     }
   },
-  mounted() {}
+  mounted() {
+    const promiseList = [1, 2, 3].map(comboType => this.getSimComboByComboType(comboType));
+    Promise.all(promiseList).then(res => {
+      const simComboList = res.map(simComboRes => {
+        return simComboRes.data.list.map(simCombo => { 
+          return {value: simCombo.id, label: simCombo.name}
+        })
+      })
+      this.activeMenuList = simComboList[0];
+      this.increaseMenuList = simComboList[1];
+      this.discountsMenuList = simComboList[2];
+    })
+    this.getOnelink();
+    this.getChildUsers();
+  }
 };
 </script>
 

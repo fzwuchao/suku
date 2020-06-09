@@ -146,6 +146,16 @@ module.exports = app => {
       field: 'net_status',
       comment: '状态: 1-未启用, 2-正常, 3-停机, 4-过期, 5-注销, 6-欠费, 7-手动复机',
     },
+    onelinkId: {
+      type: BIGINT(20),
+      field: 'onelink_id',
+      comment: 'onelink平台id',
+    },
+    onelinkName: {
+      type: STRING(30),
+      field: 'onelink_name',
+      comment: 'onelink平台名称',
+    },
     createdAt: {
       type: DATE,
       get() {

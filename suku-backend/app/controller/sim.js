@@ -48,5 +48,92 @@ class SimController extends BaseController {
     this.success(pageData, '');
   }
 
+  async importSims() {
+    const { ctx } = this;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim([
+        'activeMenuId', 'activeMenuName',
+        'otherMenuIds', 'userId', 'username',
+        'onelinkId', 'onelinkName',
+        'simType',
+        'filepath',
+      ]),
+    };
+    const params = { ...request.body };
+    ctx.validate(rule, params);
+
+    const result = await service.sheet.parseSimIdFile(params.filepath);
+    if (!result.parseSuccess) {
+      this.fail(null, null, result.msg);
+      return;
+    }
+
+    const simIdList = result.sheetData;
+    // TODO: 解析完成后，删除tmp-file/下对应的文件
+
+    const mapSimIdToCount = {};
+    // 表中的sim卡号验重
+    simIdList.forEach(simId => {
+      if (!mapSimIdToCount[simId]) {
+        mapSimIdToCount[simId] = 1;
+      } else {
+        mapSimIdToCount[simId] += mapSimIdToCount[simId];
+      }
+    });
+    const repeatSimIdsInFile = Object.keys(mapSimIdToCount).filter(simId => mapSimIdToCount[simId] > 1);
+    if (repeatSimIdsInFile.length > 0) {
+      ctx.logger.error(`【表中，sim卡号存在重复的】: ${repeatSimIdsInFile}`);
+      this.fail(null, repeatSimIdsInFile, '表中，sim卡号存在重复的');
+      return;
+    }
+
+    const repeatSimIdList = await service.sim.getRepeatSimIds(simIdList);
+    // 表格中的sim卡号与数据库中的验重
+    if (repeatSimIdList.length > 0) {
+      const repeatIds = repeatSimIdList.map(item => item.simId);
+      ctx.logger.error(`【数据库中，sim卡号已存在】: ${repeatIds}`);
+      this.fail(null, repeatIds, '数据库中，sim卡号已存在');
+      return;
+    }
+    // 激话套餐的流量、语音时长、续费价格
+    const {
+      monthSumFlowThreshold, monthSumFlowThresholdUnit,
+      monthVoiceDurationThreshold, monthVoiceDurationThresholdUnit,
+      renewPrice,
+    } = await service.simCombo.getSimComboById(params.activeMenuId);
+    const simList = simIdList.map(simId => {
+      return {
+        simId,
+        activeMenuId: params.activeMenuId,
+        activeMenuName: params.activeMenuName,
+        otherMenuIds: params.otherMenuIds,
+        userId: params.userId,
+        username: params.username,
+        onelinkId: params.onelinkId,
+        onelinkName: params.onelinkName,
+        simType: params.simType,
+        monthSumFlowThreshold,
+        monthSumFlowThresholdUnit,
+        monthVoiceDurationThreshold,
+        monthVoiceDurationThresholdUnit,
+        renewPrice,
+      };
+    });
+
+    try {
+      const result = await service.sim.bulkCreate(simList);
+      if (result) {
+        this.success('', '导入成功');
+      } else {
+        this.fail('', '', '导出失败');
+      }
+
+    } catch (error) {
+      this.fail('', '', error.message);
+    }
+  }
+
 }
 module.exports = SimController;
