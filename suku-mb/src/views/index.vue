@@ -50,17 +50,17 @@ export default {
         Toast("请输入物联卡卡号");
         return;
       }
-      this.$router.push("/recharge");
-      /* this.axios({
+      // this.$router.push("/recharge");
+      this.axios({
         method: "get",
         params: {
-          sim_id: this.simId
+          simId: this.simId
         },
         url: "/index/wechat/test-check"
       }).then(() => {
         // let data = r.data;
         // this.returnSim = data["sim_id"];
-      }); */
+      });
     }
     /* doWechatPay(json) {
       WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
