@@ -63,6 +63,8 @@ module.exports = app => {
   router.post('/user/updateAutoTransfer', controller.user.updateAutoTransfer);
   // 获取所有用户作为查询条件
   router.get('/user/getSelectUsers', controller.user.getSelectUsers);
+  // 获取一级子用户
+  router.get('/user/getChildUsers', controller.user.getChildUsers);
 
 
   // 获取onelink配置列表
@@ -75,6 +77,8 @@ module.exports = app => {
   router.post('/onelink/save', controller.onelinkPlatform.save);
   // 批量开启/关闭平台
   router.post('/onelink/updateStatus', controller.onelinkPlatform.updateStatus);
+  // 获取所有开启的onelink配置
+  router.get('/onelink/getAllOnelink', controller.onelinkPlatform.getAllOnelink);
 
 
   // 获取sim流水

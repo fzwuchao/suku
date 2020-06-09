@@ -8,6 +8,7 @@ export default {
     GET_USER_BY_ID: "/user/getUserById",
     UPDATE_OPENMSG:"/user/updateOpenmsg",
     UPDATE_AUTO_TRANSFER:"/user/updateAutoTransfer",
-    GET_SELECT_USERS: "/user/getSelectUsers"
+    GET_SELECT_USERS: "/user/getSelectUsers",
+    GET_CHILD_USERS: "/user/getChildUsers"
     
 }

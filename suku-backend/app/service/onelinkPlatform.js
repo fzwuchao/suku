@@ -31,6 +31,16 @@ class OnelinkPlatformService extends BaseService {
     return onlinkPlatform;
   }
 
+  async getAllOnelink() {
+    const attributes = [ 'id', 'name' ];
+    const onlinkPlatform = await this.app.model.OnelinkPlatform.findAll({ attributes,
+      where: {
+        status: 1,
+      },
+    });
+    return onlinkPlatform;
+  }
+
   async getOnelinkPage(pageSize, pageNum) {
     const attributes = [ 'id', 'name', 'appId', 'apiHost', 'apiVersion', 'nameKey', 'status', 'createdAt', 'updatedAt' ];
     const result = await this.findAndCountAll('OnelinkPlatform', pageSize, pageNum, {

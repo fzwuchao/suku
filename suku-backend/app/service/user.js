@@ -43,6 +43,20 @@ class UserService extends BaseService {
     return user;
   }
 
+  async getUserByPid(pid, attr) {
+    let attributes = [ 'id', 'name' ];
+    if (attr) {
+      attributes = attr;
+    }
+    const user = await this.app.model.User.findAll({ attributes,
+      where: {
+        pid,
+      },
+    });
+
+    return user;
+  }
+
   async getAllUserIds(pids, ids) {
     const attributes = [ 'id' ];
     const Op = this.getOp();

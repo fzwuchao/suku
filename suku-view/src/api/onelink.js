@@ -8,5 +8,7 @@ export default {
   // 保存或者更新onelink配置
   SAVE: '/onelink/save',
   // 批量开启/关闭平台
-  UPDATE_STATUS: '/onelink/updateStatus'
+  UPDATE_STATUS: '/onelink/updateStatus',
+  // 获取所有开启的onelink
+  GET_ALL_ONELINK: '/onelink/getAllOnelink'
 }
