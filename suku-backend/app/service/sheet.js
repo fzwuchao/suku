@@ -57,6 +57,71 @@ class SheetService extends Service {
   createReadStream(filepath) {
     return fs.createReadStream(filepath);
   }
+
+  async parseSimIdFile(filepath) {
+    const { logger } = this.ctx;
+    const sheetData = [];
+    let parseSuccess = false;
+    let msg = '';
+    const result = { parseSuccess: false, msg: '', sheetData: [] };
+
+    logger.info('【文件路径】:', filepath);
+    logger.info('【解析-Start】');
+    const startTime = moment().milliseconds();
+    const workbook = XLSX.readFile(filepath);
+    const { Sheets } = workbook;
+    for (const key in Sheets) {
+      if (Sheets.hasOwnProperty(key)) {
+        // { '!ref': 'A1:A2' }，冒号前面代表第一个单元格，后面为最后一个单元格
+        const ref = Sheets[key]['!ref'];
+        if (ref) {
+          const range = ref.split(':');
+          const colName = 'A';
+          // 保证excel表的数据是放在第一列
+          if (range[0].startsWith(colName) && range[1].startsWith(colName)) {
+            // 假如有12条数据，分别对应的cell为A1、A2、A3、...、A12
+            const start = Number(range[0].substring(1));
+            const end = Number(range[1].substring(1));
+            for (let i = start; i < end + 1; i++) {
+              const cell = `A${i}`;
+              sheetData.push(Sheets[key][cell].v);
+            }
+          } else {
+            msg = '数据必须在sheet中的第一列';
+            logger.error(`【${msg}】`);
+            result.msg = msg;
+          }
+        } else {
+          msg = '无效的内容';
+          logger.error(`【${msg}】`);
+          result.msg = msg;
+        }
+        break;
+      }
+    }
+
+    if (!parseSuccess) {
+      return result;
+    }
+
+    const endTime = moment().milliseconds();
+    result.sheetData = sheetData;
+    logger.info(sheetData);
+    logger.info(`【解析-End】总条数: ${sheetData.length}, 总耗时: ${endTime - startTime} ms`);
+    return result;
+  }
+
+  async uploadFile() {
+    const { request, logger } = this.ctx;
+    if (request.files.length > 1) {
+      logger.error(`【只能上传一个文件】上传文件数：${request.files.length}`);
+      return { uploadSuccess: false, msg: '只能上传一个文件' };
+    }
+
+    const { filename, filepath } = request.files[0];
+    logger.info('【上传的文件名】:', filename, ' 【文件路径】:', filepath);
+    return { uploadSuccess: true, filepath };
+  }
 }
 
 module.exports = SheetService;

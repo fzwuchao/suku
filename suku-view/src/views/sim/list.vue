@@ -1,7 +1,6 @@
 <template>
   <div class="sim-list">
     <div class="btn-list">
-      <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
       <el-button type="primary" @click="importDialog = !importDialog" size="mini">导入物联卡</el-button>
       <el-button type="primary" size="mini">导出查询结果</el-button>
       <el-button type="warning" size="mini">停机</el-button>
@@ -9,8 +8,8 @@
       <el-button type="warning" size="mini">强制复机</el-button>
       <el-button type="primary" size="mini">续费</el-button>
       <el-button type="primary" size="mini">短信</el-button>
-      <el-button type="warning" v-if="simType == 'B'" size="mini">停语音</el-button>
-      <el-button type="warning" v-if="simType == 'B'" size="mini">恢复语音</el-button>
+      <el-button type="warning" v-if="simType === 'B'" size="mini">停语音</el-button>
+      <el-button type="warning" v-if="simType === 'B'" size="mini">恢复语音</el-button>
       <el-button type="primary" size="mini">转让</el-button>
       <el-button type="primary" size="mini">续费增加</el-button>
       <el-button type="primary" size="mini">更换套餐</el-button>
@@ -29,7 +28,6 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
-      <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
       <el-table-column
         align="left"
@@ -76,16 +74,16 @@
       <el-table-column align="left" label="剩余流量" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} ${scope.row.monthShengyuFlowUnit ? scope.row.monthSumFlowThresholdUnit : 'M'}`}}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="余额" show-overflow-tooltip>
+      <el-table-column align="left" v-if="simType === 'B'" label="余额" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="当月语间时长阈" show-overflow-tooltip>
+      <el-table-column align="left" v-if="simType === 'B'" label="当月语音时长阈" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} ${scope.row.monthVoiceDurationThresholdUnit ? scope.row.monthVoiceDurationThresholdUnit : 'Min'}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="当月剩余语音时长" show-overflow-tooltip>
+      <el-table-column align="left" v-if="simType === 'B'" label="当月剩余语音时长" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0} ${scope.row.monthShengyuVoiceDurationUnit ? scope.row.monthShengyuVoiceDurationUnit : 'Min'}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType == 'B'" label="语音服务关停状态" show-overflow-tooltip>
+      <el-table-column align="left" v-if="simType === 'B'" label="语音服务关停状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.voiceServStatus}}</template>
       </el-table-column>
       
@@ -109,8 +107,8 @@
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
 
-    <el-dialog :title="'导入'+ (simType == 'B' ? '主叫卡': '被叫卡')" :visible.sync="importDialog">
-      <com-import :type="simType"></com-import>
+    <el-dialog :title="'导入'+ (simType === 'B' ? '主叫卡': '被叫卡')" :visible.sync="importDialog">
+      <com-import :type="simType" @close="close"></com-import>
     </el-dialog>
   </div>
 </template>
@@ -194,6 +192,10 @@ export default {
     comImport
   },
   methods: {
+    close() {
+      this.importDialog = false;
+      this.getlist();
+    },
     pageChange() {
       this.getlist();
     },

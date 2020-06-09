@@ -100,6 +100,20 @@ class SimService extends BaseService {
     return sims.length === simList.length;
   }
 
+  // 获取重复的id
+  async getRepeatSimIds(ids) {
+    const { Sim } = this.app.model;
+    const Op = this.getOp();
+    const result = await Sim.findAll({
+      where: {
+        simId: {
+          [Op.in]: ids,
+        },
+      },
+      attributes: [ 'simId' ],
+    });
+    return result;
+  }
 }
 
 module.exports = SimService;

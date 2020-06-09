@@ -32,6 +32,12 @@ module.exports = app => {
   router.post('/sim/save', controller.sim.save);
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);
+  // 导入物联卡
+  router.post('/sim/importSims', controller.sim.importSims);
+
+  // 上传文件
+  router.post('/sheet/upload', controller.sheet.uploadFile);
+
 
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);
