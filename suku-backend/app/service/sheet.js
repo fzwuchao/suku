@@ -86,6 +86,8 @@ class SheetService extends Service {
               const cell = `A${i}`;
               sheetData.push(Sheets[key][cell].v);
             }
+            parseSuccess = true;
+            result.parseSuccess = true;
           } else {
             msg = '数据必须在sheet中的第一列';
             logger.error(`【${msg}】`);
