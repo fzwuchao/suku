@@ -4,9 +4,9 @@ const ERRORMSG = require('../extend/errorCode');
 module.exports = (options, app) => {
   return async function checkToken(ctx, next) {
     const { header, url } = ctx.request;
-
+    const whiteList = [ '/login', '/logout', '/getCaptcha', '/sim/getSim' ];
     // 除登录接口外，其它接口需要验证token有效性
-    if (url !== '/login' && url !== '/logout' && url !== '/getCaptcha') {
+    if (whiteList.indexOf(url) !== -1) {
       const requestToken = header['x-csrf-token'];
       if (requestToken === undefined) {
         ctx.body = {

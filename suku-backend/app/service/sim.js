@@ -7,7 +7,14 @@ const BaseService = require('../core/baseService');
 
 class SimService extends BaseService {
   async getSimBySimId(simId) {
-    return this.app.model.Sim.findByPk(simId);
+    // const attributes = [ 'simId', 'iccid', 'simType', 'activeMenuId', 'activeMenuName', 'otherMenuIds', 'activeTime', 'overdueTime' ];
+    const [ sim ] = await this.app.model.Sim.findAll({
+      where: {
+        simId,
+      },
+    });
+
+    return sim;
   }
 
   /**

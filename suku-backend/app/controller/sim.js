@@ -135,5 +135,18 @@ class SimController extends BaseController {
     }
   }
 
+  async getSim() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.query);
+    const { simId } = request.query;
+    const result = await service.sim.getSimBySimId(simId);
+    this.success(result, '');
+  }
+
 }
 module.exports = SimController;

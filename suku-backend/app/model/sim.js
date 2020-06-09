@@ -53,7 +53,7 @@ module.exports = app => {
     isActive: {
       type: TINYINT(1),
       field: 'is_active',
-      comment: '是否激活: 1-激活, 2-未激活',
+      comment: '是否激活: 1-激活, 0-未激活',
     },
     activeTime: {
       type: DATE,

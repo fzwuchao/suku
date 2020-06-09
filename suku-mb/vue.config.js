@@ -26,13 +26,14 @@ module.exports = {
                 changeOrigin: true
             },
             "/": {
-                // 移动
-                target: 'http://api.heclouds.com',
-                pathRewrite: {
-                    '^/': '/'
-                },
-                changeOrigin: true
-            }
+              // 开发环境
+              target: "http://127.0.0.1:7001",
+              // 测试环境 target : 'http://10.2.30.193:58080',
+              pathRewrite: {
+                  "^/": "/"
+              },
+              changeOrigin: true
+          }
         }
     },
     configureWebpack: {

@@ -56,16 +56,15 @@ export default {
         return;
       }
       // this.$router.push("/recharge");
-      /* this.axios({
+      this.axios({
         method: "get",
         params: {
           simId: this.simId
         },
-        url: "/index/wechat/test-check"
-      }).then(() => {
-        // let data = r.data;
-        // this.returnSim = data["sim_id"];
-      }); */
+        url: "/sim/getSim"
+      }).then((r) => {
+        console.log(r)
+      });
     }
     /* doWechatPay(json) {
       WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
