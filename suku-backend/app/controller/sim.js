@@ -125,6 +125,12 @@ class SimController extends BaseController {
     try {
       const result = await service.sim.bulkCreate(simList);
       if (result) {
+        // 生成入库记录
+        await service.simLogistics.create({
+          receiver: params.username,
+          receiverId: params.userId,
+          total: simList.length,
+        });
         this.success('', '导入成功');
       } else {
         this.fail('', '', '导出失败');

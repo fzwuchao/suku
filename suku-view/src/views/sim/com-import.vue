@@ -6,7 +6,10 @@
       :rules="rules"
       ref="ruleForm"
     >
-      <el-form-item label="选择激活套餐" prop="activeMenuId">
+      <el-form-item
+        label="选择激活套餐"
+        prop="activeMenuId"
+      >
         <el-select
           v-model="sim.activeMenuId"
           clearable
@@ -21,7 +24,10 @@
 
         </el-select>
       </el-form-item>
-      <el-form-item label="选择叠加套餐">
+      <el-form-item
+        label="选择叠加套餐"
+        prop="increaseMenuIds"
+      >
         <el-select
           v-model="increaseMenuIds"
           multiple
@@ -52,7 +58,10 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="选择用户" prop="userId">
+      <el-form-item
+        label="选择用户"
+        prop="userId"
+      >
         <el-select
           v-model="sim.userId"
           clearable
@@ -66,7 +75,10 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="选择onelink平台" prop="onelinkId">
+      <el-form-item
+        label="选择onelink平台"
+        prop="onelinkId"
+      >
         <el-select
           v-model="sim.onelinkId"
           clearable
@@ -81,13 +93,11 @@
 
         </el-select>
       </el-form-item>
-      <el-form-item label="物流单号">
-        <el-input
-          v-model="sim.uuid"
-          placeholder="请输入物流单号"
-        ></el-input>
-      </el-form-item>
-      <el-form-item label="导入文件" prop="filepath">
+
+      <el-form-item
+        label="导入文件"
+        prop="filepath"
+      >
         <el-upload
           class="upload-demo"
           action="/sheet/upload"
@@ -117,12 +127,12 @@
 
 <script>
 import API from "@/api";
-import { getToken } from '@/utils/auth'
+import { getToken } from "@/utils/auth";
 export default {
   data() {
     return {
       uploadHeaders: {
-        'x-csrf-token': getToken(),
+        "x-csrf-token": getToken()
       },
       sim: {
         username: "",
@@ -133,8 +143,7 @@ export default {
         onelinkId: "",
         onelinkName: "",
         simType: "A",
-        uuid: "",
-        filepath: '',
+        filepath: ""
       },
       increaseMenuIds: [],
       discountsMenuIds: [],
@@ -144,18 +153,27 @@ export default {
       userList: [],
       onelinkList: [],
       rules: {
-        userId: [
-          { required: true, message: "请选择用户", trigger: "blur" }
-        ],
+        userId: [{ required: true, message: "请选择用户", trigger: "blur" }],
         activeMenuId: [
           { required: true, message: "请选择激活套餐", trigger: "blur" }
         ],
         onelinkId: [
           { required: true, message: "请选择onelink", trigger: "blur" }
         ],
-        filepath: [
-          { required: true, message: "请上传文件", trigger: "blur" }
-        ],
+        filepath: [{ required: true, message: "请上传文件", trigger: "blur" }],
+        increaseMenuIds: [
+          // { required: true, message: "请选择叠加套餐", trigger: "blur" }
+          {
+            trigger: "blur",
+            validator: (rule, value, callback) => {
+              if (this.increaseMenuIds.length === 0) {
+                callback('请选择叠加套餐');
+              } else {
+                callback();
+              }
+            }
+          }
+        ]
       }
     };
   },
@@ -163,46 +181,49 @@ export default {
     type: String
   },
   watch: {
-    'sim.activeMenuId'(val) {
+    "sim.activeMenuId"(val) {
       this.sim.activeMenuName = this.getLabel(this.activeMenuList, val);
     },
-    'sim.userId'(val) {
+    "sim.userId"(val) {
       this.sim.username = this.getLabel(this.userList, val);
     },
-    'sim.onelinkId'(val) {
+    "sim.onelinkId"(val) {
       this.sim.onelinkName = this.getLabel(this.onelinkList, val);
     }
   },
   methods: {
     getLabel(list, val) {
-      return list.filter(item => item.value === val)[0].label;
+      return val ? list.filter(item => item.value === val)[0].label : "";
     },
     handleSuccess(response) {
       if (response.success) {
-        this.sim.filepath = response.data.filepath
+        this.sim.filepath = response.data.filepath;
       } else {
-        this.$message.error(response.msg)
+        this.$message.error(response.msg);
       }
     },
     submit() {
+      console.log(this.increaseMenuIds);
       this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          this.sim.otherMenuIds = this.increaseMenuIds. concat(this.discountsMenuIds).join(',');
+          this.sim.otherMenuIds = this.increaseMenuIds
+            .concat(this.discountsMenuIds)
+            .join(",");
           this.sim.simType = this.type;
           let data = this.sim;
           this.axios({
             method: "post",
             data: data,
             url: API.SIMLIST.SIM_IMPORT_SIMS
-          }).then((r) => {
+          }).then(r => {
             if (r.success) {
               this.$refs["ruleForm"].resetFields();
-              this.$emit('close');
+              this.$emit("close");
             } else {
               this.$message({
-                type: 'error',
+                type: "error",
                 message: r.msg
-              })
+              });
             }
           });
         } else {
@@ -228,7 +249,7 @@ export default {
         url: API.ONELINK.GET_ALL_ONELINK
       }).then(r => {
         this.onelinkList = (r.data || []).map(item => {
-          return { label: item.name, value: item.id }
+          return { label: item.name, value: item.id };
         });
       });
     },
@@ -238,23 +259,25 @@ export default {
         url: API.USERS.GET_CHILD_USERS
       }).then(r => {
         this.userList = (r.data || []).map(item => {
-          return { label: item.name, value: item.id }
+          return { label: item.name, value: item.id };
         });
       });
     }
   },
   mounted() {
-    const promiseList = [1, 2, 3].map(comboType => this.getSimComboByComboType(comboType));
+    const promiseList = [1, 2, 3].map(comboType =>
+      this.getSimComboByComboType(comboType)
+    );
     Promise.all(promiseList).then(res => {
       const simComboList = res.map(simComboRes => {
-        return simComboRes.data.list.map(simCombo => { 
-          return {value: simCombo.id, label: simCombo.name}
-        })
-      })
+        return simComboRes.data.list.map(simCombo => {
+          return { value: simCombo.id, label: simCombo.name };
+        });
+      });
       this.activeMenuList = simComboList[0];
       this.increaseMenuList = simComboList[1];
       this.discountsMenuList = simComboList[2];
-    })
+    });
     this.getOnelink();
     this.getChildUsers();
   }
