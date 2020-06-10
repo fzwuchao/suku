@@ -66,7 +66,7 @@ module.exports = app => {
     overdueTime: {
       type: DATE,
       get() {
-        return this.getDataValue('overdueTime') ? moment(this.getDataValue('overdueTime')).format('YYYY-MM-DD HH:mm:ss') : null;
+        return this.getDataValue('overdueTime') ? moment(this.getDataValue('overdueTime')).format('YYYY-MM-DD') : null;
       },
       field: 'overdue_time',
       comment: '过期时间',

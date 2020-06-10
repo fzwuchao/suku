@@ -13,7 +13,7 @@ module.exports = app => {
     },
     flowNo: {
       type: STRING(50),
-      field: 'flow_no', // 发卡人id
+      field: 'flow_no', // sim卡流水号
     },
     sender: {
       type: STRING(30), // 发卡人

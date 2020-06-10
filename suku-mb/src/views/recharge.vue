@@ -7,8 +7,8 @@
             <svg-icon name="signal" class="icon-signal" />
           </div>
           <div class="top-sim-info">
-            <p class="top-sim-number">17249558227</p>
-            <p class="top-sim-iccid">iccid: 89860800142070003974</p>
+            <p class="top-sim-number">{{sim.simId}}</p>
+            <p class="top-sim-iccid">iccid: {{sim.iccid}}</p>
           </div>
         </div>
         <div class="recharge-top-msg">
@@ -22,28 +22,28 @@
           <van-grid-item>
             <p class="recharge-info-title">一年实惠包</p>
             <p class="recharge-info-value">
-              <van-button plain color="#e9b021" size="mini">续费</van-button>
+              <van-button plain color="#e9b021" :disabled="isShowRew"  size="mini">续费</van-button>
             </p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">剩余流量</p>
-            <p class="recharge-info-value">2899.00 M</p>
+            <p class="recharge-info-value">{{sim.monthShengyuFlow? sim.monthShengyuFlow: '--' }} M</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">剩余语音</p>
-            <p class="recharge-info-value">78.00 分钟</p>
+            <p class="recharge-info-value">{{sim.monthShengyuVoiceDuration? sim.monthShengyuVoiceDuration: '--'}} min</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">开关机</p>
-            <p class="recharge-info-value">开机</p>
+            <p class="recharge-info-value">{{sim.netStatus | netStatus}}</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">卡状态</p>
-            <p class="recharge-info-value">正常</p>
+            <p class="recharge-info-value">{{sim.netStatus | netStatus}}</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">过期时间</p>
-            <p class="recharge-info-value">2020-05-09</p>
+            <p class="recharge-info-value">{{sim.overdueTime? sim.overdueTime: '--'}}</p>
           </van-grid-item>
         </van-grid>
       </div>
@@ -165,38 +165,38 @@ export default {
   data() {
     return {
       simId: "",
-      manualActive: 0,
-      returnSim: "",
-      show: false,
-      active: 1,
-      virtualChild: []
+      sim: {},
+      active: 0
     };
   },
+  filters: {
+    netStatus(val) {
+      console.log(val)
+      return 'tingji'
+    }
+  },
   methods: {
-    querySim() {
-      if (this.simId.trim() == "") {
-        Toast("请输入物联卡卡号");
-        return;
-      }
+    getSim() {
       this.axios({
         method: "get",
         params: {
-          sim_id: this.simId
+          simId: this.simId
         },
-        url: "/index/wechat/test-check"
-      }).then(() => {
-        // let data = r.data;
-        // this.returnSim = data["sim_id"];
-      });
-    }
-    /* doWechatPay(json) {
-      WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
-        if (res.err_msg == "get_brand_wcpay_request:ok") {
+        url: "/sim/getSim"
+      }).then((r) => {
+        if(r.data) {
+          this.sim = r.data;
+        }else{
+          Toast("此卡号不是本平台的卡，请仔细检查！");
         }
       });
-    } */
+    }
   },
-  mounted() {}
+  mounted() {},
+  created() {
+    this.simId = this.$route.params.simId;
+    this.getSim();
+  }
 };
 </script>
 <style lang="scss">

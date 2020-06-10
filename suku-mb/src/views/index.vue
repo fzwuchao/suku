@@ -63,7 +63,11 @@ export default {
         },
         url: "/sim/getSim"
       }).then((r) => {
-        console.log(r)
+        if(r.data) {
+          this.$router.push(`/recharge/${this.simId}`);
+        }else{
+          Toast("此卡号不是本平台的卡，请仔细检查！");
+        }
       });
     }
     /* doWechatPay(json) {
