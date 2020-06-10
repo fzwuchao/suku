@@ -1,18 +1,58 @@
 <template>
   <div class="sim-list">
     <div class="btn-list">
-      <el-button type="primary" @click="importDialog = !importDialog" size="mini">导入物联卡</el-button>
-      <el-button type="primary" size="mini">导出查询结果</el-button>
-      <el-button type="warning" size="mini">停机</el-button>
-      <el-button type="warning" size="mini">复机</el-button>
-      <el-button type="warning" size="mini">强制复机</el-button>
-      <el-button type="primary" size="mini">续费</el-button>
-      <el-button type="primary" size="mini">短信</el-button>
-      <el-button type="warning" v-if="simType === 'B'" size="mini">停语音</el-button>
-      <el-button type="warning" v-if="simType === 'B'" size="mini">恢复语音</el-button>
-      <el-button type="primary" size="mini">转让</el-button>
-      <el-button type="primary" size="mini">续费增加</el-button>
-      <el-button type="primary" size="mini">更换套餐</el-button>
+      <el-button
+        type="primary"
+        @click="importDialog = !importDialog"
+        size="mini"
+      >导入物联卡</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        @click="handleExport"
+      >导出查询结果</el-button>
+      <el-button
+        type="warning"
+        size="mini"
+      >停机</el-button>
+      <el-button
+        type="warning"
+        size="mini"
+      >复机</el-button>
+      <el-button
+        type="warning"
+        size="mini"
+      >强制复机</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+      >续费</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+      >短信</el-button>
+      <el-button
+        type="warning"
+        v-if="simType === 'B'"
+        size="mini"
+      >停语音</el-button>
+      <el-button
+        type="warning"
+        v-if="simType === 'B'"
+        size="mini"
+      >恢复语音</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+      >转让</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+      >续费增加</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+      >更换套餐</el-button>
     </div>
 
     <el-table
@@ -27,7 +67,12 @@
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
+      <el-table-column
+        type="selection"
+        align="center"
+        fixed="left"
+        width="55"
+      ></el-table-column>
 
       <el-table-column
         align="left"
@@ -39,57 +84,129 @@
         <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
-      <el-table-column align="left" label="状态" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="状态"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.netStatus }}</template>
       </el-table-column>
-      <el-table-column align="left" label="流量服务关停状态" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="流量服务关停状态"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.flowServStatus}}</template>
       </el-table-column>
-      <el-table-column align="left" label="平台状态" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="平台状态"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.cardStatus}}</template>
       </el-table-column>
-      <el-table-column align="left" label="激活套餐名" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="激活套餐名"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.activeMenuName}}</template>
       </el-table-column>
 
-      <el-table-column align="left" label="过期时间" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="激活时间"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.activeTime }}</template>
       </el-table-column>
-      <el-table-column align="left" label="激活时间" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="过期时间"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.overdueTime }}</template>
       </el-table-column>
-      <el-table-column align="left" label="续费价格" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="续费价格"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
       </el-table-column>
-      <el-table-column align="left" label="用户" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="用户"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.username }}</template>
       </el-table-column>
 
-      <el-table-column align="left" label="当月流量阈" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="当月流量阈"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} M` }}</template>
       </el-table-column>
-      <el-table-column align="left" label="叠加流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthOverlapFlow : 0} M` }}</template>
+      <el-table-column
+        align="left"
+        label="叠加流量"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.monthOverlapFlow ? scope.row.monthOverlapFlow : 0} M` }}</template>
       </el-table-column>
-      <el-table-column align="left" label="剩余流量" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="剩余流量"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} M`}}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType === 'B'" label="余额" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="余额"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ `${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType === 'B'" label="当月语音时长阈" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="当月语音时长阈"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} M` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType === 'B'" label="当月剩余语音时长" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="当月剩余语音时长"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0} 分` }}</template>
       </el-table-column>
-      <el-table-column align="left" v-if="simType === 'B'" label="语音服务关停状态" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="语音服务关停状态"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.voiceServStatus}}</template>
       </el-table-column>
-      
-      <el-table-column fixed="right" label="操作" width="100">
+
+      <el-table-column
+        fixed="right"
+        label="操作"
+        width="100"
+      >
         <template slot-scope="scope">
-          <el-button type="text" @click="editSim(scope.row)" size="small">编辑</el-button>
+          <el-button
+            type="text"
+            @click="editSim(scope.row)"
+            size="small"
+          >编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -105,10 +222,19 @@
         :total="data.totalRecords"
       ></el-pagination>
     </div>
-    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+    <search-bar
+      :searchData="searchData"
+      @handleGetList="getlist"
+    ></search-bar>
 
-    <el-dialog :title="'导入'+ (simType === 'B' ? '主叫卡': '被叫卡')" :visible.sync="importDialog">
-      <com-import :type="simType" @close="close"></com-import>
+    <el-dialog
+      :title="'导入'+ (simType === 'B' ? '主叫卡': '被叫卡')"
+      :visible.sync="importDialog"
+    >
+      <com-import
+        :type="simType"
+        @close="close"
+      ></com-import>
     </el-dialog>
   </div>
 </template>
@@ -123,11 +249,13 @@ export default {
     return {
       pageNum: 1,
       simType: "A",
+      mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
       pageSize: 10,
       importDialog: false,
       tableHeight: null,
       list: [],
       data: null,
+      searchParams: {},
       searchData: [
         {
           name: "simId",
@@ -192,6 +320,32 @@ export default {
     comImport
   },
   methods: {
+    download(data, fileName, suffix) {
+      console.log("xx");
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.style.display = "none";
+      link.href = url;
+      link.setAttribute("download", fileName + "." + suffix);
+      document.body.appendChild(link);
+      link.click();
+      //释放资源
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    },
+    handleExport() {
+      this.axios({
+        methods: "get",
+        params: {
+          simType: this.simType,
+          ...this.searchParams
+        },
+        responseType: 'blob',
+        url: API.SIMLIST.SIM_EXPORT
+      }).then(r => {
+        this.download(r, `${this.mapSimTypeToName[this.simType]}`, "xlsx");
+      });
+    },
     close() {
       this.importDialog = false;
       this.getlist();
@@ -203,15 +357,16 @@ export default {
       this.$router.push(`/sim/editinfo/${this.simType}/${row.sim_id}`);
     },
     getlist(val) {
-      let params = {}
-      if (val) params = { ...val };
+      if (val) {
+        this.searchParams = val;
+      }
       this.axios({
         method: "get",
         params: {
           simType: this.simType,
           pageNum: this.pageNum,
           pageSize: this.pageSize,
-          ...params,
+          ...this.searchParams
         },
         url: API.SIMLIST.SIM_LIST
       }).then(r => {
@@ -238,9 +393,9 @@ export default {
       this.simType = newVal;
       !isSame && this.getlist();
       // 由于动态展示列表字段，当被叫卡切换到主叫卡时，主叫卡的数据部份top,height计算不对，导致未显示出来
-      this.$nextTick(()=>{
-        this.$refs['multipleTable'].doLayout()
-      })
+      this.$nextTick(() => {
+        this.$refs["multipleTable"].doLayout();
+      });
     }
   },
   created() {

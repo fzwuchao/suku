@@ -28,8 +28,6 @@ module.exports = app => {
   // 获取角色的权限
   router.get('/permission', controller.permission.getPermission);
 
-  // 创建sim卡
-  router.post('/sim/save', controller.sim.save);
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);
   // 导入物联卡
@@ -38,7 +36,8 @@ module.exports = app => {
   router.post('/sheet/upload', controller.sheet.uploadFile);
   // 根据simId获取sim信息
   router.get('/sim/getSim', controller.sim.getSim);
-
+  // 导出sim卡
+  router.get('/sim/export', controller.sim.exportExcel);
 
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);

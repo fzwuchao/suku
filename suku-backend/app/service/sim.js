@@ -8,7 +8,7 @@ const BaseService = require('../core/baseService');
 class SimService extends BaseService {
   async getSimBySimId(simId) {
     // const attributes = [ 'simId', 'iccid', 'simType', 'activeMenuId', 'activeMenuName', 'otherMenuIds', 'activeTime', 'overdueTime' ];
-    const [ sim ] = await this.app.model.Sim.findAll({
+    const [sim] = await this.app.model.Sim.findAll({
       where: {
         simId,
       },
@@ -32,6 +32,13 @@ class SimService extends BaseService {
    * @return {{count, rows}} - 总条数，一页的数据
    */
   async getSimPageData({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
+    const whereCondition = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
+    const simData = await this.findAndCountAll('Sim', pageSize, pageNum, whereCondition);
+
+    return simData;
+  }
+
+  getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName }) {
     const Op = this.getOp();
     const condition = {};
 
@@ -91,8 +98,38 @@ class SimService extends BaseService {
 
     if (Object.keys(condition).length > 0) whereCondition.where = condition;
 
-    const simData = await this.findAndCountAll('Sim', pageSize, pageNum, whereCondition);
+    return whereCondition;
+  }
 
+  async getSimDataForExcel({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName }, simTypeIsB) {
+    const whereCondition = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
+    const commonAttrs = [
+      [ 'simId', 'Sim卡号' ],
+      [ 'netStatus', '状态' ],
+      [ 'flowServStatus', '流量服务关停状态' ],
+      [ 'cardStatus', '平台状态' ],
+      [ 'activeMenuName', '激活套餐名' ],
+      [ 'activeTime', '激活时间' ],
+      [ 'overdueTime', '过期时间' ],
+      [ 'renewPrice', '续费价格' ],
+      [ 'username', '用户'],
+      [ 'monthSumFlowThreshold', '当月流量阈' ],
+      [ 'monthOverlapFlow', '叠加流量' ],
+      [ 'monthShengyuFlow', '剩余流量' ],
+    ];
+    const attrsOfB = [
+      [ 'shengyuMoney', '余额' ],
+      [ 'monthVoiceDurationThreshold', '当月语音时长阈' ],
+      [ 'monthShengyuVoiceDuration', '当月剩余语音时长' ],
+      [ 'voiceServStatus', '语音服务关停状态' ],
+    ];
+
+    let attributes = [].concat(commonAttrs);
+    if (simTypeIsB) {
+      attributes = attributes.concat(attrsOfB);
+    }
+
+    const simData = await this.app.model.Sim.findAll(whereCondition, { attributes });
     return simData;
   }
 
@@ -107,7 +144,7 @@ class SimService extends BaseService {
     return sims.length === simList.length;
   }
 
-  // 获取重复的id
+  // 获取表中存在的simId
   async getRepeatSimIds(ids) {
     const { Sim } = this.app.model;
     const Op = this.getOp();
@@ -117,7 +154,7 @@ class SimService extends BaseService {
           [Op.in]: ids,
         },
       },
-      attributes: [ 'simId' ],
+      attributes: ['simId'],
     });
     return result;
   }

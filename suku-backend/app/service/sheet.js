@@ -124,6 +124,19 @@ class SheetService extends Service {
     logger.info('【上传的文件名】:', filename, ' 【文件路径】:', filepath);
     return { uploadSuccess: true, filepath };
   }
+
+  async generateWorkbookBuffer(jsonObj) {
+    // 生成工作簿
+    const workbook = XLSX.utils.book_new();
+    // 生成sheet
+    const sheet = XLSX.utils.json_to_sheet(jsonObj);
+    // 插入到工作簿中
+    XLSX.utils.book_append_sheet(workbook, sheet, '查询结果');
+    return await XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'buffer',
+    });
+  }
 }
 
 module.exports = SheetService;
