@@ -16,14 +16,8 @@ const SimComboRules = {
   monthSumFlowThreshold: {
     type: 'number?',
   },
-  monthSumFlowThresholdUnit: {
-    type: 'string?',
-  },
   monthVoiceDurationThreshold: {
     type: 'number?',
-  },
-  monthVoiceDurationThresholdUnit: {
-    type: 'string?',
   },
   monthRent: {
     type: 'number?',

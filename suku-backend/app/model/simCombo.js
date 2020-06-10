@@ -29,12 +29,7 @@ module.exports = app => {
     monthSumFlowThreshold: {
       type: DECIMAL(10, 3),
       field: 'month_sum_flow_threshold',
-      comment: '当月流量阈',
-    },
-    monthSumFlowThresholdUnit: {
-      type: STRING(10),
-      field: 'month_sum_flow_threshold_unit',
-      comment: '当月流量阈的单位',
+      comment: '当月流量阈(M)',
     },
     monthRent: {
       type: DECIMAL(10, 3),
@@ -49,12 +44,7 @@ module.exports = app => {
     monthVoiceDurationThreshold: {
       type: DECIMAL(10, 3),
       field: 'month_voice_duration_threshold',
-      comment: '当月语音时长阈',
-    },
-    monthVoiceDurationThresholdUnit: {
-      type: STRING(10),
-      field: 'month_voice_duration_threshold_unit',
-      comment: '当月语音时长阈的单位',
+      comment: '当月语音时长阈(分)',
     },
     months: {
       type: TINYINT,

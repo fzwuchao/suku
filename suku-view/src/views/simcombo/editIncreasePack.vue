@@ -34,7 +34,7 @@
           :controls="false"
           v-model="simCombo.monthSumFlowThreshold"
         ></el-input-number>
-        <span class="unit">{{simCombo.monthSumFlowThresholdUnit}}</span>
+        <span class="unit">M</span>
       </el-form-item>
       <el-form-item
         label="语音时长"
@@ -45,7 +45,7 @@
           v-model="simCombo.monthVoiceDurationThreshold"
           :controls="false"
         ></el-input-number>
-        <span class="unit">{{simCombo.monthVoiceDurationThresholdUnit}}</span>
+        <span class="unit">分</span>
       </el-form-item>
 
       <el-form-item>
@@ -64,13 +64,6 @@ export default {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
       simComboList: [],
       isShow: true,
@@ -78,9 +71,7 @@ export default {
         id: null,
         name: "",
         monthSumFlowThreshold: 0,
-        monthSumFlowThresholdUnit: 'M',
         monthVoiceDurationThreshold: 0,
-        monthVoiceDurationThresholdUnit: '分',
         comboId: "",
         comboType: 2,
       },

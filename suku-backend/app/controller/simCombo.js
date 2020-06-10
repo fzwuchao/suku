@@ -49,9 +49,7 @@ class SimComboController extends BaseController {
     if (comboTypeStr === '1') {
       comboTypeAttrs = [
         'monthSumFlowThreshold',
-        'monthSumFlowThresholdUnit',
         'monthVoiceDurationThreshold',
-        'monthVoiceDurationThresholdUnit',
         'monthRent',
         'months',
         'renewPrice',
