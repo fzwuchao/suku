@@ -48,6 +48,9 @@ module.exports = app => {
   router.get('/simCombo/getSimComboByComboType', controller.simCombo.getSimComboByComboType);
   // 创建套餐
   router.post('/simCombo/save', controller.simCombo.save);
+  // 通过ids,查询套餐
+  router.get('/simCombo/getSimComboByIds', controller.simCombo.getSimComboByIds);
+
 
   // 套餐包
   router.get('/comboPack/search', controller.comboPack.search);

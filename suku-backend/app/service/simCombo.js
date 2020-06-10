@@ -55,6 +55,17 @@ class SimComboService extends BaseService {
     return result;
   }
 
+  async getSimComboByIds(ids) {
+    const { Sequelize: { Op } } = this.app.model;
+    const result = await this.app.model.SimCombo.findAll({
+      where: {
+        [Op.in]: ids,
+      },
+    });
+
+    return result;
+  }
+
   async save(params) {
     try {
       if (params.id !== undefined) {

@@ -166,7 +166,8 @@ export default {
     return {
       simId: "",
       sim: {},
-      active: 0
+      active: 0,
+      comboList: []
     };
   },
   filters: {
@@ -186,9 +187,25 @@ export default {
       }).then((r) => {
         if(r.data) {
           this.sim = r.data;
+          let ids = this.sim.otherMenuIds.split(',');
+          if(this.sim.sim_type == 'B') {
+            ids.push(this.sim.activeMenuId)
+          }
+          this.getSimCombo(ids);
         }else{
           Toast("此卡号不是本平台的卡，请仔细检查！");
         }
+      });
+    },
+    getSimCombo(ids) {
+      this.axios({
+        method: "get",
+        params: {
+          ids: ids
+        },
+        url: "/simCombo/getSimComboByIds"
+      }).then((r) => {
+        this.comboList = r.data
       });
     }
   },
