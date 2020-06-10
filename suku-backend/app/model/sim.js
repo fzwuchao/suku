@@ -132,6 +132,11 @@ module.exports = app => {
       field: 'onelink_name',
       comment: 'onelink平台名称',
     },
+    openStatus: {
+      type: TINYINT(1),
+      field: 'open_status',
+      comment: '开关机状态: 0-关机, 1-开机',
+    },
     createdAt: {
       type: DATE,
       get() {
