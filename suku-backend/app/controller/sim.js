@@ -44,11 +44,8 @@ class SimController extends BaseController {
 
     ctx.validate(rule, params);
     const excelSimData = await service.sim.getSimDataForExcel(params);
-    // console.log('yyyyy');
-    // console.log(excelSimData);
-    const buffer = await service.sheet.generateWorkbookBuffer(excelSimData);
-    // console.log('xxxxxxxxxx');
-    // console.log(buffer);
+    const jsonExcel = JSON.parse(JSON.stringify(excelSimData, null, 2));
+    const buffer = await service.sheet.generateWorkbookBuffer(jsonExcel);
     // application/octet-stream application/vnd.openxmlformats application/msexcel
     this.ctx.set('Content-Type', 'application/msexcel');
     this.ctx.set('Content-disposition', 'attachment; filename=1.xlsx');
