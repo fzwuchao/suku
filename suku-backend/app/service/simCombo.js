@@ -59,7 +59,11 @@ class SimComboService extends BaseService {
     const { Sequelize: { Op } } = this.app.model;
     const result = await this.app.model.SimCombo.findAll({
       where: {
-        [Op.in]: ids,
+        id: { [Op.in]: ids },
+      },
+      include: {
+        model: this.app.model.ComboPack,
+        as: 'packs',
       },
     });
 

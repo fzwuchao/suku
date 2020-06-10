@@ -22,7 +22,7 @@
           <van-grid-item>
             <p class="recharge-info-title">一年实惠包</p>
             <p class="recharge-info-value">
-              <van-button plain color="#e9b021" :disabled="isShowRew"  size="mini">续费</van-button>
+              <van-button plain color="#e9b021" :disabled="!isActive"  size="mini">续费</van-button>
             </p>
           </van-grid-item>
           <van-grid-item>
@@ -51,7 +51,7 @@
     <div class="fun-btns">
       <div class="search_c">
         <van-grid :column-num="3" clickable>
-          <van-grid-item to="/pay/1/2">
+          <van-grid-item v-if="isActive" to="/pay/1/2">
             <p class="fun-btns-icon">
               <svg-icon name="combo" class="icon-combo" />
             </p>
@@ -74,82 +74,23 @@
     </div>
     <div class="combos">
       <van-tabs v-model="active" :animated="true" scrollspy sticky>
-        <van-tab title="充值激活">
-          <div class="combo-packs">
-            <div class="combo-pack">
+        <van-tab v-for="(combo,index) in comboList" :title="combo.name" :key="index">
+          <div  class="combo-packs" >
+            <div  class="combo-pack" v-for="(pack,pindex) in combo.packs" :key="index+'_'+pindex">
               <div class="combo-pack-top">
-                <p class="cpmbo-pack-name">50M流量叠加包</p>
+                <p class="cpmbo-pack-name">{{pack.name}}</p>
                 <p class="cpmbo-pack-flow">
                   流量:
-                  <strong>600M</strong>
+                  <strong>{{pack.monthSumFlowThreshold}}M</strong>
                 </p>
                 <p class="cpmbo-pack-voice">
                   语音:
-                  <strong>80min</strong>
+                  <strong>{{pack.monthVoiceDurationThreshold}}min</strong>
                 </p>
               </div>
               <div class="combo-pack-bottom">
                 售价:
-                <strong>59.00</strong> 元
-              </div>
-            </div>
-            <div class="combo-pack">
-              <div class="combo-pack-top">
-                <p class="cpmbo-pack-name">50M流量叠加包</p>
-                <p class="cpmbo-pack-flow">
-                  流量:
-                  <strong>600M</strong>
-                </p>
-                <p class="cpmbo-pack-voice">
-                  语音:
-                  <strong>80min</strong>
-                </p>
-              </div>
-              <div class="combo-pack-bottom">
-                售价:
-                <strong>59.00</strong> 元
-              </div>
-            </div>
-          </div>
-        </van-tab>
-        <van-tab title="流量叠加包">
-          <div class="combo-packs">
-            <div class="combo-pack">
-              <div class="combo-pack-top">
-                <p class="cpmbo-pack-name">50M流量叠加包</p>
-                <p class="cpmbo-pack-flow">
-                  流量:
-                  <strong>600M</strong>
-                </p>
-                <p class="cpmbo-pack-voice">
-                  语音:
-                  <strong>80min</strong>
-                </p>
-              </div>
-              <div class="combo-pack-bottom">
-                售价:
-                <strong>59.00</strong> 元
-              </div>
-            </div>
-          </div>
-        </van-tab>
-        <van-tab title="语音叠加包">
-          <div class="combo-packs">
-            <div class="combo-pack">
-              <div class="combo-pack-top">
-                <p class="cpmbo-pack-name">50M流量叠加包</p>
-                <p class="cpmbo-pack-flow">
-                  流量:
-                  <strong>600M</strong>
-                </p>
-                <p class="cpmbo-pack-voice">
-                  语音:
-                  <strong>80min</strong>
-                </p>
-              </div>
-              <div class="combo-pack-bottom">
-                售价:
-                <strong>59.00</strong> 元
+                <strong>{{pack.money}}</strong> 元
               </div>
             </div>
           </div>
@@ -167,6 +108,8 @@ export default {
       simId: "",
       sim: {},
       active: 0,
+      isActive: false,
+      isShowRew: true,
       comboList: []
     };
   },
@@ -187,10 +130,14 @@ export default {
       }).then((r) => {
         if(r.data) {
           this.sim = r.data;
-          let ids = this.sim.otherMenuIds.split(',');
-          if(this.sim.sim_type == 'B') {
-            ids.push(this.sim.activeMenuId)
+          let ids = []
+          if(this.sim.isActive == 1 || this.sim.simType == 'A') {
+            ids = this.sim.otherMenuIds.split(',');
           }
+          if(this.sim.simType == 'B') {
+            ids.push(this.sim.activeMenuId+'')
+          }
+          this.isActive = (this.sim.isActive === 1);
           this.getSimCombo(ids);
         }else{
           Toast("此卡号不是本平台的卡，请仔细检查！");
@@ -199,13 +146,26 @@ export default {
     },
     getSimCombo(ids) {
       this.axios({
-        method: "get",
-        params: {
+        method: "post",
+        data: {
           ids: ids
         },
         url: "/simCombo/getSimComboByIds"
       }).then((r) => {
         this.comboList = r.data
+        for(let i=0; i < this.comboList.length; i++) {
+          let combo = this.comboList[i]
+          let packs = combo.packs
+          for(let j=0;j<packs.length;j++) {
+            let pack = packs[j];
+            let packMoney = (pack.awardMoney-0) + (pack.money-0)
+            let packMonths = (packMoney/combo.monthRent);
+            if(pack.comboType == 1 || pack.comboType == 3) {
+              pack.monthSumFlowThreshold =  packMonths * combo.monthSumFlowThreshold;
+              pack.monthVoiceDurationThreshold = packMonths * combo.monthVoiceDurationThreshold;
+            }  
+          }
+        }
       });
     }
   },
@@ -385,6 +345,12 @@ export default {
         padding-left: 8px;
       }
     }
+  }
+  .van-button--disabled {
+    opacity: 0.2;
+  }
+  .van-tab {
+    max-width: 35%;
   }
 }
 </style>

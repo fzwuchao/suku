@@ -73,7 +73,7 @@ module.exports = app => {
   });
 
   SimCombo.associate = function() {
-    app.model.SimCombo.hasOne(app.model.ComboPack, { foreignKey: 'comboId' });
+    app.model.SimCombo.hasMany(app.model.ComboPack, { foreignKey: 'comboId', as: 'packs' });
     // 与ComboPack存在多对一关系，所以使用belongsTo()
     // app.model.SimCombo.belongsTo(app.model.ComboPack, { foreignKey: 'comboId', targetKey: 'id' });
 
