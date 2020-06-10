@@ -77,12 +77,29 @@ class SimComboController extends BaseController {
     const { simCombo } = helper.rules;
 
     const rule = {
-      ...simCombo(['id']),
+      ...simCombo([ 'id' ]),
     };
 
     const params = request.query;
     ctx.validate(rule, params);
     const result = await service.simCombo.getSimComboById(params.id);
+    this.success(result, '');
+  }
+  async getSimComboByIds() {
+    const { ctx } = this;
+    const { service, request } = ctx;
+    const rule = {
+      ids: {
+        type: 'array',
+        itemType: 'string',
+      },
+    };
+    ctx.validate(rule, request.body);
+    const { ids } = request.body;
+    for (let i = 0; i < ids.length; i++) {
+      ids[i] = ids[i] - 0;
+    }
+    const result = await service.simCombo.getSimComboByIds(ids);
     this.success(result, '');
   }
 }
