@@ -33,10 +33,10 @@
         <template slot-scope="scope">{{ scope.row.belongsToSimType | simType }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="套餐月流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} ${scope.row.monthSumFlowThresholdUnit ? scope.row.monthSumFlowThresholdUnit : 'M'}`}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} M`}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="月通话时长" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} ${scope.row.monthVoiceDurationThresholdUnit ? scope.row.monthVoiceDurationThresholdUnit : 'Min'}`}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} 分`}}</template>
       </el-table-column>
       <el-table-column align="left" label="月份长度" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.months }}</template>

@@ -16,14 +16,8 @@ const ComboPackRules = {
   monthSumFlowThreshold: {
     type: 'number?',
   },
-  monthSumFlowThresholdUnit: {
-    type: 'string?',
-  },
   monthVoiceDurationThreshold: {
     type: 'number?',
-  },
-  monthVoiceDurationThresholdUnit: {
-    type: 'string?',
   },
   id: {
     type: 'int?',

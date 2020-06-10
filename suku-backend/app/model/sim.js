@@ -75,52 +75,27 @@ module.exports = app => {
     monthSumFlowThreshold: {
       type: DECIMAL(10, 3),
       field: 'month_sum_flow_threshold',
-      comment: '当月流量阈',
-    },
-    monthSumFlowThresholdUnit: {
-      type: STRING(10),
-      field: 'month_sum_flow_threshold_unit',
-      comment: '当月流量阈的单位',
+      comment: '当月流量阈(M)',
     },
     monthOverlapFlow: {
       type: DECIMAL(10, 3),
       field: 'month_overlap_flow',
-      comment: '当月叠加流量',
-    },
-    monthOverlapFlowUnit: {
-      type: STRING(10),
-      field: 'month_overlap_flow_unit',
-      comment: '当月叠加流量单位',
+      comment: '当月叠加流量(M)',
     },
     monthShengyuFlow: {
       type: DECIMAL(10, 3),
       field: 'month_shengyu_flow',
-      comment: '当月剩余流量',
-    },
-    monthShengyuFlowUnit: {
-      type: STRING(10),
-      field: 'month_shengyu_flow_unit',
-      comment: '当月剩余流量单位',
+      comment: '当月剩余流量(M)',
     },
     monthVoiceDurationThreshold: {
       type: DECIMAL(10, 3),
       field: 'month_voice_duration_threshold',
-      comment: '当月语间时长阈',
-    },
-    monthVoiceDurationThresholdUnit: {
-      type: STRING(10),
-      field: 'month_voice_duration_threshold_unit',
-      comment: '当月语音时长阈的单位',
+      comment: '当月语间时长阈(分)',
     },
     monthShengyuVoiceDuration: {
       type: DECIMAL(10, 3),
       field: 'month_shengyu_voice_duration',
-      comment: '当月剩余语音时长',
-    },
-    monthShengyuVoiceDurationUnit: {
-      type: STRING(10),
-      field: 'month_shengyu_voice_duration_unit',
-      comment: '当月剩余语音时长单位',
+      comment: '当月剩余语音时长(分)',
     },
     renewPrice: {
       type: DECIMAL(10, 3),

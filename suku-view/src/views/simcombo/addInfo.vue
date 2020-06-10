@@ -31,7 +31,7 @@
           :controls="false"
           v-model="simCombo.monthSumFlowThreshold"
         ></el-input-number>
-        <span class="unit">{{simCombo.monthSumFlowThresholdUnit}}</span>
+        <span class="unit">M</span>
       </el-form-item>
       <el-form-item
         label="月通话时长"
@@ -41,7 +41,7 @@
           v-model="simCombo.monthVoiceDurationThreshold"
           :controls="false"
         ></el-input-number>
-        <span class="unit">{{simCombo.monthVoiceDurationThresholdUnit}}</span>
+        <span class="unit">分</span>
       </el-form-item>
       <el-form-item
         label="月租"
@@ -101,9 +101,7 @@ export default {
         name: "",
         belongsToSimType: '',
         monthSumFlowThreshold: 0,
-        monthSumFlowThresholdUnit: "M",
         monthVoiceDurationThreshold: 0,
-        monthVoiceDurationThresholdUnit: "分",
         monthRent: 0,
         months: 1,
         renewPrice: 0,

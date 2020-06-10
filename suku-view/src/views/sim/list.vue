@@ -66,22 +66,22 @@
       </el-table-column>
 
       <el-table-column align="left" label="当月流量阈" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} ${scope.row.monthSumFlowThresholdUnit ? scope.row.monthSumFlowThresholdUnit : 'M'} ` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} M` }}</template>
       </el-table-column>
       <el-table-column align="left" label="叠加流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthOverlapFlow : 0} ${scope.row.monthOverlapFlowUnit ? scope.row.monthOverlapFlowUnit : 'M'}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthOverlapFlow : 0} M` }}</template>
       </el-table-column>
       <el-table-column align="left" label="剩余流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} ${scope.row.monthShengyuFlowUnit ? scope.row.monthSumFlowThresholdUnit : 'M'}`}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} M`}}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType === 'B'" label="余额" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType === 'B'" label="当月语音时长阈" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} ${scope.row.monthVoiceDurationThresholdUnit ? scope.row.monthVoiceDurationThresholdUnit : 'Min'}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} M` }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType === 'B'" label="当月剩余语音时长" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0} ${scope.row.monthShengyuVoiceDurationUnit ? scope.row.monthShengyuVoiceDurationUnit : 'Min'}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0} 分` }}</template>
       </el-table-column>
       <el-table-column align="left" v-if="simType === 'B'" label="语音服务关停状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.voiceServStatus}}</template>

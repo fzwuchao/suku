@@ -99,8 +99,8 @@ class SimController extends BaseController {
     }
     // 激话套餐的流量、语音时长、续费价格
     const {
-      monthSumFlowThreshold, monthSumFlowThresholdUnit,
-      monthVoiceDurationThreshold, monthVoiceDurationThresholdUnit,
+      monthSumFlowThreshold,
+      monthVoiceDurationThreshold,
       renewPrice,
     } = await service.simCombo.getSimComboById(params.activeMenuId);
     const simList = simIdList.map(simId => {
@@ -115,9 +115,7 @@ class SimController extends BaseController {
         onelinkName: params.onelinkName,
         simType: params.simType,
         monthSumFlowThreshold,
-        monthSumFlowThresholdUnit,
         monthVoiceDurationThreshold,
-        monthVoiceDurationThresholdUnit,
         renewPrice,
       };
     });
