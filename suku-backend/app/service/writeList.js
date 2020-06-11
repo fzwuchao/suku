@@ -36,13 +36,25 @@ class WriteListService extends BaseService {
     });
     return result;
   }
+  async getWriteListBySimId(query) {
+    const attributes = [ 'id', 'phone', 'createdAt' ];
+    const { simId } = query;
+    const Op = this.getOp();
+    const where = {};
 
-  async create(messageSend) {
+    if (simId) {
+      where.simId = { [Op.substring]: simId };
+    }
+
+    const result = await this.app.model.WriteList.findAll({ attributes,
+      where,
+    });
+    return result;
+  }
+
+  async create(writeList) {
     try {
-      const curUser = this.getCurUser();
-      messageSend.sender = curUser.name;
-      messageSend.senderId = curUser.id;
-      await this.app.model.MessageSend.create(messageSend);
+      await this.app.model.WriteList.create(writeList);
     } catch (e) {
       return false;
     }

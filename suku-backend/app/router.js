@@ -103,7 +103,8 @@ module.exports = app => {
   router.post('/messageSend/save', controller.messageSend.save);
   // 短信上行记录
   router.get('/messageUpgoing/getMessageUpgoinglist', controller.messageUpgoing.getMessageUpgoinglist);
-
+  // 短信发送记录
+  router.get('/messageSend/getSendlistBySimId', controller.messageSend.getSendlistBySimId);
   // 获取权限列表
   router.get('/role/searchRole', controller.role.getRolelist);
   // 获取当前用户的下级权限
@@ -117,5 +118,9 @@ module.exports = app => {
 
   // 查询白名单记录
   router.get('/writeList/getWriteList', controller.writeList.getWriteList);
+  // 设置白名单
+  router.post('/writeList/save', controller.writeList.save);
+  // 根据simId查询
+  router.get('/writeList/getWriteListBySimId', controller.writeList.getWriteListBySimId);
 
 };
