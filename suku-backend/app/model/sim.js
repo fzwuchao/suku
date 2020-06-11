@@ -137,6 +137,11 @@ module.exports = app => {
       field: 'open_status',
       comment: '开关机状态: 0-关机, 1-开机',
     },
+    privateMoney: {
+      type: DECIMAL(10, 3),
+      field: 'private_money',
+      comment: '经销商个人的加价，不参与分成',
+    },
     createdAt: {
       type: DATE,
       get() {

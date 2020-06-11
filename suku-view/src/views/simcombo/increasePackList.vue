@@ -69,6 +69,14 @@
       <el-table-column
         align="left"
         min-width="120px"
+        label="价格"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.money ? scope.row.money : 0} 元`}}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
+        min-width="120px"
         label="添加时间"
         show-overflow-tooltip
       >
