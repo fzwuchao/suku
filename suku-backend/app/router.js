@@ -111,6 +111,8 @@ module.exports = app => {
 
   // 查询订单
   router.get('/simOrder/getSimOrderlist', controller.simOrder.getSimOrderlist);
+  // 创建订单
+  router.post('/simOrder/save', controller.simOrder.save);
 
 
   // 查询白名单记录

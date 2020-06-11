@@ -20,7 +20,7 @@ module.exports = app => {
     simId: {
       type: BIGINT(20),
       field: 'sim_id',
-      comment: '订单号',
+      comment: '卡号',
     },
     uname: {
       type: STRING(30),
