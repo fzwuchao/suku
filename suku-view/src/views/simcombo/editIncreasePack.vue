@@ -1,8 +1,16 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="simCombo" :rules="rules" ref="ruleForm">
-      <el-form-item label="套餐包名" prop="name">
+    <el-form
+      label-width="130px"
+      :model="simCombo"
+      :rules="rules"
+      ref="ruleForm"
+    >
+      <el-form-item
+        label="套餐包名"
+        prop="name"
+      >
         <el-input v-model="simCombo.name"></el-input>
       </el-form-item>
       <el-form-item
@@ -15,14 +23,14 @@
           placeholder="请选择"
           @change="comboChange"
         >
-        
+
           <el-option
             v-for="item in simComboList"
             :label="item.label"
             :value="item.value"
             :key="item.value"
           ></el-option>
-        
+
         </el-select>
       </el-form-item>
       <el-form-item
@@ -47,9 +55,18 @@
         ></el-input-number>
         <span class="unit">分</span>
       </el-form-item>
-
+      <el-form-item label="价格">
+        <el-input-number
+          v-model="simCombo.money"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">元</span>
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button
+          type="primary"
+          @click="submit"
+        >提交</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -74,6 +91,7 @@ export default {
         monthVoiceDurationThreshold: 0,
         comboId: "",
         comboType: 2,
+        money: 0,
       },
       rules: {
         name: [{ required: true, message: "请输入套餐包名", trigger: "blur" }],
@@ -85,7 +103,7 @@ export default {
         ],
         monthVoiceDurationThreshold: [
           { required: true, message: "请输入语音时长", trigger: "blur" }
-        ],
+        ]
       }
     };
   },
@@ -98,7 +116,7 @@ export default {
             method: "post",
             data: data,
             url: API.SIMCOMBO.COMBO_PACK_SAVE
-          }).then((res) => {
+          }).then(res => {
             if (res.success) {
               this.$router.push("/simcombo/increasePackList");
             } else {
@@ -124,8 +142,10 @@ export default {
       this.setVoiceIsShow(val);
     },
     setVoiceIsShow(val) {
-      const belongsToSimType = this.simComboList.filter(combo => combo.value === val)[0].belongsToSimType;
-      if (belongsToSimType.includes('A')) {
+      const belongsToSimType = this.simComboList.filter(
+        combo => combo.value === val
+      )[0].belongsToSimType;
+      if (belongsToSimType.includes("A")) {
         this.isShow = false;
       } else {
         this.isShow = true;
@@ -140,7 +160,11 @@ export default {
         url: API.SIMCOMBO.SIM_COMBO_GET_BY_COMBO_TYPE
       }).then(res => {
         this.simComboList = res.data.map(item => {
-          return { value: item.id, label: item.name, belongsToSimType: item.belongsToSimType }
+          return {
+            value: item.id,
+            label: item.name,
+            belongsToSimType: item.belongsToSimType
+          };
         });
       });
     },
