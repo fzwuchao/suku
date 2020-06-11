@@ -1,10 +1,10 @@
 <template>
   <div class="message">
     <div class="htmlbanner">
-      <van-nav-bar title="发送短信" left-text left-arrow right-text />
+      <van-nav-bar title="发送短信" left-text @click-left="onClickLeft" left-arrow right-text />
       <div class="sim-content">
         <p class="sim-title">卡号</p>
-        <p class="sim-number">17245999202</p>
+        <p class="sim-number">{{simId}}</p>
       </div>
     </div>
     <div class="search">
@@ -13,18 +13,17 @@
       </div>
     </div>
     <div class="btn">
-      <van-button type="primary" size="large" @click="querySim">发送</van-button>
+      <van-button type="primary" size="large" @click="sendMsg">发送</van-button>
     </div>
     <div class="btn">
-      <van-button type="primary" color="#7232dd" size="large" @click="querySim">查看发送记录</van-button>
+      <van-button type="primary" color="#7232dd" size="large" @click="getMsgList">查看发送记录</van-button>
     </div>
 
     <van-list>
-      <van-cell title="item" />
-      <van-cell title="item" />
-      <van-cell title="item" />
-      <van-cell title="item" />
-      <van-cell title="item" />
+      <van-cell v-for="(item, index) in sendList" :key="index">
+        <p>{{item.content}}</p>
+        <p>{{item.retcode | retcode}}</p>
+      </van-cell>
     </van-list>
   </div>
 </template>
@@ -35,36 +34,73 @@ export default {
   data() {
     return {
       simId: "",
-      manualActive: 0,
-      returnSim: "",
-      msg: ""
+      msg: "",
+      sendList: []
     };
   },
-  methods: {
-    querySim() {
-      if (this.simId.trim() == "") {
-        Toast("请输入物联卡卡号");
-        return;
+  filters: {
+    retcode(type) {
+       let returnStr = "";
+      // 00：成功 01：失败 02：接收方号码为空 03：接收方号码错误 04：短信内容为空 05：鉴权ID 为空 06：鉴权失败'
+      switch (type) {
+        case '00':
+          returnStr = "成功";
+          break;
+        case '01':
+          returnStr = "失败";
+          break;
+        case '02':
+          returnStr = "接收方号码为空";
+          break;
+        case '03':
+          returnStr = "接收方号码错误";
+          break;
+        case '04':
+          returnStr = "短信内容为空";
+          break;
+        case '05':
+          returnStr = "鉴权ID为空";
+          break;
+        case '06':
+          returnStr = "鉴权失败";
+          break;
       }
+      return returnStr;
+    }
+  },
+  methods: {
+    sendMsg() {
+      this.axios({
+        method: "post",
+        data: {
+          simId: this.simId,
+          content: this.msg,
+        },
+        url: "/messageSend/save"
+      }).then(() => {
+        Toast('发送成功！')
+      });
+    },
+    onClickLeft() {
+      this.$router.back(-1);
+    },
+    getMsgList() {
       this.axios({
         method: "get",
         params: {
-          sim_id: this.simId
+          simId: this.simId,
         },
-        url: "/index/wechat/test-check"
-      }).then(() => {
-        // let data = r.data;
-        // this.returnSim = data["sim_id"];
+        url: "/messageSend/getSendlistBySimId"
+      }).then((r) => {
+        this.sendList = r.data;
       });
+      
     }
-    /* doWechatPay(json) {
-      WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
-        if (res.err_msg == "get_brand_wcpay_request:ok") {
-        }
-      });
-    } */
   },
-  mounted() {}
+  mounted() {},
+  created() {
+    this.simId = this.$route.params.simId;
+  }
 };
 </script>
 <style lang="scss">

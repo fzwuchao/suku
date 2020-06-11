@@ -20,9 +20,9 @@
       <div class="search_c">
         <van-grid :column-num="3">
           <van-grid-item>
-            <p class="recharge-info-title">一年实惠包</p>
+            <p class="recharge-info-title">{{sim.activeMenuName}}</p>
             <p class="recharge-info-value">
-              <van-button plain color="#e9b021" :disabled="!isActive"  size="mini">续费</van-button>
+              <van-button plain color="#e9b021" :disabled="!isActive" @click.native="renew" size="mini">续费</van-button>
             </p>
           </van-grid-item>
           <van-grid-item>
@@ -50,20 +50,20 @@
     </div>
     <div class="fun-btns">
       <div class="search_c">
-        <van-grid :column-num="3" clickable>
-          <van-grid-item v-if="isActive" to="/pay/1/2">
+        <van-grid :column-num="3" clickable >
+          <van-grid-item @click.native="renew" v-if="isActive">
             <p class="fun-btns-icon">
               <svg-icon name="combo" class="icon-combo" />
             </p>
             <p class="fun-btns-text">我的套餐</p>
           </van-grid-item>
-          <van-grid-item to="/message">
+          <van-grid-item :to="'/message/'+simId">
             <p class="fun-btns-icon">
               <svg-icon name="message" class="icon-telMsg" />
             </p>
             <p class="fun-btns-text">短信</p>
           </van-grid-item>
-          <van-grid-item v-if="sim.simType == 'B'" to="/contact">
+          <van-grid-item v-if="sim.simType == 'B'" :to="'/contact/'+simId" >
             <p class="fun-btns-icon">
               <svg-icon name="contact" class="icon-contact" />
             </p>
@@ -169,11 +169,15 @@ export default {
           if(combo.comboType == 1) {
             this.myCombo = combo;
           }
-          if(this.sim.simType == 'A' && combo.comboType == 1) {
-            
-            this.comboList[i].splice(i,1);
+          if(this.isActive && combo.comboType == 1) {
+            this.comboList.splice(i,1);
             continue;
           }
+          if(this.sim.simType == 'A' && combo.comboType == 1) { 
+            this.comboList.splice(i,1);
+            continue;
+          }
+          
           let packs = combo.packs
           for(let j=0;j<packs.length;j++) {
             let pack = packs[j];
@@ -188,7 +192,13 @@ export default {
         }
       });
     },
+    renew() {
+      this.showPay();
+    },
     showPay(combo, pack) {
+      if(!combo) {
+        combo = this.myCombo;
+      }
       let pay = {}
       pay.simId = this.simId;
       pay.cname = combo.name;

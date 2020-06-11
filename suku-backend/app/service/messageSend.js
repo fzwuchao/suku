@@ -38,11 +38,24 @@ class MessageSendService extends BaseService {
     return result;
   }
 
+  async getSendlistBySimId(query) {
+    const attributes = [ 'id', 'content', 'createdAt', 'retcode' ];
+    const { simId } = query;
+    const Op = this.getOp();
+    const where = {};
+
+    if (simId) {
+      where.simId = { [Op.substring]: simId };
+    }
+
+    const result = await this.app.model.MessageSend.findAll({ attributes,
+      where,
+    });
+    return result;
+  }
+
   async create(messageSend) {
     try {
-      const curUser = this.getCurUser();
-      messageSend.sender = curUser.name;
-      messageSend.senderId = curUser.id;
       messageSend.orderNo = MessageSendService.ORDER_NO_PREFIX + this.autoOrder(10);
       await this.app.model.MessageSend.create(messageSend);
     } catch (e) {

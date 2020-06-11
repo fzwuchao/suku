@@ -15,12 +15,12 @@ const routes = [{
     component: () =>
         import ( /* webpackChunkName: "about" */ "../views/recharge.vue")
 }, {
-    path: "/message",
+    path: "/message/:simId",
     name: "Message",
     component: () =>
         import ( /* webpackChunkName: "about" */ "../views/message.vue")
 }, {
-    path: "/contact",
+    path: "/contact/:simId",
     name: "Contact",
     component: () =>
         import ( /* webpackChunkName: "about" */ "../views/contact.vue")

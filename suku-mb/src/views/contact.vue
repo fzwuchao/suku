@@ -1,30 +1,28 @@
 <template>
   <div class="message">
     <div class="htmlbanner">
-      <van-nav-bar title="发送短信" left-text left-arrow right-text />
+      <van-nav-bar title="添加亲情号" @click-left="onClickLeft" left-text left-arrow right-text />
       <div class="sim-content">
         <p class="sim-title">卡号</p>
-        <p class="sim-number">17245999202</p>
+        <p class="sim-number">{{simId}}</p>
       </div>
     </div>
     <div class="search">
       <div class="search_c">
-        <van-field v-model="msg" type="tel" label="亲情号" placeholder="请输入亲情号" />
+        <van-field v-model="phone" type="tel" label="亲情号" placeholder="请输入亲情号" />
       </div>
     </div>
     <div class="btn">
-      <van-button type="primary" size="large" @click="querySim">添加亲情号</van-button>
+      <van-button type="primary" size="large" @click="addContact">添加亲情号</van-button>
     </div>
     <div class="btn">
-      <van-button type="primary" color="#7232dd" size="large" @click="querySim">亲情号列表</van-button>
+      <van-button type="primary" color="#7232dd" size="large" @click="getContactList">亲情号列表</van-button>
     </div>
 
     <van-list>
-      <van-cell title="item" />
-      <van-cell title="item" />
-      <van-cell title="item" />
-      <van-cell title="item" />
-      <van-cell title="item" />
+      <van-cell v-for="(item, index) in writeList" :key="index">
+        <p>{{item.phone}}</p>
+      </van-cell>
     </van-list>
   </div>
 </template>
@@ -35,36 +33,44 @@ export default {
   data() {
     return {
       simId: "",
-      manualActive: 0,
       returnSim: "",
-      msg: ""
+      phone: "",
+      writeList:[]
     };
   },
   methods: {
-    querySim() {
-      if (this.simId.trim() == "") {
-        Toast("请输入物联卡卡号");
-        return;
-      }
+    addContact() {
+      this.axios({
+        method: "post",
+        data: {
+          simId: this.simId,
+          phone: this.phone,
+        },
+        url: "/writeList/save"
+      }).then(() => {
+        Toast('设置成功！')
+      });
+    },
+    onClickLeft() {
+      this.$router.back(-1);
+    },
+    getContactList() {
       this.axios({
         method: "get",
         params: {
-          sim_id: this.simId
+          simId: this.simId,
         },
-        url: "/index/wechat/test-check"
-      }).then(() => {
-        // let data = r.data;
-        // this.returnSim = data["sim_id"];
+        url: "/writeList/getWriteListBySimId"
+      }).then((r) => {
+        this.writeList = r.data;
       });
+      
     }
-    /* doWechatPay(json) {
-      WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
-        if (res.err_msg == "get_brand_wcpay_request:ok") {
-        }
-      });
-    } */
   },
-  mounted() {}
+  mounted() {},
+  created() {
+    this.simId = this.$route.params.simId;
+  }
 };
 </script>
 <style lang="scss">
