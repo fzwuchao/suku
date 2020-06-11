@@ -1,14 +1,14 @@
 <template>
   <div class="pay">
     <div class="htmlbanner">
-      <van-nav-bar title="发送短信" left-text left-arrow right-text />
+      <van-nav-bar title="确认支付" left-arrow  @click-left="onClickLeft" left-text  right-text />
       <div class="sim-content">
-        <p class="sim-title">一年实惠套餐</p>
-        <p class="sim-number">158</p>
+        <p class="sim-title">{{payInfo.cname}}</p>
+        <p class="sim-number">{{payInfo.dealAmount}}</p>
       </div>
       <div class="combo-desc">
-        <p class="combo-desc-item">套餐包含: 888M 59分钟</p>
-        <p class="combo-desc-item">有效期: 12个月</p>
+        <p class="combo-desc-item">套餐包含: {{payInfo.flow? payInfo.flow: '--'}}M {{payInfo.voice?payInfo.voice:'--'}}分钟</p>
+        <p class="combo-desc-item">有效期: {{payInfo.months? `${payInfo.months}个月`: '当月'}}</p>
       </div>
     </div>
     <div class="search">
@@ -28,9 +28,9 @@
       <div class="search_c">
         <p class="pay-comfire-text">亲爱的用户，充值购买前请认真核对卡号信息，以免发生误充，一旦误充，金额将无法退还！</p>
         <div class="pay-comfire-check">
-          <p class="number">确认卡号：17288889999</p>
+          <p class="number">确认卡号：{{payInfo.simId}}</p>
           <p class="redio">
-            <van-radio-group v-model="radio">
+            <van-radio-group v-model="radioCheck">
               <van-radio name="1" checked-color="#f99710">
                 <span style="font-size:14px;color:#2f86e0">已确认</span>
               </van-radio>
@@ -40,7 +40,7 @@
       </div>
     </div>
     <div class="btn">
-      <van-button type="primary" size="large" @click="querySim">发送</van-button>
+      <van-button type="primary" size="large" @click="createOrder">确认支付</van-button>
     </div>
   </div>
 </template>
@@ -50,48 +50,59 @@ import { Toast } from "vant";
 export default {
   data() {
     return {
-      simId: "",
-      manualActive: 0,
-      returnSim: "",
-      msg: "",
+      payInfo: {},
+      radioCheck: "",
       radio: ""
     };
   },
+  props: {
+    pay: {
+      type: Object
+    }
+  },
   methods: {
-    querySim() {
-      if (this.simId.trim() == "") {
-        Toast("请输入物联卡卡号");
+    createOrder() {
+      if(!this.radioCheck) {
+        Toast('请选择支付方式！');
+        return;
+      }
+      if(!this.radio) {
+        Toast('请确认sim卡号！');
         return;
       }
       this.axios({
-        method: "get",
-        params: {
-          sim_id: this.simId
-        },
-        url: "/index/wechat/test-check"
-      }).then(() => {
-        // let data = r.data;
-        // this.returnSim = data["sim_id"];
+        method: "post",
+        data: this.payInfo,
+        url: "/simOrder/save"
+      }).then((r) => {
+        console.log(r)
       });
+
+    },
+    onClickLeft() {
+      this.$emit("clickLeft")
     }
-    /* doWechatPay(json) {
-      WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
-        if (res.err_msg == "get_brand_wcpay_request:ok") {
-        }
-      });
-    } */
   },
-  mounted() {}
+  mounted() {},
+  watch:{
+    pay(newval) {
+      this.payInfo = newval;
+    } 
+  },
+  created() {
+    this.payInfo = this.pay;
+  }
 };
 </script>
 <style lang="scss">
-.pay {
+.recharge .pay {
   padding-bottom: 40px;
   .htmlbanner {
     background: url("../assets/ic_bj.png") no-repeat;
     background-position: bottom right;
     background-size: 90px 90px;
     background-color: #fff;
+    padding-bottom: 45px;;
     .van-nav-bar {
       .van-nav-bar__title {
         color: #333;

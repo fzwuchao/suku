@@ -1,3 +1,4 @@
+/* eslint-disable default-case */
 'use strict';
 
 const BaseService = require('../core/baseService');
@@ -52,13 +53,24 @@ class SimOrderService extends BaseService {
     return result;
   }
 
-  async create(messageSend) {
+  async create(order) {
+    switch (order.orderType) {
+      case 1:
+        order.orderId = this.autoOrder(SimOrderService.ACTIVE_PREFIX, order.simId);
+        break;
+      case 2:
+        order.orderId = this.autoOrder(SimOrderService.INCRE_PREFIX, order.simId);
+        break;
+      case 3:
+        order.orderId = this.autoOrder(SimOrderService.DISCO_PREFIX, order.simId);
+        break;
+      case 4:
+        order.orderId = this.autoOrder(SimOrderService.RENEW_PREFIX, order.simId);
+        break;
+    }
+    order.orderStatus = 1;
     try {
-      const curUser = this.getCurUser();
-      messageSend.sender = curUser.name;
-      messageSend.senderId = curUser.id;
-      messageSend.orderNo = SimOrderService.ORDER_NO_PREFIX + this.autoOrder(10);
-      await this.app.model.MessageSend.create(messageSend);
+      await this.app.model.SimOrder.create(order);
     } catch (e) {
       return false;
     }

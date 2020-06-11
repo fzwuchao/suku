@@ -63,7 +63,7 @@
             </p>
             <p class="fun-btns-text">短信</p>
           </van-grid-item>
-          <van-grid-item to="/contact">
+          <van-grid-item v-if="sim.simType == 'B'" to="/contact">
             <p class="fun-btns-icon">
               <svg-icon name="contact" class="icon-contact" />
             </p>
@@ -76,7 +76,7 @@
       <van-tabs v-model="active" :animated="true" scrollspy sticky>
         <van-tab v-for="(combo,index) in comboList" :title="combo.name" :key="index">
           <div  class="combo-packs" >
-            <div  class="combo-pack" v-for="(pack,pindex) in combo.packs" :key="index+'_'+pindex">
+            <div  class="combo-pack" v-for="(pack,pindex) in combo.packs" @click="showPay(combo,pack)" :key="index+'_'+pindex">
               <div class="combo-pack-top">
                 <p class="cpmbo-pack-name">{{pack.name}}</p>
                 <p class="cpmbo-pack-flow">
@@ -90,18 +90,24 @@
               </div>
               <div class="combo-pack-bottom">
                 售价:
-                <strong>{{pack.money}}</strong> 元
+                <strong>{{(pack.money-0)}}</strong> 元
               </div>
             </div>
           </div>
         </van-tab>
       </van-tabs>
     </div>
+
+    <van-action-sheet v-model="isShowPay" >
+      <pay @clickLeft="closePay" :pay="payInfo"></pay>
+    </van-action-sheet>
+
   </div>
 </template>
 
 <script>
 import { Toast } from "vant";
+import Pay from './pay';
 export default {
   data() {
     return {
@@ -109,9 +115,14 @@ export default {
       sim: {},
       active: 0,
       isActive: false,
-      isShowRew: true,
-      comboList: []
+      isShowPay: false,
+      comboList: [],
+      payInfo: {},
+      myCombo: {},
     };
+  },
+  components:{
+    Pay
   },
   filters: {
     netStatus(val) {
@@ -134,9 +145,9 @@ export default {
           if(this.sim.isActive == 1 || this.sim.simType == 'A') {
             ids = this.sim.otherMenuIds.split(',');
           }
-          if(this.sim.simType == 'B') {
-            ids.push(this.sim.activeMenuId+'')
-          }
+          //if(this.sim.simType == 'B') {
+          ids.push(this.sim.activeMenuId+'')
+          //}
           this.isActive = (this.sim.isActive === 1);
           this.getSimCombo(ids);
         }else{
@@ -155,11 +166,20 @@ export default {
         this.comboList = r.data
         for(let i=0; i < this.comboList.length; i++) {
           let combo = this.comboList[i]
+          if(combo.comboType == 1) {
+            this.myCombo = combo;
+          }
+          if(this.sim.simType == 'A' && combo.comboType == 1) {
+            
+            this.comboList[i].splice(i,1);
+            continue;
+          }
           let packs = combo.packs
           for(let j=0;j<packs.length;j++) {
             let pack = packs[j];
             let packMoney = (pack.awardMoney-0) + (pack.money-0)
             let packMonths = (packMoney/combo.monthRent);
+            pack.months = packMonths;
             if(pack.comboType == 1 || pack.comboType == 3) {
               pack.monthSumFlowThreshold =  packMonths * combo.monthSumFlowThreshold;
               pack.monthVoiceDurationThreshold = packMonths * combo.monthVoiceDurationThreshold;
@@ -167,6 +187,33 @@ export default {
           }
         }
       });
+    },
+    showPay(combo, pack) {
+      let pay = {}
+      pay.simId = this.simId;
+      pay.cname = combo.name;
+      pay.cid = combo.id;
+      if(pack) {
+        pay.dealAmount = pack.money;
+        pay.cpname = pack.name;
+        pay.cpid = pack.id;
+        pay.flow = pack.monthSumFlowThreshold;
+        pay.voice = pack.monthVoiceDurationThreshold;
+        pay.months = pack.months;
+        pay.orderType = combo.comboType
+      } else {
+        pay.dealAmount = combo.monthRent * combo.months;
+        pay.flow = combo.monthSumFlowThreshold * combo.months;
+        pay.voice = combo.monthVoiceDurationThreshold * combo.months;
+        pay.months = combo.months;
+        pay.orderType = 4;
+      }
+      this.payInfo = pay;
+      this.isShowPay = true;
+    },
+    closePay() {
+      this.isShowPay = false;
+      this.payInfo = {};
     }
   },
   mounted() {},
@@ -351,6 +398,14 @@ export default {
   }
   .van-tab {
     max-width: 35%;
+  }
+  .van-popup--bottom.van-popup--round {
+    border-radius: 0;
+    
+  }
+  .van-action-sheet {
+    max-height: 100%;
+    height: 100%;
   }
 }
 </style>
