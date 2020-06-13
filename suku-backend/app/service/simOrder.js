@@ -24,32 +24,38 @@ class SimOrderService extends BaseService {
     const { pageSize, pageNum, orderId, simId, uid, orderStatus, orderType } = query;
     const Op = this.getOp();
     const where = {};
-
+    const queryKey = {};
     if (simId) {
       where.simId = { [Op.substring]: simId };
+      queryKey.simId = simId;
     }
     if (orderId) {
       where.orderId = { [Op.substring]: orderId };
+      queryKey.orderId = orderId;
     }
     if (uid) {
       where.uid = uid;
+      queryKey.uid = uid;
     } else {
       const curUser = this.getCurUser();
       const ids = await this.ctx.service.user.getAllUserIds([ curUser.id ]);
       where.uid = {
         [Op.in]: ids,
       };
+      queryKey.uid = ids;
     }
     if (orderStatus !== undefined) {
       where.orderStatus = orderStatus;
+      queryKey.orderStatus = orderStatus;
     }
     if (orderType) {
       where.orderType = orderType;
+      queryKey.orderType = orderType;
     }
     const result = await this.findAndCountAll('SimOrder', pageSize, pageNum, {
       attributes,
       where,
-    });
+    }, queryKey);
     return result;
   }
 
@@ -71,6 +77,7 @@ class SimOrderService extends BaseService {
     order.orderStatus = 1;
     try {
       await this.app.model.SimOrder.create(order);
+      this.app.redis.del('SimOrder*');
     } catch (e) {
       return false;
     }

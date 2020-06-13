@@ -32,8 +32,8 @@ class SimService extends BaseService {
    * @return {{count, rows}} - 总条数，一页的数据
    */
   async getSimPageData({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
-    const whereCondition = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
-    const simData = await this.findAndCountAll('Sim', pageSize, pageNum, whereCondition);
+    const result = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
+    const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
 
     return simData;
   }
@@ -41,11 +41,13 @@ class SimService extends BaseService {
   getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName }) {
     const Op = this.getOp();
     const condition = {};
+    const queryKey = {};
 
     if (simId !== undefined) {
       condition['simId'] = {
         [Op.substring]: simId,
       };
+      queryKey['simId'] = simId;
     }
 
     if (simIdRange && simIdRange.length > 0) {
@@ -62,43 +64,51 @@ class SimService extends BaseService {
         };
 
       }
+      queryKey['simIdRange'] = simIdRange;
     }
 
     if (username !== undefined) {
       condition['username'] = {
         [Op.substring]: username,
       };
+      queryKey['username'] = username;
     }
 
     if (netStatus !== undefined) {
       condition['netStatus'] = {
         [Op.eq]: netStatus,
       };
+      queryKey['netStatus'] = netStatus;
     }
 
     if (isActive !== undefined) {
       condition['isActive'] = {
         [Op.eq]: isActive,
       };
+      queryKey['isActive'] = isActive;
     }
 
     if (simType !== undefined) {
       condition['simType'] = {
         [Op.eq]: simType,
       };
+      queryKey['simType'] = simType;
     }
 
     if (activeMenuName !== undefined) {
       condition['activeMenuName'] = {
         [Op.substring]: activeMenuName,
       };
+      queryKey['activeMenuName'] = activeMenuName;
     }
 
     const whereCondition = {};
 
     if (Object.keys(condition).length > 0) whereCondition.where = condition;
-
-    return whereCondition;
+    const result = {};
+    result.whereCondition = whereCondition;
+    result.queryKey = queryKey;
+    return result;
   }
 
   async getSimDataForExcel({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName }, simTypeIsB) {
@@ -140,6 +150,7 @@ class SimService extends BaseService {
   async bulkCreate(simList) {
     const { Sim } = this.app.model;
     const sims = await Sim.bulkCreate(simList);
+    this.app.redis.del('Sim*');
     return sims.length === simList.length;
   }
 

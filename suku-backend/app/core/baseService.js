@@ -17,10 +17,21 @@ class BaseService extends Service {
     str = (str.toUpperCase()).substring(0, length);
     return str;
   }
-  async findAndCountAll(modelNmale, pageSize, pageNum, query) {
+  async findAndCountAll(modelNmale, pageSize, pageNum, query, queryKey) {
     const { helper } = this.ctx;
-    const result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
-
+    let result = null;
+    if (queryKey) {
+      const redisKey = `${modelNmale}:${JSON.stringify(queryKey)}:${pageSize}:${pageNum}`;
+      result = await this.app.redis.get(redisKey);
+      if (!result) {
+        result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
+        this.app.redis.set(redisKey, JSON.stringify(result));
+      } else {
+        result = JSON.parse(result);
+      }
+    } else {
+      result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
+    }
     return helper.pageModel(result, pageSize, pageNum);
   }
 
