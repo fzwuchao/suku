@@ -8,10 +8,10 @@
     >
       <el-form-item
         label="选择激活套餐"
-        prop="activeMenuId"
+        prop="activeComboId"
       >
         <el-select
-          v-model="sim.activeMenuId"
+          v-model="sim.activeComboId"
           clearable
           placeholder="请选择"
         >
@@ -60,10 +60,10 @@
       </el-form-item>
       <el-form-item
         label="选择用户"
-        prop="userId"
+        prop="uid"
       >
         <el-select
-          v-model="sim.userId"
+          v-model="sim.uid"
           clearable
           placeholder="请选择"
         >
@@ -135,11 +135,11 @@ export default {
         "x-csrf-token": getToken()
       },
       sim: {
-        username: "",
-        userId: "",
-        activeMenuId: "",
-        activeMenuName: "",
-        otherMenuIds: "",
+        uname: "",
+        uid: "",
+        activeComboId: "",
+        activeComboName: "",
+        otherComboIds: "",
         onelinkId: "",
         onelinkName: "",
         simType: "A",
@@ -153,8 +153,8 @@ export default {
       userList: [],
       onelinkList: [],
       rules: {
-        userId: [{ required: true, message: "请选择用户", trigger: "blur" }],
-        activeMenuId: [
+        uid: [{ required: true, message: "请选择用户", trigger: "blur" }],
+        activeComboId: [
           { required: true, message: "请选择激活套餐", trigger: "blur" }
         ],
         onelinkId: [
@@ -181,11 +181,11 @@ export default {
     type: String
   },
   watch: {
-    "sim.activeMenuId"(val) {
-      this.sim.activeMenuName = this.getLabel(this.activeMenuList, val);
+    "sim.activeComboId"(val) {
+      this.sim.activeComboName = this.getLabel(this.activeMenuList, val);
     },
-    "sim.userId"(val) {
-      this.sim.username = this.getLabel(this.userList, val);
+    "sim.uid"(val) {
+      this.sim.uname = this.getLabel(this.userList, val);
     },
     "sim.onelinkId"(val) {
       this.sim.onelinkName = this.getLabel(this.onelinkList, val);
@@ -206,7 +206,7 @@ export default {
       console.log(this.increaseMenuIds);
       this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          this.sim.otherMenuIds = this.increaseMenuIds
+          this.sim.otherComboIds = this.increaseMenuIds
             .concat(this.discountsMenuIds)
             .join(",");
           this.sim.simType = this.type;

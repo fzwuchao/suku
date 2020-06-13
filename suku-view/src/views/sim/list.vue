@@ -110,7 +110,7 @@
         label="激活套餐名"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.activeMenuName}}</template>
+        <template slot-scope="scope">{{ scope.row.activeComboName}}</template>
       </el-table-column>
 
       <el-table-column
@@ -139,7 +139,7 @@
         label="用户"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.username }}</template>
+        <template slot-scope="scope">{{ scope.row.uname }}</template>
       </el-table-column>
 
       <el-table-column
@@ -271,13 +271,13 @@ export default {
         },
 
         {
-          name: "activeMenuName",
+          name: "activeComboName",
           title: "套餐",
           type: "inputText",
           values: ""
         },
         {
-          name: "username",
+          name: "uname",
           title: "用户",
           type: "inputText",
           values: ""
@@ -321,7 +321,6 @@ export default {
   },
   methods: {
     download(data, fileName, suffix) {
-      console.log("xx");
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");
       link.style.display = "none";

@@ -3,6 +3,9 @@
 const BaseService = require('../core/baseService');
 
 const CHINA_MOBILE_HOST = 'https://api.iot.10086.cn/v5';
+// const getTransid = () => {
+
+// }
 const commonParams = {
   transid: '',
   token: '',
@@ -32,6 +35,14 @@ class ChinaMobileService extends BaseService {
    * token 过期时间为 1 小时
    */
   async getToken() {
+    const tokenName = 'onelinkToken';
+    const EXPIRE_TIME = 60 * 60 * 1000;
+    let token = await this.app.redis.get(tokenName);
+
+    if (token) {
+      return token;
+    }
+
     const data = {
       appid: '',
       password: '',
@@ -39,7 +50,14 @@ class ChinaMobileService extends BaseService {
     };
     const res = await this.fetchData(url.get_token, data);
     const result = this.getResult(res);
-    return result.length > 0 ? result[0].token : null;
+    if (result.length > 0) {
+      token = result[0].token;
+    }
+
+    const pipeline = await this.app.redis.pipeline();
+    await pipeline.set(tokenName, token).pexpire(tokenName, EXPIRE_TIME).exec((err, results)=> {});
+
+    return token;
   }
 
   /**

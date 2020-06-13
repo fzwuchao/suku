@@ -59,8 +59,8 @@ class SimController extends BaseController {
     const { sim } = helper.rules;
     const rule = {
       ...sim([
-        'activeMenuId', 'activeMenuName',
-        'otherMenuIds', 'userId', 'username',
+        'activeComboId', 'activeComboName',
+        'otherComboIds', 'uid', 'uname',
         'onelinkId', 'onelinkName',
         'simType',
         'filepath',
@@ -107,15 +107,15 @@ class SimController extends BaseController {
       monthSumFlowThreshold,
       monthVoiceDurationThreshold,
       renewPrice,
-    } = await service.simCombo.getSimComboById(params.activeMenuId);
+    } = await service.simCombo.getSimComboById(params.activeComboId);
     const simList = simIdList.map(simId => {
       return {
         simId,
-        activeMenuId: params.activeMenuId,
-        activeMenuName: params.activeMenuName,
-        otherMenuIds: params.otherMenuIds,
-        userId: params.userId,
-        username: params.username,
+        activeComboId: params.activeComboId,
+        activeComboName: params.activeComboName,
+        otherComboIds: params.otherComboIds,
+        uid: params.uid,
+        uname: params.uname,
         onelinkId: params.onelinkId,
         onelinkName: params.onelinkName,
         simType: params.simType,
@@ -130,8 +130,8 @@ class SimController extends BaseController {
       if (result) {
         // 生成入库记录
         await service.simLogistics.create({
-          receiver: params.username,
-          receiverId: params.userId,
+          receiver: params.uname,
+          receiverId: params.uid,
           total: simList.length,
         });
         this.success('', '导入成功');

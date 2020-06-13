@@ -35,8 +35,8 @@ class MessageSendController extends BaseController {
     const sender = await ctx.service.sim.getSimBySimId(simId);
     const messageSend = { simId, content };
     // 缺少调用移动端发送短信的接口，在此位置调用
-    messageSend.sender = sender.username;
-    messageSend.senderId = sender.userId;
+    messageSend.sender = sender.uname;
+    messageSend.senderId = sender.uid;
     const result = await ctx.service.messageSend.create(messageSend);
     this.success(result, '');
   }

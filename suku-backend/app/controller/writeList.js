@@ -30,8 +30,8 @@ class WriteListController extends BaseController {
     const sim = await ctx.service.sim.getSimBySimId(simId);
     const writeList = { simId, phone };
     // 缺少调用移动端发送短信的接口，在此位置调用
-    writeList.uname = sim.username;
-    writeList.uid = sim.userId;
+    writeList.uname = sim.uname;
+    writeList.uid = sim.uid;
     const result = await ctx.service.writeList.create(writeList);
     this.success(result, '');
   }
