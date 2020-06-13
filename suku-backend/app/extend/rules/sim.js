@@ -10,7 +10,7 @@ const SimRules = {
     type: 'array?',
     itemType: 'int',
   },
-  username: {
+  uname: {
     type: 'string?',
   },
   netStatus: {
@@ -22,7 +22,7 @@ const SimRules = {
   simType: {
     type: 'string?',
   },
-  activeMenuName: {
+  activeComboName: {
     type: 'string?',
   },
   onelinkId: {
@@ -31,13 +31,13 @@ const SimRules = {
   onelinkName: {
     type: 'string?',
   },
-  activeMenuId: {
+  activeComboId: {
     type: 'int?',
   },
-  userId: {
+  uid: {
     type: 'int?',
   },
-  otherMenuIds: {
+  otherComboIds: {
     type: 'string?',
   },
   filepath: {

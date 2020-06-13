@@ -7,7 +7,7 @@ const BaseService = require('../core/baseService');
 
 class SimService extends BaseService {
   async getSimBySimId(simId) {
-    // const attributes = [ 'simId', 'iccid', 'simType', 'activeMenuId', 'activeMenuName', 'otherMenuIds', 'activeTime', 'overdueTime' ];
+    // const attributes = [ 'simId', 'iccid', 'simType', 'activeComboId', 'activeComboName', 'otherComboIds', 'activeTime', 'overdueTime' ];
     const [ sim ] = await this.app.model.Sim.findAll({
       where: {
         simId,
@@ -23,7 +23,7 @@ class SimService extends BaseService {
    * object : {
    *  {string} simId - sim卡号
    *  {array} simIdRange - sim卡段号
-   *  {string} username - 用户
+   *  {string} uname - 用户
    *  {int} netStatus - 状态
    *  {int} isActive - 激活状态
    *  {int} pageSize - 每页条数
@@ -38,7 +38,7 @@ class SimService extends BaseService {
     return simData;
   }
 
-  getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName }) {
+  getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName }) {
     const Op = this.getOp();
     const condition = {};
     const queryKey = {};
@@ -67,11 +67,11 @@ class SimService extends BaseService {
       queryKey['simIdRange'] = simIdRange;
     }
 
-    if (username !== undefined) {
-      condition['username'] = {
-        [Op.substring]: username,
+    if (uname !== undefined) {
+      condition['uname'] = {
+        [Op.substring]: uname,
       };
-      queryKey['username'] = username;
+      queryKey['uname'] = uname;
     }
 
     if (netStatus !== undefined) {
@@ -95,11 +95,11 @@ class SimService extends BaseService {
       queryKey['simType'] = simType;
     }
 
-    if (activeMenuName !== undefined) {
-      condition['activeMenuName'] = {
-        [Op.substring]: activeMenuName,
+    if (activeComboName !== undefined) {
+      condition['activeComboName'] = {
+        [Op.substring]: activeComboName,
       };
-      queryKey['activeMenuName'] = activeMenuName;
+      queryKey['activeComboName'] = activeComboName;
     }
 
     const whereCondition = {};
@@ -111,17 +111,17 @@ class SimService extends BaseService {
     return result;
   }
 
-  async getSimDataForExcel({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName }, simTypeIsB) {
-    const whereCondition = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
+  async getSimDataForExcel({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName }, simTypeIsB) {
+    const whereCondition = this.getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName });
     const commonAttrs = [
       [ 'sim_id', 'Sim卡号' ],
       // [ 'net_status', '状态' ],
       [ 'flow_serv_status', '流量服务关停状态' ],
-      [ 'active_menu_name', '激活套餐名' ],
+      [ 'active_combo_name', '激活套餐名' ],
       [ 'active_time', '激活时间' ],
       [ 'overdue_time', '过期时间' ],
       [ 'renew_price', '续费价格' ],
-      [ 'username', '用户' ],
+      [ 'uname', '用户' ],
       [ 'month_sum_flow_threshold', '当月流量阈' ],
       [ 'month_overlap_flow', '叠加流量' ],
       [ 'month_shengyu_flow', '剩余流量' ],

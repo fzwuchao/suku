@@ -21,12 +21,12 @@ module.exports = app => {
     },
     iccid: STRING(50),
     imei: STRING(50),
-    userId: {
+    uid: {
       type: BIGINT(20),
-      field: 'user_id',
+      field: 'uid',
       comment: '用户id',
     },
-    username: {
+    uname: {
       type: STRING(30),
       comment: '用户名',
     },
@@ -35,19 +35,19 @@ module.exports = app => {
       field: 'sim_type',
       comment: '类型: A-被叫卡, B-主叫卡',
     },
-    activeMenuId: {
+    activeComboId: {
       type: BIGINT(10),
-      field: 'active_menu_id',
+      field: 'active_combo_id',
       comment: '激活套餐id',
     },
-    activeMenuName: {
+    activeComboName: {
       type: STRING(30),
-      field: 'active_menu_name',
+      field: 'active_combo_name',
       comment: '激活套餐名',
     },
-    otherMenuIds: {
+    otherComboIds: {
       type: STRING(100),
-      field: 'other_menu_ids',
+      field: 'other_combo_ids',
       comment: '其它套餐ids, 格式: 1,2,3',
     },
     isActive: {
