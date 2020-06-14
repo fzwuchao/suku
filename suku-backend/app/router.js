@@ -31,7 +31,8 @@ module.exports = app => {
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);
   // 导入物联卡
-  router.post('/sim/importSims', controller.sim.importSims);
+  // router.post('/sim/importSims', controller.sim.importSims);
+  router.post('/sim/importSims', controller.sim.importSimsWithHeadField);
   // 上传文件
   router.post('/sheet/upload', controller.sheet.uploadFile);
   // 根据simId获取sim信息

@@ -16,7 +16,7 @@
           placeholder="请选择"
         >
           <el-option
-            v-for="activeMenu in activeMenuList"
+            v-for="activeMenu in activeComboList"
             :key="activeMenu.value"
             :label="activeMenu.label"
             :value="activeMenu.value"
@@ -26,18 +26,18 @@
       </el-form-item>
       <el-form-item
         label="选择叠加套餐"
-        prop="increaseMenuIds"
+        prop="increaseComboIds"
       >
         <el-select
-          v-model="increaseMenuIds"
+          v-model="increaseComboIds"
           multiple
           placeholder="请选择"
         >
           <el-option
-            v-for="increaseMenu in increaseMenuList"
-            :key="increaseMenu.value"
-            :label="increaseMenu.label"
-            :value="increaseMenu.value"
+            v-for="increaseCombo in increaseComboList"
+            :key="increaseCombo.value"
+            :label="increaseCombo.label"
+            :value="increaseCombo.value"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -46,15 +46,15 @@
         label="选择特惠套餐"
       >
         <el-select
-          v-model="discountsMenuIds"
+          v-model="discountsComboIds"
           multiple
           placeholder="请选择"
         >
           <el-option
-            v-for="discountsMenu in discountsMenuList"
-            :key="discountsMenu.value"
-            :label="discountsMenu.label"
-            :value="discountsMenu.value"
+            v-for="discountsCombo in discountsComboList"
+            :key="discountsCombo.value"
+            :label="discountsCombo.label"
+            :value="discountsCombo.value"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -145,11 +145,11 @@ export default {
         simType: "A",
         filepath: ""
       },
-      increaseMenuIds: [],
-      discountsMenuIds: [],
-      activeMenuList: [],
-      increaseMenuList: [],
-      discountsMenuList: [],
+      increaseComboIds: [],
+      discountsComboIds: [],
+      activeComboList: [],
+      increaseComboList: [],
+      discountsComboList: [],
       userList: [],
       onelinkList: [],
       rules: {
@@ -161,12 +161,12 @@ export default {
           { required: true, message: "请选择onelink", trigger: "blur" }
         ],
         filepath: [{ required: true, message: "请上传文件", trigger: "blur" }],
-        increaseMenuIds: [
+        increaseComboIds: [
           // { required: true, message: "请选择叠加套餐", trigger: "blur" }
           {
             trigger: "blur",
             validator: (rule, value, callback) => {
-              if (this.increaseMenuIds.length === 0) {
+              if (this.increaseComboIds.length === 0) {
                 callback('请选择叠加套餐');
               } else {
                 callback();
@@ -182,7 +182,7 @@ export default {
   },
   watch: {
     "sim.activeComboId"(val) {
-      this.sim.activeComboName = this.getLabel(this.activeMenuList, val);
+      this.sim.activeComboName = this.getLabel(this.activeComboList, val);
     },
     "sim.uid"(val) {
       this.sim.uname = this.getLabel(this.userList, val);
@@ -203,11 +203,10 @@ export default {
       }
     },
     submit() {
-      console.log(this.increaseMenuIds);
       this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          this.sim.otherComboIds = this.increaseMenuIds
-            .concat(this.discountsMenuIds)
+          this.sim.otherComboIds = this.increaseComboIds
+            .concat(this.discountsComboIds)
             .join(",");
           this.sim.simType = this.type;
           let data = this.sim;
@@ -274,9 +273,9 @@ export default {
           return { value: simCombo.id, label: simCombo.name };
         });
       });
-      this.activeMenuList = simComboList[0];
-      this.increaseMenuList = simComboList[1];
-      this.discountsMenuList = simComboList[2];
+      this.activeComboList = simComboList[0];
+      this.increaseComboList = simComboList[1];
+      this.discountsComboList = simComboList[2];
     });
     this.getOnelink();
     this.getChildUsers();

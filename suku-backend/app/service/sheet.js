@@ -58,6 +58,50 @@ class SheetService extends Service {
     return fs.createReadStream(filepath);
   }
 
+  /**
+   * 解析excel文件, 含头字段
+   * @param {filepath} filepath - 文件路径
+   * @return {object} {parseSuccess, msg, sheetData}
+   */
+  async parseFileWithHeadField(filepath) {
+    const { logger } = this.ctx;
+    const result = { parseSuccess: false, msg: '', sheetData: [] };
+    let sheetData = [];
+    let parseSuccess = false;
+    let msg = '';
+
+    logger.info('【文件路径】:', filepath);
+    logger.info('【解析-Start】');
+
+    const startTime = moment().milliseconds();
+    const workbook = XLSX.readFile(filepath);
+    const { Sheets } = workbook;
+
+    for (const key in Sheets) {
+      if (Sheets.hasOwnProperty(key)) {
+        sheetData = XLSX.utils.sheet_to_json(Sheets[key]);
+      }
+    }
+
+    // TODO: 考虑解析错误时，怎样处理
+
+    // 暂都设置解析成功
+    parseSuccess = true;
+    result.parseSuccess = parseSuccess;
+    result.msg = msg;
+    result.sheetData = sheetData;
+
+    const endTime = moment().milliseconds();
+    logger.info(`【解析-End】总条数: ${sheetData.length}, 总耗时: ${endTime - startTime} ms`);
+    return result;
+  }
+
+  /**
+   * 解析excel文件
+   * 文件格式：第一列是simId数据，没有头字段
+   * @param {string} filepath - 文件路径
+   * @return {object} {parseSuccess, msg, sheetData}
+   */
   async parseSimIdFile(filepath) {
     const { logger } = this.ctx;
     const sheetData = [];
