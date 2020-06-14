@@ -83,14 +83,6 @@
       >
         <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
-
-      <el-table-column
-        align="left"
-        label="状态"
-        show-overflow-tooltip
-      >
-        <template slot-scope="scope">{{ scope.row.netStatus }}</template>
-      </el-table-column>
       <el-table-column
         align="left"
         label="流量服务状态"
@@ -104,7 +96,7 @@
         label="平台状态"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.onelinkStatus}}</template>
+        <template slot-scope="scope">{{ scope.row.cardStatus | cardStatus}}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -207,7 +199,7 @@
       <el-table-column
         fixed="right"
         label="操作"
-        width="100"
+        width="150"
       >
         <template slot-scope="scope">
           <el-button
@@ -215,6 +207,11 @@
             @click="editSim(scope.row)"
             size="small"
           >编辑</el-button>
+           <el-button
+            type="text"
+            @click="syncOnelink(scope.row)"
+            size="small"
+          >同步更新</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -291,31 +288,20 @@ export default {
           values: ""
         },
         {
-          name: "netStatus",
-          title: "状态",
+          name: "cardStatus",
+          title: "平台状态",
           type: "select",
           values: [
             { value: "", key: "全部" },
-            { value: 1, key: "未启用" },
-            { value: 2, key: "正常" },
-            { value: 3, key: "停机" },
-            { value: 4, key: "过期" },
-            { value: 5, key: "注销" },
-            { value: 6, key: "欠费" },
-            { value: 7, key: "手动复机" }
+            { value: '1', key: "待激活" },
+            { value: '2', key: "已激活" },
+            { value: '20', key: "停机" },
+            { value: '4', key: "停机" },
+            { value: '21', key: "注销" },
+            { value: '6', key: "可测试" },
+            { value: '22', key: "欠费" }
           ],
           active: [1, 2, 3, 4, 5, 6, 7]
-        },
-        {
-          name: "isActive",
-          title: "激活状态",
-          type: "select",
-          values: [
-            { value: "", key: "全部" },
-            { value: 1, key: "已激活" },
-            { value: 2, key: "未激活" }
-          ],
-          active: [1, 2]
         }
       ]
     };
@@ -323,10 +309,37 @@ export default {
   props: {
     type: String
   },
+  filters:{
+    cardStatus(val){
+      let returnStr = "";
+      switch (val) {
+        case '1':
+          returnStr = "待激活";
+          break;
+        case '2':
+          returnStr = "已激活";
+          break;
+        case '4':
+          returnStr = "停机";
+          break;
+        case '21':
+          returnStr = "注销";
+          break;
+        case '6':
+          returnStr = "可测试";
+          break;
+        case '22':
+          returnStr = "欠费";
+          break;
+      }
+      return returnStr;
+    }
+  },
   components: {
     searchBar,
     comImport
   },
+  
   methods: {
     download(data, fileName, suffix) {
       const url = window.URL.createObjectURL(new Blob([data]));
@@ -339,6 +352,9 @@ export default {
       //释放资源
       window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
+    },
+    syncOnelink(item) {
+      console.log(item)
     },
     handleExport() {
       this.axios({
