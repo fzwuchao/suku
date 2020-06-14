@@ -98,7 +98,7 @@ export default {
       withdrawalDialog: false,
       tableHeight: null,
       list: [],
-      withdrawalMoney: 000,
+      withdrawalMoney: '00',
       data: null,
       searchData: [
         {

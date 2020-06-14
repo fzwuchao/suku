@@ -150,7 +150,7 @@ class SimService extends BaseService {
   async bulkCreate(simList) {
     const { Sim } = this.app.model;
     const sims = await Sim.bulkCreate(simList);
-    this.app.redis.del('Sim*');
+    await this.app.redis.del('Sim:{"simType":"B"}:10:1');
     return sims.length === simList.length;
   }
 

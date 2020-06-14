@@ -93,7 +93,8 @@
       </el-table-column>
       <el-table-column
         align="left"
-        label="流量服务关停状态"
+        label="流量服务状态"
+        min-width="100px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.flowServStatus}}</template>
@@ -103,11 +104,12 @@
         label="平台状态"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.cardStatus}}</template>
+        <template slot-scope="scope">{{ scope.row.onelinkStatus}}</template>
       </el-table-column>
       <el-table-column
         align="left"
         label="激活套餐名"
+        min-width="100px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.activeComboName}}</template>
@@ -144,29 +146,32 @@
 
       <el-table-column
         align="left"
-        label="当月流量阈"
+        label="当月流量阈(M)"
+        min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} M` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
-        label="叠加流量"
+        label="叠加流量(M)"
+        min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthOverlapFlow ? scope.row.monthOverlapFlow : 0} M` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthOverlapFlow ? scope.row.monthOverlapFlow : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
-        label="剩余流量"
+        label="剩余流量(M)"
+        min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0} M`}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0}`}}</template>
       </el-table-column>
       <el-table-column
         align="left"
         v-if="simType === 'B'"
-        label="余额"
+        label="余额(元)"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
@@ -174,23 +179,26 @@
       <el-table-column
         align="left"
         v-if="simType === 'B'"
-        label="当月语音时长阈"
+        label="当月语音阈(分)"
+        min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} M` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
         v-if="simType === 'B'"
-        label="当月剩余语音时长"
+        label="当月剩余语音(分)"
+        min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0} 分` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
         v-if="simType === 'B'"
-        label="语音服务关停状态"
+        label="语音服务状态"
+        min-width="100px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.voiceServStatus}}</template>
