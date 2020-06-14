@@ -4,7 +4,7 @@
 // sim卡
 const moment = require('moment');
 module.exports = app => {
-  const { STRING, DATE, TINYINT, DECIMAL, CHAR, BIGINT } = app.Sequelize;
+  const { STRING, DATE, TINYINT, DECIMAL, CHAR, BIGINT, VIRTUAL } = app.Sequelize;
 
   const Sim = app.model.define('sim', {
     id: {
@@ -87,10 +87,24 @@ module.exports = app => {
       field: 'month_overlap_flow',
       comment: '当月叠加流量(M)',
     },
+    // 剩余流量
     monthShengyuFlow: {
-      type: DECIMAL(10, 3),
-      field: 'month_shengyu_flow',
-      comment: '当月剩余流量(M)',
+      type: VIRTUAL,
+      get() {
+        const monthFlow = this.getDataValue('monthFlow') || 0;
+        const monthOverlapFlow = this.getDataValue('monthOverlapFlow') || 0;
+        const monthUsedFlow = this.getDataValue('monthUsedFlow') || 0;
+        return monthFlow + monthOverlapFlow - monthUsedFlow;
+      },
+    },
+    // 总流量
+    monthSumFlow: {
+      type: VIRTUAL,
+      get() {
+        const monthFlow = this.getDataValue('monthFlow') || 0;
+        const monthOverlapFlow = this.getDataValue('monthOverlapFlow') || 0;
+        return monthFlow + monthOverlapFlow;
+      },
     },
     monthUsedFlow: {
       type: DECIMAL(10, 3),
@@ -102,10 +116,24 @@ module.exports = app => {
       field: 'month_voice',
       comment: '当月语间时长阈(分)',
     },
+    // 总时长
+    monthSumVoice: {
+      type: VIRTUAL,
+      get() {
+        const monthVoice = this.getDataValue('monthVoice') || 0;
+        const monthOverlapVoiceDuration = this.getDataValue('monthOverlapVoiceDuration') || 0;
+        return monthVoice + monthOverlapVoiceDuration;
+      },
+    },
+    // 剩余时长
     monthShengyuVoiceDuration: {
-      type: DECIMAL(10, 3),
-      field: 'month_shengyu_voice_duration',
-      comment: '当月剩余语音时长(分)',
+      type: VIRTUAL,
+      get() {
+        const monthVoice = this.getDataValue('monthVoice') || 0;
+        const monthOverlapVoiceDuration = this.getDataValue('monthOverlapVoiceDuration') || 0;
+        const monthUsedVoiceDuration = this.getDataValue('monthUsedVoiceDuration') || 0;
+        return monthVoice + monthOverlapVoiceDuration - monthUsedVoiceDuration;
+      },
     },
     monthOverlapVoiceDuration: {
       type: DECIMAL(10, 3),

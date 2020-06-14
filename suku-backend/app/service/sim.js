@@ -130,14 +130,12 @@ class SimService extends BaseService {
       [ 'overdue_time', '过期时间' ],
       [ 'renew_price', '续费价格' ],
       [ 'uname', '用户' ],
-      [ 'month_sum_flow_threshold', '当月流量阈' ],
+      [ 'month_flow', '当月流量' ],
       [ 'month_overlap_flow', '叠加流量' ],
-      [ 'month_shengyu_flow', '剩余流量' ],
     ];
     const attrsOfB = [
       [ 'shengyu_money', '余额' ],
-      [ 'month_voice_duration_threshold', '当月语音时长阈' ],
-      [ 'month_shengyu_voice_duration', '当月剩余语音时长' ],
+      [ 'month_voice', '当月语音时长' ],
       [ 'voice_serv_status', '语音服务关停状态' ],
     ];
 

@@ -158,7 +158,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"

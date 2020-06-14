@@ -130,8 +130,6 @@ class SimController extends BaseController {
         simType: params.simType,
         monthFlow,
         monthVoice,
-        monthShengyuFlow: monthFlow,
-        monthShengyuVoiceDuration: monthVoice,
         renewPrice,
         monthRent,
       };
@@ -228,8 +226,6 @@ class SimController extends BaseController {
         simType: params.simType,
         monthFlow,
         monthVoice,
-        monthShengyuFlow: monthFlow,
-        monthShengyuVoiceDuration: monthVoice,
         renewPrice,
         monthRent,
       };
