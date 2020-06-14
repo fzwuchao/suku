@@ -132,6 +132,11 @@ module.exports = app => {
       field: 'onelink_name',
       comment: 'onelink平台名称',
     },
+    onelinkStatus: {
+      type: STRING(2),
+      field: 'onelink_status',
+      comment: 'onelink平台状态: 1：待激活, 2：已激活, 4：停机, 6：可测试, 7：库存, 8：预销户',
+    },
     openStatus: {
       type: TINYINT(1),
       field: 'open_status',
