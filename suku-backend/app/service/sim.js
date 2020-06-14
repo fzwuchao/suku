@@ -6,6 +6,14 @@
 const BaseService = require('../core/baseService');
 
 class SimService extends BaseService {
+  async update(sim) {
+    try {
+      await this.app.model.Sim.update(sim, { where: { simId: sim.simId } });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
   async getSimBySimId(simId) {
     // const attributes = [ 'simId', 'iccid', 'simType', 'activeComboId', 'activeComboName', 'otherComboIds', 'activeTime', 'overdueTime' ];
     const [ sim ] = await this.app.model.Sim.findAll({
