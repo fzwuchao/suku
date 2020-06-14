@@ -1,6 +1,7 @@
 'use strict';
 
 const BaseController = require('../core/baseController');
+const { orderType } = require('../extend/rules/simOrder');
 
 class MessageSendController extends BaseController {
 
@@ -32,8 +33,9 @@ class MessageSendController extends BaseController {
     // 缺少调用移动端发送短信的接口，在此位置调用
     order.uname = sim.uname;
     order.uid = sim.uid;
-    const result = await ctx.service.simOrder.create(order);
-    this.success(result, '');
+    await ctx.service.simOrder.create(order);
+    await ctx.service.simOrder.changeSim(sim, order);
+    this.success(true, '');
   }
 
 }

@@ -207,6 +207,7 @@ export default {
         pay.dealAmount = pack.money;
         pay.cpname = pack.name;
         pay.cpid = pack.id;
+        pay.awardMoney = pack.awardMoney;
         pay.flow = pack.monthSumFlowThreshold;
         pay.voice = pack.monthVoiceDurationThreshold;
         pay.months = pack.months;

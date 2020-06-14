@@ -58,7 +58,23 @@ class SimOrderService extends BaseService {
     }, queryKey);
     return result;
   }
-
+  async changeSim(sim, order) {
+    switch (order.orderType) {
+      case 1:
+        sim.shengyuMoney = ((order.money - 0) + (order.awardMoney - 0)) - sim.monthRent;
+        sim.overdueTime = (moment(sim.overdueTime).add(order.months, 'M')).toDate();
+        break;
+      case 2:
+        sim.monthOverlapFlow = order.flow;
+        break;
+      case 3:
+        order.orderId = this.autoOrder(SimOrderService.DISCO_PREFIX, order.simId);
+        break;
+      case 4:
+        order.orderId = this.autoOrder(SimOrderService.RENEW_PREFIX, order.simId);
+        break;
+    }
+  }
   async create(order) {
     switch (order.orderType) {
       case 1:
