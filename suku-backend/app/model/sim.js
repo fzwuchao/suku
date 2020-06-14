@@ -45,6 +45,11 @@ module.exports = app => {
       field: 'active_combo_name',
       comment: '激活套餐名',
     },
+    monthRent: {
+      type: DECIMAL(10, 3),
+      field: 'month_rent',
+      comment: '月租',
+    },
     otherComboIds: {
       type: STRING(100),
       field: 'other_combo_ids',
@@ -132,14 +137,16 @@ module.exports = app => {
       field: 'onelink_name',
       comment: 'onelink平台名称',
     },
-    onelinkStatus: {
+    cardStatus: {
       type: STRING(2),
-      field: 'onelink_status',
+      field: 'card_status',
+      defaultValue: '1',
       comment: 'onelink平台状态: 1：待激活, 2：已激活, 4：停机, 6：可测试, 7：库存, 8：预销户',
     },
     openStatus: {
       type: TINYINT(1),
       field: 'open_status',
+      defaultValue: 0,
       comment: '开关机状态: 0-关机, 1-开机',
     },
     privateMoney: {
