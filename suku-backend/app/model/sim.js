@@ -137,7 +137,7 @@ module.exports = app => {
       field: 'onelink_name',
       comment: 'onelink平台名称',
     },
-    CardStatus: {
+    cardStatus: {
       type: STRING(2),
       field: 'card_status',
       defaultValue: '1',
