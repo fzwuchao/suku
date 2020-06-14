@@ -92,6 +92,11 @@ module.exports = app => {
       field: 'month_shengyu_flow',
       comment: '当月剩余流量(M)',
     },
+    monthUsedFlow: {
+      type: DECIMAL(10, 3),
+      field: 'month_used_flow',
+      comment: '已用流量(M)',
+    },
     monthVoiceDurationThreshold: {
       type: DECIMAL(10, 3),
       field: 'month_voice_duration_threshold',
@@ -101,6 +106,16 @@ module.exports = app => {
       type: DECIMAL(10, 3),
       field: 'month_shengyu_voice_duration',
       comment: '当月剩余语音时长(分)',
+    },
+    monthOverlapVoiceDuration: {
+      type: DECIMAL(10, 3),
+      field: 'month_overlap_voice_duration',
+      comment: '当月叠加语单时长(分)',
+    },
+    monthUsedVoiceDuration: {
+      type: DECIMAL(10, 3),
+      field: 'month_used_voice_duration',
+      comment: '已用语单时长(分)',
     },
     renewPrice: {
       type: DECIMAL(10, 3),
@@ -115,11 +130,19 @@ module.exports = app => {
     voiceServStatus: {
       type: TINYINT(1),
       field: 'voice_serv_status',
+      defaultValue: 2,
       comment: '语音服务关停状态: 1-开, 2-关',
     },
     flowServStatus: {
       type: TINYINT(1),
       field: 'flow_serv_status',
+      defaultValue: 2,
+      comment: '流量服务关停状态: 1-开, 2-关',
+    },
+    msgServStatus: {
+      type: TINYINT(1),
+      field: 'msg_serv_status',
+      defaultValue: 2,
       comment: '流量服务关停状态: 1-开, 2-关',
     },
     netStatus: {
