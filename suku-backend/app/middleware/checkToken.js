@@ -1,6 +1,6 @@
 // 验证token是否有效
 'use strict';
-const ERRORMSG = require('../extend/errorCode');
+const ERRORMSG = require('../extend/errorCode')();
 module.exports = (options, app) => {
   return async function checkToken(ctx, next) {
     const { header, url } = ctx.request;
