@@ -13,10 +13,10 @@ const ComboPackRules = {
   awardMoney: {
     type: 'number?',
   },
-  monthSumFlowThreshold: {
+  monthFlow: {
     type: 'number?',
   },
-  monthVoiceDurationThreshold: {
+  monthVoice: {
     type: 'number?',
   },
   id: {

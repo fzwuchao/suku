@@ -109,8 +109,8 @@ class SimController extends BaseController {
     }
     // 激话套餐的流量、语音时长、续费价格
     const {
-      monthSumFlowThreshold,
-      monthVoiceDurationThreshold,
+      monthFlow,
+      monthVoice,
       renewPrice,
       monthRent,
     } = await service.simCombo.getSimComboById(params.activeComboId);
@@ -128,10 +128,10 @@ class SimController extends BaseController {
         onelinkId: params.onelinkId,
         onelinkName: params.onelinkName,
         simType: params.simType,
-        monthSumFlowThreshold,
-        monthVoiceDurationThreshold,
-        monthShengyuFlow: monthSumFlowThreshold,
-        monthShengyuVoiceDuration: monthVoiceDurationThreshold,
+        monthFlow,
+        monthVoice,
+        monthShengyuFlow: monthFlow,
+        monthShengyuVoiceDuration: monthVoice,
         renewPrice,
         monthRent,
       };
@@ -210,8 +210,8 @@ class SimController extends BaseController {
     }
     // 激话套餐的流量、语音时长、续费价格
     const {
-      monthSumFlowThreshold,
-      monthVoiceDurationThreshold,
+      monthFlow,
+      monthVoice,
       renewPrice,
       monthRent,
     } = await service.simCombo.getSimComboById(params.activeComboId);
@@ -226,10 +226,10 @@ class SimController extends BaseController {
         onelinkId: params.onelinkId,
         onelinkName: params.onelinkName,
         simType: params.simType,
-        monthSumFlowThreshold,
-        monthVoiceDurationThreshold,
-        monthShengyuFlow: monthSumFlowThreshold,
-        monthShengyuVoiceDuration: monthVoiceDurationThreshold,
+        monthFlow,
+        monthVoice,
+        monthShengyuFlow: monthFlow,
+        monthShengyuVoiceDuration: monthVoice,
         renewPrice,
         monthRent,
       };

@@ -13,10 +13,10 @@ const SimComboRules = {
   comboType: {
     type: 'int?',
   },
-  monthSumFlowThreshold: {
+  monthFlow: {
     type: 'number?',
   },
-  monthVoiceDurationThreshold: {
+  monthVoice: {
     type: 'number?',
   },
   monthRent: {

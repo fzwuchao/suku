@@ -48,8 +48,8 @@ class SimComboController extends BaseController {
     // 非激活套餐（叠加套餐、特惠套餐，只包含套餐名和适用类型）
     if (comboTypeStr === '1') {
       comboTypeAttrs = [
-        'monthSumFlowThreshold',
-        'monthVoiceDurationThreshold',
+        'monthFlow',
+        'monthVoice',
         'monthRent',
         'months',
         'renewPrice',

@@ -35,22 +35,22 @@
       </el-form-item>
       <el-form-item
         label="流量"
-        prop="monthSumFlowThreshold"
+        prop="monthFlow"
       >
         <el-input-number
           :precision="2"
           :controls="false"
-          v-model="simCombo.monthSumFlowThreshold"
+          v-model="simCombo.monthFlow"
         ></el-input-number>
         <span class="unit">M</span>
       </el-form-item>
       <el-form-item
         label="语音时长"
-        prop="monthVoiceDurationThreshold"
+        prop="monthVoice"
         v-if="isShow"
       >
         <el-input-number
-          v-model="simCombo.monthVoiceDurationThreshold"
+          v-model="simCombo.monthVoice"
           :controls="false"
         ></el-input-number>
         <span class="unit">分</span>
@@ -87,8 +87,8 @@ export default {
       simCombo: {
         id: null,
         name: "",
-        monthSumFlowThreshold: 0,
-        monthVoiceDurationThreshold: 0,
+        monthFlow: 0,
+        monthVoice: 0,
         comboId: "",
         comboType: 2,
         money: 0,
@@ -98,10 +98,10 @@ export default {
         comboId: [
           { required: true, message: "请选择所属套餐", trigger: "blur" }
         ],
-        monthSumFlowThreshold: [
+        monthFlow: [
           { required: true, message: "请输入流量", trigger: "blur" }
         ],
-        monthVoiceDurationThreshold: [
+        monthVoice: [
           { required: true, message: "请输入语音时长", trigger: "blur" }
         ]
       }

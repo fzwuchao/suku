@@ -26,9 +26,9 @@ module.exports = app => {
       field: 'belongs_to_sim_type',
       comment: '所属sim卡的类型: 格式如: A,B',
     },
-    monthSumFlowThreshold: {
+    monthFlow: {
       type: DECIMAL(10, 3),
-      field: 'month_sum_flow_threshold',
+      field: 'month_flow',
       comment: '当月流量阈(M)',
     },
     monthRent: {
@@ -41,9 +41,9 @@ module.exports = app => {
       field: 'renew_price',
       comment: '续费价格',
     },
-    monthVoiceDurationThreshold: {
+    monthVoice: {
       type: DECIMAL(10, 3),
-      field: 'month_voice_duration_threshold',
+      field: 'month_voice',
       comment: '当月语音时长阈(分)',
     },
     months: {

@@ -24,21 +24,21 @@
       </el-form-item>
       <el-form-item
         label="套餐月流量"
-        prop="monthSumFlowThreshold"
+        prop="monthFlow"
       >
         <el-input-number
           :precision="2"
           :controls="false"
-          v-model="simCombo.monthSumFlowThreshold"
+          v-model="simCombo.monthFlow"
         ></el-input-number>
         <span class="unit">M</span>
       </el-form-item>
       <el-form-item
         label="月通话时长"
-        prop="monthVoiceDurationThreshold"
+        prop="monthVoice"
       >
         <el-input-number
-          v-model="simCombo.monthVoiceDurationThreshold"
+          v-model="simCombo.monthVoice"
           :controls="false"
         ></el-input-number>
         <span class="unit">分</span>
@@ -101,8 +101,8 @@ export default {
         id: '',
         name: "",
         belongsToSimType: "",
-        monthSumFlowThreshold: 0,
-        monthVoiceDurationThreshold: 0,
+        monthFlow: 0,
+        monthVoice: 0,
         monthRent: 0,
         months: 1,
         renewPrice: 0,
@@ -113,10 +113,10 @@ export default {
         belongsToSimType: [
           { required: true, message: "请勾选适用卡类型", trigger: "blur" }
         ],
-        monthSumFlowThreshold: [
+        monthFlow: [
           { required: true, message: "请输入套餐月流量", trigger: "blur" }
         ],
-        monthVoiceDurationThreshold: [
+        monthVoice: [
           { required: true, message: "请输入月通话时长", trigger: "blur" }
         ],
         monthRent: [{ required: true, message: "请输入月租", trigger: "blur" }],

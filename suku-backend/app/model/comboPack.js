@@ -35,14 +35,14 @@ module.exports = app => {
       field: 'award_money',
       comment: '赠送金额',
     },
-    monthSumFlowThreshold: {
+    monthFlow: {
       type: DECIMAL(10, 3),
-      field: 'month_sum_flow_threshold',
-      comment: '当月流量阈(M)',
+      field: 'month_flow',
+      comment: '当月流量',
     },
-    monthVoiceDurationThreshold: {
+    monthVoice: {
       type: DECIMAL(10, 3),
-      field: 'month_voice_duration_threshold',
+      field: 'month_voice',
       comment: '当月语音时长阈(分)',
     },
     createdAt: {

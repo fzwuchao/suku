@@ -81,11 +81,11 @@
                 <p class="cpmbo-pack-name">{{pack.name}}</p>
                 <p class="cpmbo-pack-flow">
                   流量:
-                  <strong>{{pack.monthSumFlowThreshold}}M</strong>
+                  <strong>{{pack.monthFlow}}M</strong>
                 </p>
                 <p class="cpmbo-pack-voice">
                   语音:
-                  <strong>{{pack.monthVoiceDurationThreshold}}min</strong>
+                  <strong>{{pack.monthVoice}}min</strong>
                 </p>
               </div>
               <div class="combo-pack-bottom">
@@ -185,8 +185,8 @@ export default {
             let packMonths = (packMoney/combo.monthRent);
             pack.months = packMonths;
             if(pack.comboType == 1 || pack.comboType == 3) {
-              pack.monthSumFlowThreshold =  packMonths * combo.monthSumFlowThreshold;
-              pack.monthVoiceDurationThreshold = packMonths * combo.monthVoiceDurationThreshold;
+              pack.monthFlow =  packMonths * combo.monthFlow;
+              pack.monthVoice = packMonths * combo.monthVoice;
             }  
           }
         }
@@ -208,14 +208,14 @@ export default {
         pay.cpname = pack.name;
         pay.cpid = pack.id;
         pay.awardMoney = pack.awardMoney;
-        pay.flow = pack.monthSumFlowThreshold;
-        pay.voice = pack.monthVoiceDurationThreshold;
+        pay.flow = pack.monthFlow;
+        pay.voice = pack.monthVoice;
         pay.months = pack.months;
         pay.orderType = combo.comboType
       } else {
         pay.dealAmount = combo.monthRent * combo.months;
-        pay.flow = combo.monthSumFlowThreshold * combo.months;
-        pay.voice = combo.monthVoiceDurationThreshold * combo.months;
+        pay.flow = combo.monthFlow * combo.months;
+        pay.voice = combo.monthVoice * combo.months;
         pay.months = combo.months;
         pay.orderType = 4;
       }

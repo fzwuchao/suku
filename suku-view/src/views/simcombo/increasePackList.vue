@@ -56,7 +56,7 @@
         label="流量"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0} M`}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthFlow ? scope.row.monthFlow : 0} M`}}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -64,7 +64,7 @@
         label="时长"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0} 分`}}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoice ? scope.row.monthVoice : 0} 分`}}</template>
       </el-table-column>
       <el-table-column
         align="left"

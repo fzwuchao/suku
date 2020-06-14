@@ -89,7 +89,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.flowServStatus | serveStatus }}</template>
+        <template slot-scope="scope">{{ scope.row.flowServStatus}}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -142,7 +142,7 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthSumFlowThreshold ? scope.row.monthSumFlowThreshold : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthFlow ? scope.row.monthFlow : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -158,7 +158,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0}`}}</template>
+        <template slot-scope="scope">{{ }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -175,7 +175,7 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthVoiceDurationThreshold ? scope.row.monthVoiceDurationThreshold : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthVoice ? scope.row.monthVoice : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"

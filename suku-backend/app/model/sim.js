@@ -77,9 +77,9 @@ module.exports = app => {
       field: 'overdue_time',
       comment: '过期时间',
     },
-    monthSumFlowThreshold: {
+    monthFlow: {
       type: DECIMAL(10, 3),
-      field: 'month_sum_flow_threshold',
+      field: 'month_flow',
       comment: '当月流量阈(M)',
     },
     monthOverlapFlow: {
@@ -97,9 +97,9 @@ module.exports = app => {
       field: 'month_used_flow',
       comment: '已用流量(M)',
     },
-    monthVoiceDurationThreshold: {
+    monthVoice: {
       type: DECIMAL(10, 3),
-      field: 'month_voice_duration_threshold',
+      field: 'month_voice',
       comment: '当月语间时长阈(分)',
     },
     monthShengyuVoiceDuration: {

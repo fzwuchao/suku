@@ -65,7 +65,8 @@ class SimOrderService extends BaseService {
         sim.overdueTime = (moment(sim.overdueTime).add(order.months, 'M')).toDate();
         break;
       case 2:
-        sim.monthOverlapFlow = order.flow;
+        sim.monthOverlapFlow = order.flow - 0;
+        sim.monthOverlapVoiceDuration = order.voice - 0;
         break;
       case 3:
         order.orderId = this.autoOrder(SimOrderService.DISCO_PREFIX, order.simId);
