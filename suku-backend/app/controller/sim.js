@@ -213,6 +213,7 @@ class SimController extends BaseController {
       monthSumFlowThreshold,
       monthVoiceDurationThreshold,
       renewPrice,
+      monthRent,
     } = await service.simCombo.getSimComboById(params.activeComboId);
     const simList = simIdList.map(simId => {
       return {
@@ -227,7 +228,10 @@ class SimController extends BaseController {
         simType: params.simType,
         monthSumFlowThreshold,
         monthVoiceDurationThreshold,
+        monthShengyuFlow: monthSumFlowThreshold,
+        monthShengyuVoiceDuration: monthVoiceDurationThreshold,
         renewPrice,
+        monthRent,
       };
     });
 
