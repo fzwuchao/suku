@@ -89,7 +89,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.flowServStatus}}</template>
+        <template slot-scope="scope">{{ scope.row.flowServStatus | serveStatus }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -193,7 +193,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.voiceServStatus}}</template>
+        <template slot-scope="scope">{{ scope.row.voiceServStatus | serveStatus }}</template>
       </el-table-column>
 
       <el-table-column
@@ -333,6 +333,13 @@ export default {
           break;
       }
       return returnStr;
+    },
+    serveStatus(val) {
+      const serveStatus = {
+        1: '开',
+        2: '关',
+      }
+      return serveStatus[val];
     }
   },
   components: {

@@ -43,7 +43,7 @@ class SimController extends BaseController {
     }, {});
 
     ctx.validate(rule, params);
-    const excelSimData = await service.sim.getSimDataForExcel(params);
+    const excelSimData = await service.sim.getSimDataForExcel(params, params.simType === 'B');
     const jsonExcel = JSON.parse(JSON.stringify(excelSimData, null, 2));
     const buffer = await service.sheet.generateWorkbookBuffer(jsonExcel);
     // application/octet-stream application/vnd.openxmlformats application/msexcel
@@ -73,10 +73,9 @@ class SimController extends BaseController {
     const params = { ...request.body };
     ctx.validate(rule, params);
 
-    const simExcelHeadField = [ 'MSISDN', 'ICCID' ];
+    const simExcelHeadField = ['MSISDN', 'ICCID'];
     const result = await service.sheet.parseFileWithHeadField(params.filepath);
-    // 解析完成后，删除tmp-file/下对应的文件
-    await service.sheet.removeFile(params.filepath);
+
     if (!result.parseSuccess) {
       this.fail(null, null, result.msg);
       return;
@@ -113,6 +112,7 @@ class SimController extends BaseController {
       monthSumFlowThreshold,
       monthVoiceDurationThreshold,
       renewPrice,
+      monthRent,
     } = await service.simCombo.getSimComboById(params.activeComboId);
     const simList = sheetData.map(item => {
       const simId = item[simExcelHeadField[0]];
@@ -130,23 +130,25 @@ class SimController extends BaseController {
         simType: params.simType,
         monthSumFlowThreshold,
         monthVoiceDurationThreshold,
+        monthShengyuFlow: monthSumFlowThreshold,
+        monthShengyuVoiceDuration: monthVoiceDurationThreshold,
         renewPrice,
+        monthRent,
       };
     });
 
     try {
-      const result = await service.sim.bulkCreate(simList);
-      if (result) {
-        // 生成入库记录
-        await service.simLogistics.create({
-          receiver: params.uname,
-          receiverId: params.uid,
-          total: simList.length,
-        });
-        this.success('', '导入成功');
-      } else {
-        this.fail('', '', '导出失败');
-      }
+      await service.sim.bulkCreate(simList);
+      // 在表中生成数据后，删除tmp-file/下对应的文件
+      await service.sheet.removeFile(params.filepath);
+
+      // 生成入库记录
+      await service.simLogistics.create({
+        receiver: params.uname,
+        receiverId: params.uid,
+        total: simList.length,
+      });
+      this.success('', '导入成功');
 
     } catch (error) {
       this.fail('', '', error.message);
@@ -174,8 +176,6 @@ class SimController extends BaseController {
     ctx.validate(rule, params);
 
     const result = await service.sheet.parseSimIdFile(params.filepath);
-    // 解析完成后，删除tmp-file/下对应的文件
-    await service.sheet.removeFile(params.filepath);
 
     if (!result.parseSuccess) {
       this.fail(null, null, result.msg);
@@ -236,19 +236,16 @@ class SimController extends BaseController {
     });
 
     try {
-      const result = await service.sim.bulkCreate(simList);
-      if (result) {
-        // 生成入库记录
-        await service.simLogistics.create({
-          receiver: params.uname,
-          receiverId: params.uid,
-          total: simList.length,
-        });
-        this.success('', '导入成功');
-      } else {
-        this.fail('', '', '导出失败');
-      }
-
+      await service.sim.bulkCreate(simList);
+      // 解析完成后，删除tmp-file/下对应的文件
+      await service.sheet.removeFile(params.filepath);
+      // 生成入库记录
+      await service.simLogistics.create({
+        receiver: params.uname,
+        receiverId: params.uid,
+        total: simList.length,
+      });
+      this.success('', '导入成功');
     } catch (error) {
       this.fail('', '', error.message);
     }
