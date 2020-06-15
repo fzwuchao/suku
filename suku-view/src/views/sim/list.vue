@@ -196,6 +196,15 @@
       >
         <template slot-scope="scope">{{ scope.row.voiceServStatus | serveStatus }}</template>
       </el-table-column>
+      
+      <el-table-column
+        align="left"
+        label="开关机状态"
+        min-width="100px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.openStatus == 0 ? '关机' : '开机'  }}</template>
+      </el-table-column>
 
       <el-table-column
         fixed="right"

@@ -61,25 +61,26 @@ class SimOrderService extends BaseService {
     return result;
   }
   async changeSim(sim, order) {
+    const newSim = { id: sim.id };
     switch (order.orderType) {
       case 1: 
       case 4:
       case 3:
-        sim.shengyuMoney = ((order.money - 0) + (order.awardMoney - 0));
+        newSim.shengyuMoney = sim.shengyuMoney + ((order.money - 0) + (order.awardMoney - 0));
         if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
-          sim.shengyuMoney -= sim.monthRent;
+          newSim.shengyuMoney = newSim.shengyuMoney - sim.monthRent;
           order.months = order.months - 1; 
         }
-        // sim.overdueTime = sim.overdueTime ? sim.overdueTime : new Date();
-        // const newTime = moment(sim.overdueTime).add(order.months, 'M');
-        // sim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
+        newSim.overdueTime = sim.overdueTime ? sim.overdueTime : new Date();
+        const newTime = moment(newSim.overdueTime).add(order.months, 'M');
+        newSim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         break;
       case 2:
         sim.monthOverlapFlow = sim.monthOverlapFlow + (order.flow - 0);
         sim.monthOverlapVoiceDuration = sim.monthOverlapVoiceDuration + (order.voice - 0);
         break;
     }
-    await this.ctx.service.sim.update(sim);
+    await this.ctx.service.sim.update(newSim);
   }
   async create(order) {
     switch (order.orderType) {
