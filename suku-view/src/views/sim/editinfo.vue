@@ -2,54 +2,71 @@
   <div class="add-person">
     <edit-bar></edit-bar>
     <el-form label-width="130px" :model="sim" :rules="rules" ref="ruleForm">
-      <el-form-item label="卡号">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="Sim卡号">
+        <span>{{ sim.simId }}</span>
       </el-form-item>
       <el-form-item label="ICCID">
         <span>{{ sim.iccid }}</span>
       </el-form-item>
       <el-form-item label="IMEI">
-        <span>{{ sim.sim_id }}</span>
+        <span>{{ sim.imei }}</span>
       </el-form-item>
       <el-form-item label="平台状态">
-        <span>{{ sim.sim_id }}</span>
+        <span>{{ sim.cardStatus | cardStatus}}</span>
+      </el-form-item>
+       <el-form-item label="激活套餐名">
+        <span>{{ sim.activeComboName }}</span>
       </el-form-item>
       <el-form-item label="激活时间">
-        <span>{{ sim.sim_id }}</span>
+        <span>{{ sim.activeTime }}</span>
       </el-form-item>
-      <el-form-item label="已使用流量">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="过期时间">
+        <span>{{ sim.overdueTime }}</span>
       </el-form-item>
-      <el-form-item label="总流量">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="过期时间">
+        <span>{{ sim.overdueTime }}</span>
       </el-form-item>
-      <el-form-item label="套餐流量">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="续费价格">
+        <span>{{ sim.renewPrice }}</span>
       </el-form-item>
-      <el-form-item label="已使用语音">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="用户">
+        <span>{{ sim.uname }}</span>
       </el-form-item>
-      <el-form-item label="语音状态">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="当月流量阈(M)">
+        <span>{{ `${sim.monthFlow ? sim.monthFlow : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="平台语音状态">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="叠加流量(M)">
+        <span>{{ `${sim.monthOverlapFlow ? sim.monthOverlapFlow : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="开关机">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="已用流量(M)">
+        <span>{{ `${sim.monthUsedFlow ? sim.monthUsedFlow : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="通信状态">
-        <span>{{ sim.sim_id }}</span>
+      <el-form-item label="剩余流量(M)">
+        <span>{{ `${sim.monthShengyuFlow ? sim.monthShengyuFlow : 0}` }}</span>
+      </el-form-item>
+      <el-form-item label="余额(元)" v-if="sim.simType === 'B'">
+        <span>{{ `${sim.monthShengyuFlow ? sim.monthShengyuFlow : 0}` }}</span>
+      </el-form-item>
+      <el-form-item label="当月语音阈(分)" v-if="sim.simType === 'B'">
+        <span>{{ `${sim.monthVoice ? sim.monthVoice : 0}` }}</span>
+      </el-form-item>
+      <el-form-item label="已用语音(分)" v-if="sim.simType === 'B'">
+        <span>{{ `${sim.monthUsedVoiceDuration ? sim.monthUsedVoiceDuration : 0}` }}</span>
+      </el-form-item>
+      <el-form-item label="当月剩余语音(分)" v-if="sim.simType === 'B'">
+        <span>{{ `${sim.monthShengyuVoiceDuration ? sim.monthShengyuVoiceDuration : 0}` }}</span>
+      </el-form-item>
+      <el-form-item label="流量服务状态">
+        <span>{{ sim.flowServStatus | serveStatus}}</span>
+      </el-form-item>
+      <el-form-item label="语音服务状态" v-if="sim.simType === 'B'">
+        <span>{{ sim.voiceServStatus | serveStatus }}</span>
+      </el-form-item>
+      <el-form-item label="开关机状态">
+        <span>{{ sim.openStatus === 0 ? '关机' : '开机' }}</span>
       </el-form-item>
       <el-form-item label="添加时间">
-        <span>{{ sim.sim_id }}</span>
-      </el-form-item>
-
-      <el-form-item label="续费价格" prop="sim_id">
-        <el-input v-model="sim.sim_id"></el-input>
-      </el-form-item>
-      <el-form-item label="月租增价" prop="sim_id">
-        <el-input v-model="sim.sim_id"></el-input>
+        <span>{{ sim.createdAt }}</span>
       </el-form-item>
       <el-form-item label="套餐增价" prop="sim_id">
         <el-input v-model="sim.sim_id" readonly="true"></el-input>
@@ -73,52 +90,18 @@
 
 <script>
 import EditBar from "../../components/EditBar";
-// import API from "@/api";
+import API from "@/api";
 // import { validateTel } from "../../utils/validate.js";
 export default {
   components: {
     EditBar
   },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
       sim: {
-        sim_id: 17290033433,
-        iccid: "0",
-        active_time: null,
-        overdue_time: null,
-        username: "\u963f\u6e29",
-        sim_type: "A",
-        net_status: "<span style='color:green'>\u6b63\u5e38</span>",
-        month_sum_flow: "30 M",
-        overlap_flow: "0.00 M",
-        renew_price: 60,
-        office_renew_price: "60.00",
-        renew_add_price: "0.00",
-        menu_flow: "30.00 M",
-        menu_name: "30M\u5e74\u5361",
-        menu_id: 17,
-        month_used_flow: 0,
-        shengyu_flow: "30 M",
-        voice_flow: "",
-        voice_status: "\u5f00\u542f",
-        voice_time: "0.00",
-        shengyu_voice: 0,
-        cardStatus: "",
-        openStatus: "",
-        networkStatus: "\u65e0",
-        apiVoiceStatus: "\u65e0",
-        imei: "0",
-        created_at: "2020-05-13 10:20:30",
-        is_active: 0,
-        money: null
+        
       },
+      simId: null,
       rules: {
         username: [
           { required: true, message: "请输入机构名称", trigger: "blur" }
@@ -126,9 +109,28 @@ export default {
       }
     };
   },
+  filters:{
+    cardStatus(val){
+      const status= {
+        '1' : "待激活",
+        '2' : "已激活",
+        '4' : "停机",
+        '6' : "可测试",
+        '21': "注销",
+        '22': "欠费"
+      }
+      return status[val];
+    },
+    serveStatus(val) {
+      const serveStatus = {
+        1: '开',
+        2: '关',
+      }
+      return serveStatus[val];
+    }
+  },
   methods: {
     submit() {
-      this.$router.push("/system/userList");
       /* this.$refs["ruleForm"].validate(valid => {
         if (valid) {
           let data = this.user;
@@ -143,9 +145,25 @@ export default {
           return false;
         }
       }); */
-    }
+    },
+    getSimBySimId() {
+      this.axios({
+        method: "get",
+        params: {
+          simId: this.simId,
+        },
+        url: API.SIMLIST.SIM_GET_SIM
+      }).then((r) => {
+        this.sim = r.data;
+      });
+    },
+
   },
-  mounted() {}
+  mounted() {
+   const { id } = this.$route.params;
+   this.simId = id;
+   this.getSimBySimId();
+  }
 };
 </script>
 

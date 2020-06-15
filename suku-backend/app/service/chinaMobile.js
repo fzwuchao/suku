@@ -182,7 +182,7 @@ class ChinaMobileService extends BaseService {
     const result = await this.handleBy(api.query.sim_base_info, msisdn, { msisdn });
     const { activeDate } = result[0] || {};
     let activeDt = null;
-    if (activeDate !== ' ' && _.isNil(activeDate)) {
+    if (activeDate !== ' ' && !_.isNil(activeDate)) {
       activeDt = moment(activeDate).toDate()
     }
     return activeDt;
