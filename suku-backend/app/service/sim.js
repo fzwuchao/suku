@@ -8,7 +8,7 @@ const BaseService = require('../core/baseService');
 class SimService extends BaseService {
   async update(sim) {
     try {
-      await this.app.model.Sim.update(sim, { where: { simId: sim.simId } });
+      await this.app.model.Sim.update(sim, { where: { id: sim.id } });
     } catch (e) {
       return false;
     }

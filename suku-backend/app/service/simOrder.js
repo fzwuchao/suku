@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable default-case */
 'use strict';
@@ -67,15 +68,18 @@ class SimOrderService extends BaseService {
         sim.shengyuMoney = ((order.money - 0) + (order.awardMoney - 0));
         if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
           sim.shengyuMoney -= sim.monthRent;
+          order.months = order.months - 1; 
         }
-        sim.overdueTime = (moment(sim.overdueTime).add(order.months, 'M')).toDate();
+        // sim.overdueTime = sim.overdueTime ? sim.overdueTime : new Date();
+        // const newTime = moment(sim.overdueTime).add(order.months, 'M');
+        // sim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         break;
       case 2:
         sim.monthOverlapFlow = sim.monthOverlapFlow + (order.flow - 0);
         sim.monthOverlapVoiceDuration = sim.monthOverlapVoiceDuration + (order.voice - 0);
         break;
     }
-    this.ctx.service.sim.update(sim);
+    await this.ctx.service.sim.update(sim);
   }
   async create(order) {
     switch (order.orderType) {

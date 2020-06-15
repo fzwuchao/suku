@@ -205,6 +205,7 @@ export default {
       pay.cid = combo.id;
       if(pack) {
         pay.dealAmount = pack.money;
+        pay.money = pack.money;
         pay.cpname = pack.name;
         pay.cpid = pack.id;
         pay.awardMoney = pack.awardMoney;
@@ -217,6 +218,7 @@ export default {
         pay.flow = combo.monthFlow * combo.months;
         pay.voice = combo.monthVoice * combo.months;
         pay.months = combo.months;
+        pay.money = combo.monthRent * combo.months;
         pay.orderType = 4;
       }
       this.payInfo = pay;
