@@ -83,14 +83,7 @@
       >
         <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
-      <el-table-column
-        align="left"
-        label="流量服务状态"
-        min-width="100px"
-        show-overflow-tooltip
-      >
-        <template slot-scope="scope">{{ scope.row.flowServStatus}}</template>
-      </el-table-column>
+      
       <el-table-column
         align="left"
         label="平台状态"
@@ -185,6 +178,14 @@
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0}` }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
+        label="流量服务状态"
+        min-width="100px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.flowServStatus | serveStatus}}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -311,28 +312,15 @@ export default {
   },
   filters:{
     cardStatus(val){
-      let returnStr = "";
-      switch (val) {
-        case '1':
-          returnStr = "待激活";
-          break;
-        case '2':
-          returnStr = "已激活";
-          break;
-        case '4':
-          returnStr = "停机";
-          break;
-        case '21':
-          returnStr = "注销";
-          break;
-        case '6':
-          returnStr = "可测试";
-          break;
-        case '22':
-          returnStr = "欠费";
-          break;
+      const status= {
+        '1' : "待激活",
+        '2' : "已激活",
+        '4' : "停机",
+        '6' : "可测试",
+        '21': "注销",
+        '22': "欠费"
       }
-      return returnStr;
+      return status[val];
     },
     serveStatus(val) {
       const serveStatus = {

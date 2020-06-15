@@ -141,12 +141,12 @@ export default {
       }).then((r) => {
         if(r.data) {
           this.sim = r.data;
-          let ids = []
+          let ids = [];
           if(this.sim.isActive == 1 || this.sim.simType == 'A') {
             ids = this.sim.otherMenuIds.split(',');
           }
           //if(this.sim.simType == 'B') {
-          ids.push(this.sim.activeMenuId+'')
+          ids.push(this.sim.activeComboId+'')
           //}
           this.isActive = (this.sim.isActive === 1);
           this.getSimCombo(ids);

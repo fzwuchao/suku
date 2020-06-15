@@ -20,9 +20,7 @@ const getNowStr = () => {
 
 // 获取transid
 const getTransid = appid => {
-  return {
-    transid: `${appid}${getNowStr()}${getIndexStr()}`,
-  };
+  return `${appid}${getNowStr()}${getIndexStr()}`;
 };
 
 const api = {
@@ -55,14 +53,25 @@ const api = {
     sim_call_function: '/ec/operate/sim-call-function',
   },
 };
-
 class ChinaMobileService extends BaseService {
-  async fetchData(url, data, options) {
-    return await this.ctx.curl(url, {
+  async getOnelink(simId) {
+    const { onelinkId } = await this.ctx.service.sim.getSimBySimId(simId);
+    const oneLink = await this.ctx.service.onelinkPlatform.getOnelinkById(onelinkId);
+    return oneLink;
+  }
+  async fetchData(url, data, simId, options) {
+    const { appId, apiHost, apiVersion, status } = await this.getOnelink(simId);
+    if (status === 0) {
+      return null;
+    }
+    data.token = await this.getToken(simId);
+    data.transid = getTransid(appId);
+    const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
       data,
       dataType: 'json',
       ...options,
     });
+    return this.getResult(res);
   }
 
   getResult(res) {
@@ -73,7 +82,6 @@ class ChinaMobileService extends BaseService {
       }
       this.ctx.logger.error(res.message);
       return [];
-
     }
     this.ctx.logger.error(`【异常状态码】: ${res.status}`);
     return [];
@@ -115,24 +123,27 @@ class ChinaMobileService extends BaseService {
   /**
    * CMIOT_API25000-认证服务接口
    * token 过期时间为 1 小时
-   * @param {string} nameKey - token的key名
-   * @param {string} appid - appid
-   * @param {string} password -密码
-   * @param {string} hostAndVer - 主机和版本
+   * @param {string} simId - token的key名
    */
-  async getToken(nameKey, appid, password, hostAndVer) {
+  async getToken(simId) {
     // 设置超时时间为50分钟，避免产生时间差
     const EXPIRE_TIME = 50 * 60 * 1000;
+    const { nameKey, apiHost, appId, apiVersion, secretKey, status } = await this.getOnelink(simId);
+    if (status === 0) {
+      return null;
+    }
     let token = await this.app.redis.get(nameKey);
-
     if (token) {
       return token;
     }
 
-    const res = await this.fetchData(`${hostAndVer}${api.get_token}`, {
-      appid,
-      password,
-      ...getTransid(appid),
+    const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.get_token}`, {
+      data: {
+        appid: appId,
+        password: secretKey,
+        transid: getTransid(appId),
+      },
+      dataType: 'json',
     });
     const result = this.getResult(res);
     if (result.length > 0) {
@@ -140,7 +151,7 @@ class ChinaMobileService extends BaseService {
     }
 
     const pipeline = await this.app.redis.pipeline();
-    await pipeline.set(nameKey, token).pexpire(nameKey, EXPIRE_TIME).exec((err, results) => { });
+    await pipeline.set(nameKey, token).pexpire(nameKey, EXPIRE_TIME).exec(() => { });
 
     return token;
   }
@@ -175,31 +186,17 @@ class ChinaMobileService extends BaseService {
 
   /**
    * CMIOT_API23S03-单卡状态变更
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
-   * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
+   * @param {string} simId - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @param {string} operType - operType
-   * @return {array} [{msisdn | imsi | iccid}] - 码号信息，同入参
+   * @return {array} [{simId | imsi | iccid}] - 码号信息，同入参
    */
-  async changeSimStatus(appid, token, hostAndVer, msisdn, iccid, imsi, operType) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
+  async changeSimStatus(simId, operType) {
     const data = {
-      token,
       operType,
-      ...getTransid(appid),
-      ...mii,
+      msisdn: simId,
     };
-
-    const res = await this.fetchData(`${hostAndVer}${api.change.sim_status}`, data);
-    const result = this.getResult(res);
-    return result;
+    const res = await this.fetchData(api.change.sim_status, data, simId);
+    return res;
   }
 
   /**
@@ -503,24 +500,19 @@ class ChinaMobileService extends BaseService {
   /**
    * CMIOT_API23M09-物联卡通信功能开停批量办理
    * 集团客户可以通过卡号调用该接口批量办理物联卡的通信功能（语音、短信、国际漫游、数据通信服务）开停
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdns - 物联卡号 多个号码用下划线分隔
    * @param {int} serviceType - 服务类型
    * @param {string} operType - 操作类型
    * @param {string} apnName - APN 名称
    * @return {array} [{jobId}] - 任务流水号
    */
-  async operateSimCommunicationFuctionBatch(appid, token, hostAndVer, msisdns, serviceType, operType, apnName) {
+  async operateSimCommunicationFuctionBatch(msisdns, serviceType, operType, apnName) {
     const { logger } = this.ctx;
     const data = {
-      token,
       msisdns,
       serviceType,
       operType,
       apnName,
-      ...getTransid(appid),
     };
 
     if (serviceType === 11 && _.isNil(apnName)) {
@@ -532,8 +524,8 @@ class ChinaMobileService extends BaseService {
       logger.error('【物联卡号最多 100 个】');
       return [];
     }
-
-    const res = await this.fetchData(`${hostAndVer}${api.operate.sim_communication_function_batch}`, data);
+    const simId = _.split(msisdns, '_')[0];
+    const res = await this.fetchData(`${api.operate.sim_communication_function_batch}`, data, simId);
     const result = this.getResult(res);
     return result;
   }

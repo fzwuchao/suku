@@ -74,8 +74,8 @@ export default {
         method: "post",
         data: this.payInfo,
         url: "/simOrder/save"
-      }).then((r) => {
-        console.log(r)
+      }).then(() => {
+        this.$emit("clickLeft")
       });
 
     },

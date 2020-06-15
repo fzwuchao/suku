@@ -1,3 +1,4 @@
+/* eslint-disable no-trailing-spaces */
 /* eslint-disable default-case */
 'use strict';
 
@@ -60,21 +61,21 @@ class SimOrderService extends BaseService {
   }
   async changeSim(sim, order) {
     switch (order.orderType) {
-      case 1:
-        sim.shengyuMoney = ((order.money - 0) + (order.awardMoney - 0)) - sim.monthRent;
+      case 1: 
+      case 4:
+      case 3:
+        sim.shengyuMoney = ((order.money - 0) + (order.awardMoney - 0));
+        if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
+          sim.shengyuMoney -= sim.monthRent;
+        }
         sim.overdueTime = (moment(sim.overdueTime).add(order.months, 'M')).toDate();
         break;
       case 2:
-        sim.monthOverlapFlow = order.flow - 0;
-        sim.monthOverlapVoiceDuration = order.voice - 0;
-        break;
-      case 3:
-        order.orderId = this.autoOrder(SimOrderService.DISCO_PREFIX, order.simId);
-        break;
-      case 4:
-        order.orderId = this.autoOrder(SimOrderService.RENEW_PREFIX, order.simId);
+        sim.monthOverlapFlow = sim.monthOverlapFlow + (order.flow - 0);
+        sim.monthOverlapVoiceDuration = sim.monthOverlapVoiceDuration + (order.voice - 0);
         break;
     }
+    this.ctx.service.sim.update(sim);
   }
   async create(order) {
     switch (order.orderType) {
