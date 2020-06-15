@@ -164,11 +164,20 @@
       <el-table-column
         align="left"
         v-if="simType === 'B'"
-        label="当月语音阈(分)"
+        label="当月语音(分)"
         min-width="120px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.monthVoice ? scope.row.monthVoice : 0}` }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="叠加语音(分)"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.monthOverlapVoiceDuration ? scope.row.monthOverlapVoiceDuration : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
