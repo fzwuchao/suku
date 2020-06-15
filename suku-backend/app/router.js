@@ -39,6 +39,8 @@ module.exports = app => {
   router.get('/sim/getSim', controller.sim.getSim);
   // 导出sim卡
   router.get('/sim/export', controller.sim.exportExcel);
+  // 同步更新
+  router.get('/sim/syncUpdate', controller.sim.syncUpdate);
 
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);

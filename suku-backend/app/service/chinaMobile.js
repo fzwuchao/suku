@@ -157,31 +157,30 @@ class ChinaMobileService extends BaseService {
   }
 
   /**
-   * CMIOT_API23S00-单卡基本信息查询
-   * 查询物联卡码号信息、开卡时间、首次激活时间
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
-   * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
-   * @return {array} [{ msisdn, imsi, iccid, activeDate, openDate}] - 物联卡号码, 国际移动用户识别码, IC 卡的唯一识别号码, 激活日期（首次）, 开卡时间
+   * 通过url、msisdn、data，处理数据
+   * @param {string} url - ur
+   * @param {string} msisdn - 物联卡号
+   * @param {object} data - 请求数据
    */
-  async querySimBasicInfo(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
+  async handleBy(url, msisdn, data) {
+    if (_.isNil(msisdn)) {
       return [];
     }
 
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_base_info}`, data);
-    const result = this.getResult(res);
+    const result = await this.fetchData(url, data, msisdn);
     return result;
+  }
+
+  /**
+   * CMIOT_API23S00-单卡基本信息查询
+   * 查询物联卡码号信息、开卡时间、首次激活时间
+   * @param {string} msisdn - 物联卡号码
+   * @return {datetime} activeDate - 激活日期（首次）
+   */
+  async querySimBasicInfo(msisdn) {
+    const result = await this.handleBy(api.query.sim_base_info, msisdn, { msisdn });
+    const { activeDate } = result[0] || {};
+    return activeDate ? moment(activeDate) : null;
   }
 
   /**
@@ -195,28 +194,24 @@ class ChinaMobileService extends BaseService {
       operType,
       msisdn: simId,
     };
-    const res = await this.fetchData(api.change.sim_status, data, simId);
-    return res;
+    const result = await this.handleBy(api.change.sim_status, simId, data);
+    return result;
   }
 
   /**
    * CMIOT_API23S06-物联卡状态变更批量办理
    * 集团客户可以通过卡号调用该接口批量办理物联卡的状态变更，每次不超过100 张卡，同一卡号 30 分钟内不得重复调用该接口
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdns - 物联卡号码 (多个号码用下划线分隔。例如：xxxx_xxxx_xxxx)
    * @param {int} operType - 操作类型
    * @param {string} reason - 停复机原因 (在 operType 为 9或 11 时，原因必传01：主动停复机)
    * @return {array} [{jobId}] - 任务流水号
    */
-  async changeSimStatusBatch(appid, token, hostAndVer, msisdns, operType, reason) {
+  async changeSimStatusBatch(msisdns, operType, reason) {
     const { logger } = this.ctx;
     const { error } = logger;
 
     const data = {
-      token,
-      ...getTransid(appid),
+      operType,
       reason,
     };
 
@@ -232,168 +227,82 @@ class ChinaMobileService extends BaseService {
 
     data.msisdns = msisdns;
 
-    const res = await this.fetchData(`${hostAndVer}${api.change.sim_status_batch}`, data);
-    const result = this.getResult(res);
+    const simId = _.split(msisdns, '_')[0];
+    const result = await this.fetchData(api.change.sim_status_batch, data, simId);
     return result;
   }
 
   /**
    * CMIOT_API25S04-单卡状态查询(替代CMIOT_API23S01)
    * 通过卡号查询物联卡的状态信息
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
-   * @return {array} [{cardStatus, lastChangeDate}] - 物联卡状态, 最后一次变更时间
+   * @return {string} cardStatus - 物联卡状态
    */
-  async querySimStatus(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_status}`, data);
-    const result = this.getResult(res);
-    return result;
+  async querySimStatus(msisdn) {
+    const result = await this.handleBy(api.query.sim_status, msisdn, { msisdn });
+    const { cardStatus } = result[0] || {};
+    return cardStatus;
   }
 
   /**
    * CMIOT_API25U04-单卡本月流量累计使用量查询（替代CMIOT_API23U03）
    * 查询集团所属物联卡当月的 GPRS 使用量，PB 号段为截至前一天 24 点流量，CT 号段为实时流量。（单位：KB）。
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
-   * @return {array} [{
-   *  dataAmount,
-   *  apnUseAmountList: [
-   *    {apnName, apnUseAmount, pccCodeUseAmountList: [{pccCode, pccCodeUseAmount}]}
-   *  ]
-   * }]
+   * @return {number} usedFlow - 已用流量(M)
    */
-  async querySimDataUsage(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
+  async querySimDataUsage(msisdn) {
+    const result = await this.handleBy(api.query.sim_data_usage, msisdn, { msisdn });
+    const { dataAmount } = result[0] || {};
+    // 单位：M
+    let usedFlow = 0;
+    // 单位：KB, 返回" "时，表示卡未产生用量或未订购套餐
+    if (usedFlow !== ' ') {
+      usedFlow = Number(dataAmount) / 1024;
     }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_data_usage}`, data);
-    const result = this.getResult(res);
-    return result;
+    return usedFlow;
   }
 
   /**
    * CMIOT_API23S04-单卡绑定 IMEI 实时查询
    * 通过卡号查询物联卡绑定的 IMEI 信息
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{imei}] - IMEI 号码
    */
-  async querySimImei(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_imei}`, data);
-    const result = this.getResult(res);
+  async querySimImei(msisdn) {
+    const result = await this.handleBy(api.query.sim_imei, msisdn, { msisdn });
     return result;
   }
 
   /**
    * CMIOT_API25M01-单卡在线信息实时查询
    * 查询物联卡的在线信息，区分 APN，返回 APN 信息、IP 地址、会话创建时间。
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{
    *  simSessionList: [{apnId, status, ip, createDate, rat}]
    * }]
    */
-  async querySimSession(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_session}`, data);
-    const result = this.getResult(res);
+  async querySimSession(msisdn) {
+    const result = await this.handleBy(api.query.sim_session, msisdn, { msisdn });
     return result;
   }
 
   /**
    * CMIOT_API25M00-单卡开关机状态实时查询
    * 查询终端的开关机信息
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
-   * @return {array} [{status}] - 终端的开关机状态, 0:关机 1:开机
+   * @return {string} status - 终端的开关机状态, 0:关机 1:开机
    */
-  async queryOnOffStatus(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.on_off_status}`, data);
-    const result = this.getResult(res);
-    return result;
+  async queryOnOffStatus(msisdn) {
+    const result = await this.handleBy(api.query.on_off_status, msisdn, { msisdn });
+    const { status } = result[0] || {};
+    return status;
   }
 
   /**
    * CMIOT_API23M15-成员语音白名单查询
    * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）实现集团旗下单个群组成员的语音白名单查询。
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} groupId - 成员归属的群组 ID
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{
    *  totalCount,
    *  memVoiceWhiteList:[
@@ -401,76 +310,36 @@ class ChinaMobileService extends BaseService {
    *  ]
    * }]
    */
-  async queryMemberVoiceWhitelist(appid, token, hostAndVer, groupId, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      groupId,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.on_off_status}`, data);
-    const result = this.getResult(res);
+  async queryMemberVoiceWhitelist(groupId, msisdn) {
+    const result = await this.handleBy(api.query.member_voice_whitelist, msisdn, { msisdn, groupId });
     return result;
   }
 
   /**
    * CMIOT_API23E02-成员归属群组查询
    * 查询物联卡归属的群组信息
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{
    *  groupList: [
    *    {groupId, offeringId, offeringName}
    *  ]
    * }]
    */
-  async queryGroupByMember(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.group_by_member}`, data);
-    const result = this.getResult(res);
+  async queryGroupByMember(msisdn) {
+    const result = await this.handleBy(api.query.group_by_member, msisdn, { msisdn });
     return result;
   }
 
   /**
    * CMIOT_API23M16-成员语音白名单配置
    * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）实现集团旗下单个群组成员的语音白名单配置
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} groupId - 成员归属的群组 ID
    * @param {string} operType - 语音白名单配置类型：1：新增 4：删除
    * @param {string} whiteNumber - 成员配置的语音白名单号码, 多个时用下划线分隔，例如：xxxx_xxxx
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} []
    */
-  async configMemberVoiceWhitelist(appid, token, hostAndVer, groupId, operType, whiteNumber, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
+  async configMemberVoiceWhitelist(groupId, operType, whiteNumber, msisdn) {
     // 当 operType=1 新增时，whiteNumber只能传 1 个值。
     // 当 operType=4 删除时，whiteNumber可传 2 个值，2 个号码用下划线分隔，例如：xxxx_xxxx
     const len = _.split(whiteNumber, '_').length;
@@ -485,15 +354,12 @@ class ChinaMobileService extends BaseService {
     }
 
     const data = {
-      token,
       groupId,
       operType,
-      ...getTransid(appid),
-      ...mii,
+      msisdn,
     };
 
-    const res = await this.fetchData(`${hostAndVer}${api.config.member_voice_whitelist}`, data);
-    const result = this.getResult(res);
+    const result = await this.handleBy(api.config.member_voice_whitelist, msisdn, data);
     return result;
   }
 
@@ -525,92 +391,60 @@ class ChinaMobileService extends BaseService {
       return [];
     }
     const simId = _.split(msisdns, '_')[0];
-    const res = await this.fetchData(`${api.operate.sim_communication_function_batch}`, data, simId);
-    const result = this.getResult(res);
+    const result = await this.handleBy(api.operate.sim_communication_function_batch, simId, data);
     return result;
   }
 
   /**
    * CMIOT_API23M08-单卡通信功能开通查询（替代 CMIOT_API23M01
    * 查询物联卡通信功能开通情况
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
-   * @return {array} [{
-   *  serviceTypeList:[{serviceType, serviceStatus, apnName}]
-   * }]
+   * @return {object} {voiceServStatus, msgServStatus, flowServStatus}
    */
-  async querySimCommunicationFunctionStatus(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
+  async querySimCommunicationFunctionStatus(msisdn) {
+    const result = await this.handleBy(api.query.sim_communication_function_status, msisdn, { msisdn });
+    const { serviceTypeList = [] } = result[0] || {};
+    const servStatus = {};
+    const serviceType = {
+      '01': 'voiceServStatus', // 语音服务,
+      '08': 'msgServStatus', // 短信服务
+      11: 'flowServStatus', // 流量服务
     };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_communication_function_status}`, data);
-    const result = this.getResult(res);
-    return result;
+    serviceTypeList.forEach(item => {
+      servStatus[serviceType[item.serviceType]] = item.serviceStatus;
+    });
+    return servStatus;
   }
 
   /**
    * CMIOT_API23U07-单卡本月套餐内流量使用量实时查询
    * 实时查询物联卡本月套餐内流量使用量
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{
    *  accmMarginList: [{offeringId, offeringName, apnName, totalAmount, useAmount, remainAmount, pccCode}]
    * }]
    */
-  async querySimDataMargin(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_data_margin}`, data);
-    const result = this.getResult(res);
+  async querySimDataMargin(msisdn) {
+    const result = await this.handleBy(api.query.sim_data_margin, msisdn, { msisdn });
     return result;
   }
 
   /**
    * CMIOT_API23A06-批量机卡绑定/解绑（话单侧)
    * 集团客户可以通过卡号（仅 msisdn，最多 100 张）实现批量 SIM 卡在话单侧的机卡绑定、解绑
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdns - 物联卡号多个号码用下划线分隔。例如：xxxx_xxxx_xxxx
    * @param {string} operType - 机卡操作
    * @param {string} bindingStyle - 机卡绑定方式
    * @param {string} tac - IMEI段
    * @return {array} [{jobId}] - 任务查询流水号
    */
-  async operateCardBindByBillBatch(appid, token, hostAndVer, msisdns, operType, bindingStyle, tac) {
+  async operateCardBindByBillBatch(msisdns, operType, bindingStyle, tac) {
     const { logger } = this.ctx;
     const data = {
-      token,
       msisdns,
       operType,
       bindingStyle,
       tac,
-      ...getTransid(appid),
     };
 
     if (this.isExceedLimit(msisdns)) {
@@ -630,109 +464,63 @@ class ChinaMobileService extends BaseService {
       return [];
     }
 
-    const res = await this.fetchData(`${hostAndVer}${api.operate.card_bind_by_bill_batch}`, data);
-    const result = this.getResult(res);
+    const simId = _.split(msisdns, '_')[0];
+    const result = await this.handleBy(api.operate.card_bind_by_bill_batch, simId, data);
     return result;
   }
 
   /**
    * CMIOT_API23U05-单卡本月套餐内语音使用量实时查询
    * 实时查询物联卡本月套餐内语音使用量
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{
    *  accmMarginList: [{offeringId, offeringName, totalAmount, useAmount, remainAmount}]
    * }]
    */
-  async querySimVoiceMargin(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_voice_margin}`, data);
-    const result = this.getResult(res);
+  async querySimVoiceMargin(msisdn) {
+    const result = await this.handleBy(api.query.sim_voice_margin, msisdn, { msisdn });
     return result;
   }
 
   /**
    * CMIOT_API23U01-单卡本月语音累计使用量实时查询
    * 实时查询物联卡本月语音累计使用量
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
-   * @return {array} [{voiceAmount}] - 语音累积量值，单位：分钟
+   * @return {number} voiceAmount - 语音累积量值，单位：分钟
    */
-  async querySimVoiceUsage(appid, token, hostAndVer, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
+  async querySimVoiceUsage(msisdn) {
+    const result = await this.handleBy(api.query.sim_voice_usage, msisdn, { msisdn });
+    const va = result[0].voiceAmount;
+    let voiceAmount = 0;
+    // 返回" "时,表示卡未产生用量或者未订购套餐
+    if (va !== ' ') {
+      voiceAmount = Number(va);
     }
-
-    const data = {
-      token,
-      ...getTransid(appid),
-      ...mii,
-    };
-
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_voice_usage}`, data);
-    const result = this.getResult(res);
-    return result;
+    return voiceAmount;
   }
 
   /**
    * CMIOT_API23M05-单卡语音功能开停
    * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）办理集团归属物联卡的语音功能开/停
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} operType - 0:开 1:停
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} iccid - IC 卡的唯一识别号码 (msisdn、iccid、imsi必须有且只有一项)
-   * @param {string} imsi - 国际移动用户识别码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{msisdn | imsi | iccid}]
    */
-  async operateSimCallFunction(appid, token, hostAndVer, operType, msisdn, iccid, imsi) {
-    const mii = this.getMsisdnOrIccidOrImsi(msisdn, iccid, imsi);
-    if (mii.length === 0) {
-      return [];
-    }
-
+  async operateSimCallFunction(operType, msisdn) {
     const data = {
-      token,
       operType,
-      ...getTransid(appid),
-      ...mii,
+      msisdn,
     };
 
-    const res = await this.fetchData(`${hostAndVer}${api.operate.sim_call_function}`, data);
-    const result = this.getResult(res);
+    const result = await this.handleBy(api.operate.sim_call_function, msisdn, data);
     return result;
   }
 
   /**
    * CMIOT_API25U03-物联卡单月 GPRS 流量使用量批量查询
    * 批量（100 张）查询物联卡指定月份的 GPRS 流量使用量，仅支持查询最近 6个月中某月的使用量，其中本月数据截止为前一天。
-   * @param {string} appid - appid
-   * @param {string} token - token
-   * @param {string} hostAndVer - 主机和版本
    * @param {string} queryDate - 查询最近 6 个月中的某月，其中本月数据截止为前一天，日期格式为 yyyyMM
    * @param {string} msisdns - 物联卡号码, 多个号码用下划线分隔 (msisdns、iccids、imsis必须有且只有一项)
-   * @param {string} iccids - IC 卡的唯一识别号码, 多个号码用下划线分隔 (msisdns、iccids、imsis必须有且只有一项)
-   * @param {string} imsis - 国际移动用户识别码, 多个号码用下划线分隔 (msisdns、iccids、imsis必须有且只有一项)
    * @return {array} [{
    *  dataAmountList: [{
    *    msisdn | imsi | iccid,
@@ -741,28 +529,21 @@ class ChinaMobileService extends BaseService {
    *  }]
    * }]
    */
-  async querySimDataUsageMonthlyBatch(appid, token, hostAndVer, queryDate, msisdns, iccids, imsis) {
+  async querySimDataUsageMonthlyBatch(queryDate, msisdns) {
     const { logger } = this.ctx;
 
-    const mii = this.getMsisdnOrIccidOrImsi(msisdns, iccids, imsis);
-    if (mii.length === 0) {
-      return [];
-    }
-
-    if (this.isExceedLimit(Object.values(mii)[0])) {
+    if (this.isExceedLimit(msisdns)) {
       logger.error('【物联卡号最多 100 个】');
       return [];
     }
 
     const data = {
-      token,
       queryDate,
-      ...getTransid(appid),
-      ...mii,
+      msisdns,
     };
 
-    const res = await this.fetchData(`${hostAndVer}${api.query.sim_data_usage_monthly_batch}`, data);
-    const result = this.getResult(res);
+    const simId = _.split(msisdns, '_')[0];
+    const result = await this.handleBy(api.query.sim_data_usage_monthly_batch, simId, data);
     return result;
   }
 }

@@ -1,5 +1,7 @@
 'use strict';
 
+const moment = require('moment');
+
 const BaseController = require('../core/baseController');
 
 class SimController extends BaseController {
@@ -258,6 +260,56 @@ class SimController extends BaseController {
     const { simId } = request.query;
     const result = await service.sim.getSimBySimId(simId);
     this.success(result, '');
+  }
+
+  /**
+   * 同步更新
+   * 都需要同步的字段有：状态信息、开关机状态、通信功能开通、流量累计使用量
+   * 被叫卡还需要同步的字段：激活时间
+   * 主叫卡还需要同步的字段：语音累计使用量
+   */
+  async syncUpdate() {
+    const ctx = this.ctx;
+    const { request, service, helper, logger } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim([ 'simId', 'simType' ]),
+    };
+    ctx.validate(rule, request.query);
+    const { simId, simType } = request.query;
+
+    const startTime = moment().milliseconds();
+    const params = {};
+    // 被叫卡有激活时间，主叫卡有语音使用量
+    if (simType === 'A') {
+      // 激活时间
+      const activeTime = await service.chinaMobile.querySimBasicInfo(simId);
+      params.activeTime = activeTime;
+    } else {
+      // 语音累计使用量
+      const voiceAmount = await service.chinaMobile.querySimVoiceUsage(simId);
+      params.voiceAmount = voiceAmount;
+    }
+    // 状态信息
+    const cardStatus = await service.chinaMobile.querySimStatus(simId);
+    params.cardStatus = cardStatus;
+    // imei
+    // await service.chinaMobile.querySimImei(simId);
+    // 开关机状态
+    const openStatus = await service.chinaMobile.queryOnOffStatus(simId);
+    params.openStatus = openStatus;
+    // 通信功能开通
+    const servStatus = await service.chinaMobile.querySimCommunicationFunctionStatus(simId);
+    for (const key in servStatus) {
+      params[key] = servStatus[key];
+    }
+    // 流量累计使用量
+    const monthUsedFlow = await service.chinaMobile.querySimDataUsage(simId);
+    params.monthUsedFlow = monthUsedFlow;
+    const endTime = moment().milliseconds();
+    logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
+    await service.sim.updateBySimId(params, simId);
+    this.success('', '同步更新完成');
   }
 
 }

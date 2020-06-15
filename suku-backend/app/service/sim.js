@@ -14,6 +14,16 @@ class SimService extends BaseService {
     }
     return true;
   }
+
+  async updateBySimId(sim, simId) {
+    try {
+      await this.app.model.Sim.update(sim, { where: { simId } });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
   async getSimBySimId(simId) {
     // const attributes = [ 'simId', 'iccid', 'simType', 'activeComboId', 'activeComboName', 'otherComboIds', 'activeTime', 'overdueTime' ];
     const [ sim ] = await this.app.model.Sim.findAll({

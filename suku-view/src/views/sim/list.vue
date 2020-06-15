@@ -349,7 +349,23 @@ export default {
       document.body.removeChild(link);
     },
     syncOnelink(item) {
-      console.log(item)
+      this.axios({
+        method: "get",
+        params: {
+          simType: this.simType,
+          simId: item.simId,
+        },
+        url: API.SIMLIST.SIM_SYNC_UPDATE
+      }).then(r => {
+        if (r.success) {
+          this.getlist();
+          return;
+        }
+        this.$message({
+            message: '同步更新失败',
+            type: 'error'
+          });
+      });
     },
     handleExport() {
       this.axios({

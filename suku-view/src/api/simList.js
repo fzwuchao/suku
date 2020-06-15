@@ -3,4 +3,5 @@ export default {
     WRITE_LIST: "/writeList/getWriteList",
     SIM_IMPORT_SIMS: "/sim/importSims",
     SIM_EXPORT: "/sim/export",
+    SIM_SYNC_UPDATE: "/sim/syncUpdate",
 }
