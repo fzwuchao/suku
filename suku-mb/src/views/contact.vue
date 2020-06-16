@@ -15,9 +15,9 @@
     <div class="btn">
       <van-button type="primary" size="large" @click="addContact">添加亲情号</van-button>
     </div>
-    <div class="btn">
+    <!--<div class="btn">
       <van-button type="primary" color="#7232dd" size="large" @click="getContactList">亲情号列表</van-button>
-    </div>
+    </div>-->
 
     <van-list>
       <van-cell v-for="(item, index) in writeList" :key="index">
@@ -40,6 +40,10 @@ export default {
   },
   methods: {
     addContact() {
+      if(this.phone.trim() === '') {
+        Toast('请输入要添加的亲情号码！')
+        return ;
+      }
       this.axios({
         method: "post",
         data: {
@@ -48,6 +52,7 @@ export default {
         },
         url: "/writeList/save"
       }).then(() => {
+        this.getContactList();
         Toast('设置成功！')
       });
     },
@@ -70,6 +75,7 @@ export default {
   mounted() {},
   created() {
     this.simId = this.$route.params.simId;
+    this.getContactList();
   }
 };
 </script>

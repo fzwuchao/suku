@@ -76,16 +76,18 @@ class ChinaMobileService extends BaseService {
   }
 
   getResult(res) {
+    console.log(res);
     if (res.status === 200) {
       const resData = res.data;
       if (resData.status === '0') {
         return resData.result;
       }
+      resData.error = true;
       this.ctx.logger.error(res.message);
-      return [];
+      return resData;
     }
     this.ctx.logger.error(`【异常状态码】: ${res.status}`);
-    return [];
+    return res;
   }
 
   /**
@@ -331,22 +333,37 @@ class ChinaMobileService extends BaseService {
    * }]
    */
   async queryGroupByMember(msisdn) {
+    const { nameKey, status } = await this.getOnelink(msisdn);
+    await this.app.redis.del(`${nameKey}_groupId`);
+    if (status === 0) {
+      return null;
+    }
+    let groupId = await this.app.redis.get(`${nameKey}_groupId`);
+    if (groupId) {
+      return groupId;
+    }
+
     const result = await this.handleBy(api.query.group_by_member, msisdn, { msisdn });
-    return result;
+    if (result.length > 0) {
+      groupId = result[0].groupList[0].groupId;
+    }
+    // await this.app.redis.set(`${nameKey}_groupId`, groupId);
+
+    return groupId;
   }
 
   /**
    * CMIOT_API23M16-成员语音白名单配置
    * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）实现集团旗下单个群组成员的语音白名单配置
-   * @param {string} groupId - 成员归属的群组 ID
    * @param {string} operType - 语音白名单配置类型：1：新增 4：删除
    * @param {string} whiteNumber - 成员配置的语音白名单号码, 多个时用下划线分隔，例如：xxxx_xxxx
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} []
    */
-  async configMemberVoiceWhitelist(groupId, operType, whiteNumber, msisdn) {
+  async configMemberVoiceWhitelist(operType, whiteNumber, msisdn) {
     // 当 operType=1 新增时，whiteNumber只能传 1 个值。
     // 当 operType=4 删除时，whiteNumber可传 2 个值，2 个号码用下划线分隔，例如：xxxx_xxxx
+    const groupId = await this.queryGroupByMember(msisdn);
     const len = _.split(whiteNumber, '_').length;
     const whiteNumberIsRight = (operType === 1 && len === 1) || (operType === 4 && len <= 2 && len >= 1);
     if (!whiteNumberIsRight) {
@@ -362,6 +379,7 @@ class ChinaMobileService extends BaseService {
       groupId,
       operType,
       msisdn,
+      whiteNumber,
     };
 
     const result = await this.handleBy(api.config.member_voice_whitelist, msisdn, data);

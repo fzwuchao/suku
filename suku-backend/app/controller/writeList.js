@@ -32,8 +32,13 @@ class WriteListController extends BaseController {
     // 缺少调用移动端发送短信的接口，在此位置调用
     writeList.uname = sim.uname;
     writeList.uid = sim.uid;
-    const result = await ctx.service.writeList.create(writeList);
-    this.success(result, '');
+    const res = await ctx.service.chinaMobile.configMemberVoiceWhitelist(1, phone, simId);
+    if (!res.error) {
+      await ctx.service.writeList.create(writeList);
+    } else {
+      this.fail('99', res, '亲情号设置失败！');
+    }
+    this.success(res, '');
   }
   async getWriteListBySimId() {
     const { ctx } = this;
