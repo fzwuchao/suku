@@ -20,17 +20,9 @@
         size="mini"
       >复机</el-button>
       <el-button
-        type="warning"
-        size="mini"
-      >强制复机</el-button>
-      <el-button
         type="primary"
         size="mini"
       >续费</el-button>
-      <el-button
-        type="primary"
-        size="mini"
-      >短信</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
@@ -147,11 +139,19 @@
       </el-table-column>
       <el-table-column
         align="left"
+        label="已用流量(M)"
+        min-width="100px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.monthUsedFlow ? scope.row.monthUsedFlow : 0}` }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
         label="剩余流量(M)"
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -182,11 +182,21 @@
       <el-table-column
         align="left"
         v-if="simType === 'B'"
+        label="已用语音(分)"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.monthUsedVoiceDuration ? scope.row.monthUsedVoiceDuration : 0}` }}</template>
+
+      </el-table-column>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
         label="当月剩余语音(分)"
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration }` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -406,7 +416,7 @@ export default {
       this.getlist();
     },
     editSim(row) {
-      this.$router.push(`/sim/editinfo/${this.simType}/${row.sim_id}`);
+      this.$router.push(`/sim/editinfo/${this.simType}/${row.simId}`);
     },
     getlist(val) {
       if (val) {

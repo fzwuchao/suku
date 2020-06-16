@@ -265,7 +265,6 @@ class SimController extends BaseController {
   /**
    * 同步更新
    * 都需要同步的字段有：状态信息、开关机状态、通信功能开通、流量累计使用量
-   * 被叫卡还需要同步的字段：激活时间
    * 主叫卡还需要同步的字段：语音累计使用量
    */
   async syncUpdate() {
@@ -281,14 +280,16 @@ class SimController extends BaseController {
     const startTime = moment().milliseconds();
     const params = {};
     // 被叫卡有激活时间，主叫卡有语音使用量
-    if (simType === 'A') {
-      // 激活时间
-      const activeTime = await service.chinaMobile.querySimBasicInfo(simId);
-      params.activeTime = activeTime;
-    } else {
+    if (simType === 'B') {
       // 语音累计使用量
       const voiceAmount = await service.chinaMobile.querySimVoiceUsage(simId);
       params.voiceAmount = voiceAmount;
+    }
+    // 激活时间
+    const activeTime = await service.chinaMobile.querySimBasicInfo(simId);
+    if (activeTime) {
+      params.activeTime = activeTime;
+      params.isActive = 1;
     }
     // 状态信息
     const cardStatus = await service.chinaMobile.querySimStatus(simId);

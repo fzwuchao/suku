@@ -51,6 +51,7 @@ const api = {
     sim_communication_function_batch: '/ec/operate/sim-communication-function/batch',
     card_bind_by_bill_batch: '/ec/operate/card-bind-by-bill/batch',
     sim_call_function: '/ec/operate/sim-call-function',
+    sim_sms_function: '/ec/operate/sim-sms-function',
   },
 };
 class ChinaMobileService extends BaseService {
@@ -180,7 +181,11 @@ class ChinaMobileService extends BaseService {
   async querySimBasicInfo(msisdn) {
     const result = await this.handleBy(api.query.sim_base_info, msisdn, { msisdn });
     const { activeDate } = result[0] || {};
-    return activeDate ? moment(activeDate) : null;
+    let activeDt = null;
+    if (activeDate !== ' ' && !_.isNil(activeDate)) {
+      activeDt = moment(activeDate).toDate()
+    }
+    return activeDt;
   }
 
   /**
@@ -256,7 +261,7 @@ class ChinaMobileService extends BaseService {
     // 单位：M
     let usedFlow = 0;
     // 单位：KB, 返回" "时，表示卡未产生用量或未订购套餐
-    if (usedFlow !== ' ') {
+    if (dataAmount !== ' ' && !_.isNil(dataAmount)) {
       usedFlow = Number(dataAmount) / 1024;
     }
     return usedFlow;
@@ -490,10 +495,10 @@ class ChinaMobileService extends BaseService {
    */
   async querySimVoiceUsage(msisdn) {
     const result = await this.handleBy(api.query.sim_voice_usage, msisdn, { msisdn });
-    const va = result[0].voiceAmount;
+    const va = (result[0] || {}).voiceAmount;
     let voiceAmount = 0;
     // 返回" "时,表示卡未产生用量或者未订购套餐
-    if (va !== ' ') {
+    if (va !== ' ' && !_.isNil(va)) {
       voiceAmount = Number(va);
     }
     return voiceAmount;
@@ -544,6 +549,46 @@ class ChinaMobileService extends BaseService {
 
     const simId = _.split(msisdns, '_')[0];
     const result = await this.handleBy(api.query.sim_data_usage_monthly_batch, simId, data);
+    return result;
+  }
+
+  /**
+   * CMIOT_API23M06-单卡短信功能开停
+   * @param {string} msisdn - 物联卡号
+   * @param {string} operType - 0:开 1:停
+   */
+  async operateSimSmsFunction(msisdn, operType) {
+    const data = {
+      msisdn,
+      operType,
+    };
+    const result = await this.handleBy(api.operate.sim_sms_function, msisdn, data);
+    return result;
+  }
+
+  /**
+   * CMIOT_API23E04-群组成员流量限额设置
+   * @param {*} msisdn - 物联卡号码
+   * @param {*} groupId - 群组 ID
+   * @param {*} offerId - 群组订购的资费商品 ID
+   * @param {*} apnName - APN 名称
+   * @param {*} operType - 限额设置的操作：1：添加 2：删除 3：变更
+   * @param {*} limitValue - 限额值：单位 MB
+   * @param {*} actionRule - 限额规则：达到限额值，将执行的业务规则 1:停数据通信服务 2:使用流量池外资费
+   */
+  async limitGroupMemberDataUsage(msisdn, groupId, offerId, apnName, operType, limitValue, actionRule) {
+    const data = {
+      msisdn,
+      groupId,
+      offerId,
+      apnName,
+      operType,
+    };
+
+    if (!_.isNil(limitValue)) data.limitValue = limitValue;
+    if (!_.isNil(actionRule)) data.actionRule = actionRule;
+
+    const result = await this.handleBy(api.operate.sim_sms_function, msisdn, data);
     return result;
   }
 }
