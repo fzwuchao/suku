@@ -161,7 +161,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow ? scope.row.monthShengyuFlow : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -174,11 +174,20 @@
       <el-table-column
         align="left"
         v-if="simType === 'B'"
-        label="当月语音阈(分)"
+        label="当月语音(分)"
         min-width="120px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.monthVoice ? scope.row.monthVoice : 0}` }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="叠加语音(分)"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.monthOverlapVoiceDuration ? scope.row.monthOverlapVoiceDuration : 0}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -188,6 +197,7 @@
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.monthUsedVoiceDuration ? scope.row.monthUsedVoiceDuration : 0}` }}</template>
+
       </el-table-column>
       <el-table-column
         align="left"
@@ -196,7 +206,7 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration ? scope.row.monthShengyuVoiceDuration : 0}` }}</template>
+        <template slot-scope="scope">{{ `${scope.row.monthShengyuVoiceDuration }` }}</template>
       </el-table-column>
       <el-table-column
         align="left"

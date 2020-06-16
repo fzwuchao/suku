@@ -20,7 +20,7 @@
       <div class="search_c">
         <van-grid :column-num="3">
           <van-grid-item>
-            <p class="recharge-info-title">{{sim.activeMenuName}}</p>
+            <p class="recharge-info-title">{{sim.activeComboName}}</p>
             <p class="recharge-info-value">
               <van-button plain color="#e9b021" :disabled="!isActive" @click.native="renew" size="mini">续费</van-button>
             </p>
@@ -35,11 +35,11 @@
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">开关机</p>
-            <p class="recharge-info-value">{{sim.netStatus | netStatus}}</p>
+            <p class="recharge-info-value">{{sim.openStatus==0? '关机':'开机'}}</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">卡状态</p>
-            <p class="recharge-info-value">{{sim.netStatus | netStatus}}</p>
+            <p class="recharge-info-value">{{sim.cardStatus | cardStatus}}</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">过期时间</p>
@@ -125,9 +125,16 @@ export default {
     Pay
   },
   filters: {
-    netStatus(val) {
-      console.log(val)
-      return 'tingji'
+    cardStatus(val) {
+      const status= {
+        '1' : "待激活",
+        '2' : "正常",
+        '4' : "停机",
+        '6' : "可测试",
+        '21': "注销",
+        '22': "欠费"
+      }
+      return status[val];
     }
   },
   methods: {
@@ -143,7 +150,7 @@ export default {
           this.sim = r.data;
           let ids = [];
           if(this.sim.isActive == 1 || this.sim.simType == 'A') {
-            ids = this.sim.otherMenuIds.split(',');
+            ids = this.sim.otherComboIds.split(',');
           }
           //if(this.sim.simType == 'B') {
           ids.push(this.sim.activeComboId+'')

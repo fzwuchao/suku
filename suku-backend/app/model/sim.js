@@ -3,6 +3,7 @@
 
 // sim卡
 const moment = require('moment');
+const calc = require('calculatorjs');
 module.exports = app => {
   const { STRING, DATE, TINYINT, DECIMAL, CHAR, BIGINT, VIRTUAL } = app.Sequelize;
 
@@ -72,7 +73,7 @@ module.exports = app => {
     overdueTime: {
       type: DATE,
       get() {
-        return this.getDataValue('overdueTime') ? moment(this.getDataValue('overdueTime')).format('YYYY-MM-DD HH:mm:ss') : null;
+        return this.getDataValue('overdueTime') ? moment(this.getDataValue('overdueTime')).format('YYYY-MM-DD') : null;
       },
       field: 'overdue_time',
       comment: '过期时间',
@@ -94,7 +95,8 @@ module.exports = app => {
         const monthFlow = this.getDataValue('monthFlow') || 0;
         const monthOverlapFlow = this.getDataValue('monthOverlapFlow') || 0;
         const monthUsedFlow = this.getDataValue('monthUsedFlow') || 0;
-        return monthFlow + monthOverlapFlow - monthUsedFlow;
+
+        return calc(`${monthFlow} + ${monthOverlapFlow} - ${monthUsedFlow}`);
       },
     },
     // 总流量
@@ -103,7 +105,7 @@ module.exports = app => {
       get() {
         const monthFlow = this.getDataValue('monthFlow') || 0;
         const monthOverlapFlow = this.getDataValue('monthOverlapFlow') || 0;
-        return monthFlow + monthOverlapFlow;
+        return calc(`${monthFlow} + ${monthOverlapFlow}`);
       },
     },
     monthUsedFlow: {
@@ -122,7 +124,7 @@ module.exports = app => {
       get() {
         const monthVoice = this.getDataValue('monthVoice') || 0;
         const monthOverlapVoiceDuration = this.getDataValue('monthOverlapVoiceDuration') || 0;
-        return monthVoice + monthOverlapVoiceDuration;
+        return calc(`${monthVoice} + ${monthOverlapVoiceDuration}`);
       },
     },
     // 剩余时长
@@ -132,7 +134,7 @@ module.exports = app => {
         const monthVoice = this.getDataValue('monthVoice') || 0;
         const monthOverlapVoiceDuration = this.getDataValue('monthOverlapVoiceDuration') || 0;
         const monthUsedVoiceDuration = this.getDataValue('monthUsedVoiceDuration') || 0;
-        return monthVoice + monthOverlapVoiceDuration - monthUsedVoiceDuration;
+        return calc(`${monthVoice} + ${monthOverlapVoiceDuration} - ${monthUsedVoiceDuration}`);
       },
     },
     monthOverlapVoiceDuration: {

@@ -5,6 +5,7 @@
 
 const BaseService = require('../core/baseService');
 const moment = require('moment');
+const calc = require('calculatorjs');
 // 导出文件所在路径
 // const FILE_PATH_PREFIX = '/var/tmp/';
 
@@ -66,21 +67,29 @@ class SimOrderService extends BaseService {
       case 1: 
       case 4:
       case 3:
-        newSim.shengyuMoney = sim.shengyuMoney + ((order.money - 0) + (order.awardMoney - 0));
+        newSim.shengyuMoney = calc(`${sim.shengyuMoney} + ${order.money}+ ${order.awardMoney}`);
         if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
-          newSim.shengyuMoney = newSim.shengyuMoney - sim.monthRent;
+          newSim.shengyuMoney = calc(`${newSim.shengyuMoney} - ${sim.monthRent}`);
           order.months = order.months - 1; 
         }
+        
         newSim.overdueTime = sim.overdueTime ? sim.overdueTime : new Date();
         const newTime = moment(newSim.overdueTime).add(order.months, 'M');
         newSim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         break;
       case 2:
-        sim.monthOverlapFlow = sim.monthOverlapFlow + (order.flow - 0);
-        sim.monthOverlapVoiceDuration = sim.monthOverlapVoiceDuration + (order.voice - 0);
+        newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow} + ${order.flow}`);
+        newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration} + ${order.voice}`);
         break;
     }
     await this.ctx.service.sim.update(newSim);
+  }
+  async update(order) {
+    try {
+      return await this.app.model.SimOrder.update(order, { where: { orderId: order.orderId } });
+    } catch (e) {
+      return false;
+    }
   }
   async create(order) {
     switch (order.orderType) {
@@ -99,12 +108,12 @@ class SimOrderService extends BaseService {
     }
     order.orderStatus = 1;
     try {
-      await this.app.model.SimOrder.create(order);
+      const result = await this.app.model.SimOrder.create(order);
       this.app.redis.del('SimOrder*');
+      return result;
     } catch (e) {
       return false;
     }
-    return true;
   }
 
 }
