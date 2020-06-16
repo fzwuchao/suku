@@ -102,5 +102,20 @@ class SimComboController extends BaseController {
     const result = await service.simCombo.getSimComboByIds(ids);
     this.success(result, '');
   }
+
+  async getNonActiveComboBySimType() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.query);
+    const { simId } = request.query;
+    const simData = await service.sim.getSimBySimId(simId);
+    const { simType } = simData;
+    const result = await service.simCombo.getNonActiveComboBySimType(simType);
+    this.success(result, '');
+  }
 }
 module.exports = SimComboController;

@@ -41,6 +41,8 @@ module.exports = app => {
   router.get('/sim/export', controller.sim.exportExcel);
   // 同步更新
   router.get('/sim/syncUpdate', controller.sim.syncUpdate);
+  // 更新
+  router.post('/sim/update', controller.sim.update);
 
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);
@@ -52,7 +54,8 @@ module.exports = app => {
   router.post('/simCombo/save', controller.simCombo.save);
   // 通过ids,查询套餐
   router.post('/simCombo/getSimComboByIds', controller.simCombo.getSimComboByIds);
-
+  // 套餐列表
+  router.get('/simCombo/comboList', controller.simCombo.getNonActiveComboBySimType);
 
   // 套餐包
   router.get('/comboPack/search', controller.comboPack.search);
