@@ -42,6 +42,12 @@ const SimRules = {
   },
   filepath: {
     type: 'string?',
+  },
+  overdueTime: {
+    type: 'dateTime?',
+  },
+  privateMoney: {
+    type: 'number?',
   }
 };
 

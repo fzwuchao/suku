@@ -5,4 +5,5 @@ export default {
     SIM_EXPORT: "/sim/export",
     SIM_SYNC_UPDATE: "/sim/syncUpdate",
     SIM_GET_SIM: "/sim/getSim",
+    SIM_UPDATE: "/sim/update",
 }

@@ -115,6 +115,13 @@
       </el-table-column>
       <el-table-column
         align="left"
+        label="增续价格"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.privateMoney }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
         label="用户"
         show-overflow-tooltip
       >

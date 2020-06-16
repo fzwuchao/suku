@@ -91,6 +91,26 @@ class SimComboService extends BaseService {
     const result = await this.app.model.SimCombo.findByPk(id);
     return result;
   }
+
+  /**
+   * 获取套餐列表，不包含激活套餐
+   * @param {string} simType - 卡类型
+   */
+  async getNonActiveComboBySimType(simType) {
+    const Op = this.getOp();
+    const result = await this.app.model.SimCombo.findAll({
+      where: {
+        belongsToSimType: {
+          [Op.substring]: simType,
+        },
+        comboType: {
+          [Op.ne]: 1,
+        },
+      },
+    });
+
+    return result;
+  }
 }
 
 module.exports = SimComboService;

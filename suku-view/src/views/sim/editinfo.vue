@@ -1,7 +1,12 @@
 <template>
   <div class="add-person">
     <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="sim" :rules="rules" ref="ruleForm">
+    <el-form
+      label-width="130px"
+      :model="sim"
+      :rules="rules"
+      ref="ruleForm"
+    >
       <el-form-item label="Sim卡号">
         <span>{{ sim.simId }}</span>
       </el-form-item>
@@ -14,14 +19,11 @@
       <el-form-item label="平台状态">
         <span>{{ sim.cardStatus | cardStatus}}</span>
       </el-form-item>
-       <el-form-item label="激活套餐名">
+      <el-form-item label="激活套餐名">
         <span>{{ sim.activeComboName }}</span>
       </el-form-item>
       <el-form-item label="激活时间">
         <span>{{ sim.activeTime }}</span>
-      </el-form-item>
-      <el-form-item label="过期时间">
-        <span>{{ sim.overdueTime }}</span>
       </el-form-item>
       <el-form-item label="过期时间">
         <span>{{ sim.overdueTime }}</span>
@@ -44,22 +46,37 @@
       <el-form-item label="剩余流量(M)">
         <span>{{ `${sim.monthShengyuFlow ? sim.monthShengyuFlow : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="余额(元)" v-if="sim.simType === 'B'">
+      <el-form-item
+        label="余额(元)"
+        v-if="sim.simType === 'B'"
+      >
         <span>{{ `${sim.monthShengyuFlow ? sim.monthShengyuFlow : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="当月语音阈(分)" v-if="sim.simType === 'B'">
+      <el-form-item
+        label="当月语音阈(分)"
+        v-if="sim.simType === 'B'"
+      >
         <span>{{ `${sim.monthVoice ? sim.monthVoice : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="已用语音(分)" v-if="sim.simType === 'B'">
+      <el-form-item
+        label="已用语音(分)"
+        v-if="sim.simType === 'B'"
+      >
         <span>{{ `${sim.monthUsedVoiceDuration ? sim.monthUsedVoiceDuration : 0}` }}</span>
       </el-form-item>
-      <el-form-item label="当月剩余语音(分)" v-if="sim.simType === 'B'">
+      <el-form-item
+        label="当月剩余语音(分)"
+        v-if="sim.simType === 'B'"
+      >
         <span>{{ `${sim.monthShengyuVoiceDuration ? sim.monthShengyuVoiceDuration : 0}` }}</span>
       </el-form-item>
       <el-form-item label="流量服务状态">
         <span>{{ sim.flowServStatus | serveStatus}}</span>
       </el-form-item>
-      <el-form-item label="语音服务状态" v-if="sim.simType === 'B'">
+      <el-form-item
+        label="语音服务状态"
+        v-if="sim.simType === 'B'"
+      >
         <span>{{ sim.voiceServStatus | serveStatus }}</span>
       </el-form-item>
       <el-form-item label="开关机状态">
@@ -68,21 +85,49 @@
       <el-form-item label="添加时间">
         <span>{{ sim.createdAt }}</span>
       </el-form-item>
-      <el-form-item label="套餐增价" prop="sim_id">
-        <el-input v-model="sim.sim_id" readonly="true"></el-input>
+      <el-form-item
+        label="套餐增价"
+        prop="sim_id"
+      >
+        <el-input-number
+          v-model="sim.privateMoney"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">元</span>
       </el-form-item>
-      <el-form-item label="套餐" prop="is_active">
-        <el-select v-model="sim.is_active" clearable placeholder="请选择">
-          <el-option label="运营商" :value="0">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+      <el-form-item
+        label="套餐"
+        prop="comboIds"
+      >
+        <el-select
+          v-model="comboIds"
+          clearable
+          placeholder="请选择"
+          multiple
+        >
+          <el-option
+            v-for="simCombo in simComboList"
+            :label="simCombo.label"
+            :value="simCombo.value"
+            :key="simCombo.value"
+          >
+          </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="过期时间" prop="sim_id">
-        <el-input v-model="sim.sim_id"></el-input>
+      <el-form-item label="过期时间">
+        <el-date-picker
+          v-model="sim.overdueTime"
+          type="datetime"
+          placeholder="选择日期时间"
+          value-format="yyyy-MM-dd HH:mm:ss"
+        >
+        </el-date-picker>
       </el-form-item>
-
       <el-form-item>
-        <el-button type="primary" @click="submit">提交</el-button>
+        <el-button
+          type="primary"
+          @click="submit"
+        >提交</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -99,70 +144,101 @@ export default {
   data() {
     return {
       sim: {
-        
+        otherComboIds: "",
+        simType: "A"
       },
+      simComboList: [],
+      comboIds: [],
       simId: null,
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
+        comboIds: [
+          {
+            trigger: "blur",
+            validator: (rule, value, callback) => {
+              if (this.comboIds.length === 0) {
+                callback("请选择套餐");
+              } else {
+                callback();
+              }
+            }
+          }
         ]
       }
     };
   },
-  filters:{
-    cardStatus(val){
-      const status= {
-        '1' : "待激活",
-        '2' : "已激活",
-        '4' : "停机",
-        '6' : "可测试",
-        '21': "注销",
-        '22': "欠费"
-      }
+  filters: {
+    cardStatus(val) {
+      const status = {
+        "1": "待激活",
+        "2": "已激活",
+        "4": "停机",
+        "6": "可测试",
+        "21": "注销",
+        "22": "欠费"
+      };
       return status[val];
     },
     serveStatus(val) {
       const serveStatus = {
-        1: '开',
-        2: '关',
-      }
+        1: "开",
+        2: "关"
+      };
       return serveStatus[val];
     }
   },
   methods: {
     submit() {
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          const data = {
+            otherComboIds: this.comboIds.join(","),
+            overdueTime: this.sim.overdueTime,
+            privateMoney: this.sim.privateMoney,
+            simId: this.simId
+          };
           this.axios({
             method: "post",
-            data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
+            data,
+            url: API.SIMLIST.SIM_UPDATE
           }).then(() => {
-            this.$router.push("/demand/list");
+            this.$router.push(`/sim/list/${this.sim.simType}`);
           });
         } else {
           return false;
         }
-      }); */
+      });
     },
     getSimBySimId() {
       this.axios({
         method: "get",
         params: {
-          simId: this.simId,
+          simId: this.simId
         },
         url: API.SIMLIST.SIM_GET_SIM
-      }).then((r) => {
+      }).then(r => {
         this.sim = r.data;
       });
     },
-
+    getSimComboList() {
+      this.axios({
+        method: "get",
+        params: {
+          simId: this.simId
+        },
+        url: API.SIMCOMBO.SIM_COMBO_COMBO_LIST
+      }).then(r => {
+        this.simComboList = (r.data || []).map(item => {
+          return { label: item.name, value: item.id + "" };
+        });
+        this.comboIds = (this.sim.otherComboIds || "").split(",");
+      });
+    }
   },
   mounted() {
-   const { id } = this.$route.params;
-   this.simId = id;
-   this.getSimBySimId();
+    const { id } = this.$route.params;
+    this.simId = id;
+    this.getSimBySimId();
+    this.getSimComboList();
   }
 };
 </script>

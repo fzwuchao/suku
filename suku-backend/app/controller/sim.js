@@ -313,5 +313,17 @@ class SimController extends BaseController {
     this.success('', '同步更新完成');
   }
 
+  async update() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.body);
+    const { simId, otherComboIds, overdueTime, privateMoney } = request.body;
+    await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney }, simId);
+    this.success(null, '更新成功');
+  }
 }
 module.exports = SimController;
