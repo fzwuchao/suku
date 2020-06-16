@@ -1,6 +1,7 @@
 'use strict';
 
 const moment = require('moment');
+const _ = require('lodash');
 
 const BaseController = require('../core/baseController');
 
@@ -324,6 +325,35 @@ class SimController extends BaseController {
     const { simId, otherComboIds, overdueTime, privateMoney } = request.body;
     await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney }, simId);
     this.success(null, '更新成功');
+  }
+
+  async batchUpdate() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.body);
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, renewPrice } = request.body;
+    const data = {};
+    let result = null;
+    // 套餐
+    if (!_.isNil(otherComboIds)) data.otherComboIds = otherComboIds;
+    // 停/复机
+    if (!_.isNil(cardStatus)) {
+      data.cardStatus = cardStatus;
+      const operType = cardStatus === 2 ? 11 : 9;
+      result = await service.chinaMobile.changeSimStatusBatch(simIds.join('_'), operType);
+    }
+    // 停/复语音
+    if (!_.isNil(voiceServStatus)) data.voiceServStatus = voiceServStatus;
+    // 续费增价
+    if (!_.isNil(privateMoney)) data.privateMoney = privateMoney;
+    // 续费
+    if (!_.isNil(renewPrice)) data.renewPrice = renewPrice;
+    // await service.sim.batchUpdateBySimIds(data, simIds);
+    this.success(null, '批量更新成功');
   }
 }
 module.exports = SimController;

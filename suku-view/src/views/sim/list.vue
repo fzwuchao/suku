@@ -14,10 +14,12 @@
       <el-button
         type="warning"
         size="mini"
+        @click="activate(false)"
       >停机</el-button>
       <el-button
         type="warning"
         size="mini"
+        @click="activate(true)"
       >复机</el-button>
       <el-button
         type="primary"
@@ -44,6 +46,7 @@
       <el-button
         type="primary"
         size="mini"
+        @click="handleComboChange"
       >更换套餐</el-button>
     </div>
 
@@ -75,7 +78,7 @@
       >
         <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
-      
+
       <el-table-column
         align="left"
         label="平台状态"
@@ -212,7 +215,7 @@
       >
         <template slot-scope="scope">{{ scope.row.voiceServStatus | serveStatus }}</template>
       </el-table-column>
-      
+
       <el-table-column
         align="left"
         label="开关机状态"
@@ -233,7 +236,7 @@
             @click="editSim(scope.row)"
             size="small"
           >编辑</el-button>
-           <el-button
+          <el-button
             type="text"
             @click="syncOnelink(scope.row)"
             size="small"
@@ -267,6 +270,16 @@
         @close="close"
       ></com-import>
     </el-dialog>
+    <el-dialog
+      title="更换套餐"
+      :visible.sync="comboDialog"
+    >
+      <combo-change
+        :type="simType"
+        :simIds="simIds"
+        @close="closeComboChange"
+      ></combo-change>
+    </el-dialog>
   </div>
 </template>
 
@@ -274,15 +287,18 @@
 import API from "@/api";
 import searchBar from "@/components/SearchBar";
 import comImport from "./com-import";
+import comboChange from "./combo-change";
 import { getTableHeight } from "@/utils";
 export default {
   data() {
     return {
+      multipleSelection: [],
       pageNum: 1,
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
       pageSize: 10,
       importDialog: false,
+      comboDialog: false,
       tableHeight: null,
       list: [],
       data: null,
@@ -319,13 +335,13 @@ export default {
           type: "select",
           values: [
             { value: "", key: "全部" },
-            { value: '1', key: "待激活" },
-            { value: '2', key: "已激活" },
-            { value: '20', key: "停机" },
-            { value: '4', key: "停机" },
-            { value: '21', key: "注销" },
-            { value: '6', key: "可测试" },
-            { value: '22', key: "欠费" }
+            { value: "1", key: "待激活" },
+            { value: "2", key: "已激活" },
+            { value: "20", key: "停机" },
+            { value: "4", key: "停机" },
+            { value: "21", key: "注销" },
+            { value: "6", key: "可测试" },
+            { value: "22", key: "欠费" }
           ],
           active: [1, 2, 3, 4, 5, 6, 7]
         }
@@ -335,32 +351,97 @@ export default {
   props: {
     type: String
   },
-  filters:{
-    cardStatus(val){
-      const status= {
-        '1' : "待激活",
-        '2' : "已激活",
-        '4' : "停机",
-        '6' : "可测试",
-        '21': "注销",
-        '22': "欠费"
+  computed: {
+    simIds() {
+      const simIds = [];
+      for (let i = 0; i < this.multipleSelection.length; i++) {
+        simIds.push(this.multipleSelection[i].simId);
       }
+      return simIds;
+    }
+  },
+  filters: {
+    cardStatus(val) {
+      const status = {
+        "1": "待激活",
+        "2": "已激活",
+        "4": "停机",
+        "6": "可测试",
+        "21": "注销",
+        "22": "欠费"
+      };
       return status[val];
     },
     serveStatus(val) {
       const serveStatus = {
-        1: '开',
-        2: '关',
-      }
+        1: "开",
+        2: "关"
+      };
       return serveStatus[val];
     }
   },
   components: {
     searchBar,
-    comImport
+    comImport,
+    comboChange
   },
-  
+
   methods: {
+    activate(isActivated) {
+      // 对应要复机/停机的卡的状态
+      const handlingSimStatus = isActivated ? "4" : "2";
+      const statusError = {
+        "4": "只有已停机的卡才可以复机，请确认所选的卡都是已停机状态",
+        "2": "只有已激活的卡才可以停机，请确认所选的卡都是已激活状态"
+      };
+      if (!this.checkStatus(handlingSimStatus)) {
+        this.$message({
+          type: "warning",
+          message: statusError[handlingSimStatus]
+        });
+        return;
+      }
+      // 对应复机/停机后卡的状态
+      const cardStatus = isActivated ? "2" : "4";
+      this.confirm(`是否批量${isActivated ? "复机" : "停机"}选中的卡`, () => {
+        this.batchUpdate({
+          cardStatus
+        });
+      });
+    },
+    confirm(message, callback) {
+      this.$confirm(message, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          callback();
+        })
+        .catch(() => {});
+    },
+    checkStatus(cardStatus) {
+      return this.multipleSelection.every(item => {
+        return item.cardStatus === cardStatus;
+      });
+    },
+    // isSamePlatform() {
+    //   return this.multipleSelection.every(item => {
+    //     return item.cardStatus === cardStatus;
+    //   });
+    // },
+    batchUpdate(data) {
+      this.axios({
+        method: "post",
+        data: {
+          simIds: this.simIds,
+          ...data
+        },
+        url: API.SIMLIST.SIM_BATCH_UPDATE
+      }).then(() => {
+        this.$router.push(`/sim/list/${this.simType}`);
+      });
+    },
     download(data, fileName, suffix) {
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");
@@ -378,7 +459,7 @@ export default {
         method: "get",
         params: {
           simType: this.simType,
-          simId: item.simId,
+          simId: item.simId
         },
         url: API.SIMLIST.SIM_SYNC_UPDATE
       }).then(r => {
@@ -387,9 +468,9 @@ export default {
           return;
         }
         this.$message({
-            message: '同步更新失败',
-            type: 'error'
-          });
+          message: "同步更新失败",
+          type: "error"
+        });
       });
     },
     handleExport() {
@@ -399,7 +480,7 @@ export default {
           simType: this.simType,
           ...this.searchParams
         },
-        responseType: 'blob',
+        responseType: "blob",
         url: API.SIMLIST.SIM_EXPORT
       }).then(r => {
         this.download(r, `${this.mapSimTypeToName[this.simType]}`, "xlsx");
@@ -408,6 +489,17 @@ export default {
     close() {
       this.importDialog = false;
       this.getlist();
+    },
+    closeComboChange() {
+      this.comboDialog = false;
+      this.reset();
+      this.getlist();
+    },
+    handleComboChange() {
+      this.comboDialog = this.checkIsSelected();
+    },
+    reset() {
+      this.multipleSelection = [];
     },
     pageChange() {
       this.getlist();
@@ -433,7 +525,18 @@ export default {
         this.list = r.data.list;
       });
     },
+    checkIsSelected() {
+      const isSelected = this.multipleSelection.length > 0;
+      if (!isSelected) {
+        this.$message({
+          message: "请勾选要更换套餐的Sim卡!",
+          type: "warning"
+        });
+      }
+      return isSelected;
+    },
     handleSelectionChange(val) {
+      console.log("val:", val);
       this.multipleSelection = val;
     },
     viewItem(item, column, event) {

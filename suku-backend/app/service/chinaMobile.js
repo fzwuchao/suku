@@ -39,6 +39,7 @@ const api = {
     sim_voice_margin: '/ec/query/sim-voice-margin',
     sim_voice_usage: '/ec/query/sim-voice-usage',
     sim_data_usage_monthly_batch: '/ec/query/sim-data-usage-monthly/batch',
+    sim_batch_result: '/ec/query/sim-batch-result',
   },
   change: {
     sim_status: '/ec/change/sim-status',
@@ -222,18 +223,18 @@ class ChinaMobileService extends BaseService {
 
     // 在 operType 为 9或 11 时，原因必传01：主动停复机
     if ([ 9, 11 ].indexOf(operType) > -1 && _.isNil(reason)) {
-      data.reason = '01：主动停复机';
+      data.reason = '01';
     }
 
     if (this.isExceedLimit(msisdns)) {
       error('【查询的物联卡号最多不超过100个！】');
-      return;
+      return [];
     }
 
     data.msisdns = msisdns;
 
     const simId = _.split(msisdns, '_')[0];
-    const result = await this.fetchData(api.change.sim_status_batch, data, simId);
+    const result = await this.handleBy(api.change.sim_status_batch, simId, data);
     return result;
   }
 
@@ -589,6 +590,20 @@ class ChinaMobileService extends BaseService {
     if (!_.isNil(actionRule)) data.actionRule = actionRule;
 
     const result = await this.handleBy(api.operate.sim_sms_function, msisdn, data);
+    return result;
+  }
+
+  /**
+   * CMIOT_API23M10-物联卡业务批量办理结果查询
+   * 集团客户可以通过物联卡批量处理的任务流水号接口查询物联卡业务批量办理的结果。
+   * @param {string} jobId - 物联卡批量处理的任务流水号
+   * @param {string} msisdn - 物联卡
+   * @return {array} [{
+   *  jobStatus, resultList: [{status, message, resultType, resultId}]
+   * }]
+   */
+  async querySimBatchResult(jobId, msisdn) {
+    const result = await this.handleBy(api.operate.sim_sms_function, msisdn, { jobId });
     return result;
   }
 }

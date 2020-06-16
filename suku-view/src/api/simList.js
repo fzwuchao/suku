@@ -6,4 +6,5 @@ export default {
     SIM_SYNC_UPDATE: "/sim/syncUpdate",
     SIM_GET_SIM: "/sim/getSim",
     SIM_UPDATE: "/sim/update",
+    SIM_BATCH_UPDATE: "/sim/batchUpdate",
 }
