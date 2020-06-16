@@ -24,6 +24,19 @@ class SimService extends BaseService {
     return true;
   }
 
+  async batchUpdateBySimIds(data, simIds) {
+    const Op = this.getOp();
+    try {
+      await this.app.model.Sim.update(data, { where: {
+        simId: {
+          [Op.in]: simIds,
+        },
+      } });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
   async getSimBySimId(simId) {
     // const attributes = [ 'simId', 'iccid', 'simType', 'activeComboId', 'activeComboName', 'otherComboIds', 'activeTime', 'overdueTime' ];
     const [ sim ] = await this.app.model.Sim.findAll({

@@ -43,6 +43,8 @@ module.exports = app => {
   router.get('/sim/syncUpdate', controller.sim.syncUpdate);
   // 更新
   router.post('/sim/update', controller.sim.update);
+  // 批量更新
+  router.post('/sim/batchUpdate', controller.sim.batchUpdate);
 
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);

@@ -48,6 +48,18 @@ const SimRules = {
   },
   privateMoney: {
     type: 'number?',
+  },
+  simIds: {
+    type: 'array?',
+  },
+  cardStatus: {
+    type: 'string?',
+  },
+  voiceServStatus: {
+    type: 'number?',
+  },
+  renewPrice: {
+    type: 'number?',
   }
 };
 

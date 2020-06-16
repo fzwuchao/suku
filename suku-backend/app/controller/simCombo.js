@@ -111,11 +111,10 @@ class SimComboController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.query);
-    const { simId } = request.query;
-    const simData = await service.sim.getSimBySimId(simId);
-    const { simType } = simData;
+    const { simType } = request.query;
     const result = await service.simCombo.getNonActiveComboBySimType(simType);
     this.success(result, '');
   }
+
 }
 module.exports = SimComboController;

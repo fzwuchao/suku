@@ -208,8 +208,8 @@ export default {
         }
       });
     },
-    getSimBySimId() {
-      this.axios({
+    async getSimBySimId() {
+      await this.axios({
         method: "get",
         params: {
           simId: this.simId
@@ -219,11 +219,11 @@ export default {
         this.sim = r.data;
       });
     },
-    getSimComboList() {
-      this.axios({
+    async getSimComboList() {
+      await this.axios({
         method: "get",
         params: {
-          simId: this.simId
+          simType: this.sim.simType
         },
         url: API.SIMCOMBO.SIM_COMBO_COMBO_LIST
       }).then(r => {
@@ -234,11 +234,11 @@ export default {
       });
     }
   },
-  mounted() {
+  async mounted() {
     const { id } = this.$route.params;
     this.simId = id;
-    this.getSimBySimId();
-    this.getSimComboList();
+    await this.getSimBySimId();
+    await this.getSimComboList();
   }
 };
 </script>
