@@ -285,6 +285,74 @@ class SimService extends BaseService {
     return result;
   }
 
+  async updateFlowServStatusBatch(oneLinkSimIds, flowServStatus) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    const allSimIds = [];
+    data.flowServStatus = flowServStatus;
+    const operType = flowServStatus === '1' ? 1 : 0;
+    const res = {};
+    for (const key in oneLinkSimIds) {
+      const simIds = oneLinkSimIds[key];
+      Array.prototype.push.apply(allSimIds, simIds);
+      const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(simIds.join('_'), '11', operType, 'CMIOT');
+      if (result.error) {
+        // this.fail(result.errorCode, '', result.errorInfo);
+        res.code = 1001;
+        res[key] = result;
+        continue;
+      }
+      const jobId = (result[0] || {}).jobId;
+      const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
+      if (batchResult.failure) {
+        // this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
+        // return;
+        res.code = 1002;
+        res[key] = batchResult;
+        continue;
+      }
+    }
+    if (!res.code) {
+      await this.batchUpdateBySimIds(data, allSimIds);
+    }
+    return res;
+  }
+
+  async updateVoiceServStatusBatch(oneLinkSimIds, voiceServStatus) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    const allSimIds = [];
+    data.voiceServStatus = voiceServStatus;
+    const operType = voiceServStatus === '1' ? 1 : 0;
+    const res = {};
+    for (const key in oneLinkSimIds) {
+      const simIds = oneLinkSimIds[key];
+      Array.prototype.push.apply(allSimIds, simIds);
+      const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(simIds.join('_'), '01', operType, 'CMIOT');
+      if (result.error) {
+        // this.fail(result.errorCode, '', result.errorInfo);
+        res.code = 1001;
+        res[key] = result;
+        continue;
+      }
+      const jobId = (result[0] || {}).jobId;
+      const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
+      if (batchResult.failure) {
+        // this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
+        // return;
+        res.code = 1002;
+        res[key] = batchResult;
+        continue;
+      }
+    }
+    if (!res.code) {
+      await this.batchUpdateBySimIds(data, allSimIds);
+    }
+    return res;
+  }
+
 }
 
 module.exports = SimService;

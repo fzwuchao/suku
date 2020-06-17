@@ -35,11 +35,13 @@
         type="warning"
         v-if="simType === 'B'"
         size="mini"
+        @click="voiceServStatus(false)"
       >停语音</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
+        @click="voiceServStatus(true)"
       >恢复语音</el-button>
       <el-button
         type="primary"
@@ -462,25 +464,52 @@ export default {
     },
     checkFloeServ(status) {
       return this.multipleSelection.every(item => {
-        return item.flowServStatus === status;
+        return item.flowServStatus + '' === status;
       });
     },
     flowServStatus(status) {
-      const flowServStatus = status? 1 : 2;
+      const handlingFlowServStatus = status? '2' : '1';
       const statusError = {
-        1: "请确保所有卡的数据服务都是关闭的",
-        2: "请确保所有卡的数据服务都是开启的"
+        1: "请确保所有卡的数据服务都是开启的",
+        2: "请确保所有卡的数据服务都是关闭的"
       };
-      if (!this.checkFloeServ(status)) {
+      if (!this.checkFloeServ(handlingFlowServStatus)) {
         this.$message({
           type: "warning",
-          message: statusError[status]
+          message: statusError[handlingFlowServStatus]
         });
         return;
       }
+      const flowServStatus = status? 1 : 2;
       this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
         this.batchUpdate({
           flowServStatus
+        });
+      });
+    },
+    checkVoiceServ(status) {
+      return this.multipleSelection.every(item => {
+        console.log(item.flowServStatus, status)
+        return item.flowServStatus + '' === status;
+      });
+    },
+    voiceServStatus(status) {
+      const handlingVoiceServStatus = status? '2' : '1';
+      const statusError = {
+        1: "请确保所有卡的语音服务都是开启的",
+        2: "请确保所有卡的语音服务都是关闭的"
+      };
+      if (!this.checkVoiceServ(handlingVoiceServStatus)) {
+        this.$message({
+          type: "warning",
+          message: statusError[handlingVoiceServStatus]
+        });
+        return;
+      }
+      const voiceServStatus = status? 1 : 2;
+      this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
+        this.batchUpdate({
+          voiceServStatus
         });
       });
     },
