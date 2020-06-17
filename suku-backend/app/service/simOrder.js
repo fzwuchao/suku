@@ -82,6 +82,9 @@ class SimOrderService extends BaseService {
         newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration} + ${order.voice}`);
         break;
     }
+    if (order.orderType === 1) {
+      newSim.isActive = 1;
+    }
     await this.ctx.service.sim.update(newSim);
   }
   async update(order) {

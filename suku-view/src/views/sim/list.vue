@@ -24,7 +24,13 @@
       <el-button
         type="primary"
         size="mini"
-      >续费</el-button>
+        @click="flowServStatus(false)"
+      >停数据</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        @click="flowServStatus(true)"
+      >恢复数据</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
@@ -42,7 +48,7 @@
       <el-button
         type="primary"
         size="mini"
-      >续费增加</el-button>
+      >用户增价</el-button>
       <el-button
         type="primary"
         size="mini"
@@ -118,7 +124,7 @@
       </el-table-column>
       <el-table-column
         align="left"
-        label="增续价格"
+        label="用户增价"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.privateMoney }}</template>
@@ -347,7 +353,6 @@ export default {
             { value: "", key: "全部" },
             { value: "1", key: "待激活" },
             { value: "2", key: "已激活" },
-            { value: "20", key: "停机" },
             { value: "4", key: "停机" },
             { value: "21", key: "注销" },
             { value: "6", key: "可测试" },
@@ -366,6 +371,17 @@ export default {
       const simIds = [];
       for (let i = 0; i < this.multipleSelection.length; i++) {
         simIds.push(this.multipleSelection[i].simId);
+      }
+      return simIds;
+    },
+    oneLinkSimIds() {
+      const simIds = {};
+      for (let i = 0; i < this.multipleSelection.length; i++) {
+        let item = this.multipleSelection[i];
+        if(!simIds[item.onelinkId]){
+          simIds[item.onelinkId] = []
+        }       
+        simIds[item.onelinkId].push(item.simId)
       }
       return simIds;
     }
@@ -411,6 +427,15 @@ export default {
         });
         return;
       }
+      for(const key in this.oneLinkSimIds){
+        if(this.oneLinkSimIds[key].length > 100) {
+          this.$message({
+          type: "warning",
+          message: "一个集团一次更改的卡数不能超过100张，请确认数目！"
+        });
+        return;
+        }
+      }
       // 对应复机/停机后卡的状态
       const cardStatus = isActivated ? "2" : "4";
       this.confirm(`是否批量${isActivated ? "复机" : "停机"}选中的卡`, () => {
@@ -435,16 +460,35 @@ export default {
         return item.cardStatus === cardStatus;
       });
     },
-    // isSamePlatform() {
-    //   return this.multipleSelection.every(item => {
-    //     return item.cardStatus === cardStatus;
-    //   });
-    // },
+    checkFloeServ(status) {
+      return this.multipleSelection.every(item => {
+        return item.flowServStatus === status;
+      });
+    },
+    flowServStatus(status) {
+      const flowServStatus = status? 1 : 2;
+      const statusError = {
+        1: "请确保所有卡的数据服务都是关闭的",
+        2: "请确保所有卡的数据服务都是开启的"
+      };
+      if (!this.checkFloeServ(status)) {
+        this.$message({
+          type: "warning",
+          message: statusError[status]
+        });
+        return;
+      }
+      this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
+        this.batchUpdate({
+          flowServStatus
+        });
+      });
+    },
     batchUpdate(data) {
       this.axios({
         method: "post",
         data: {
-          simIds: this.simIds,
+          oneLinkSimIds: this.oneLinkSimIds,
           ...data
         },
         url: API.SIMLIST.SIM_BATCH_UPDATE
@@ -552,14 +596,7 @@ export default {
       return isSelected;
     },
     handleSelectionChange(val) {
-      console.log("val:", val);
       this.multipleSelection = val;
-    },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
     }
   },
   mounted() {

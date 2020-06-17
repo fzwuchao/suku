@@ -192,7 +192,9 @@ class ChinaMobileService extends BaseService {
     if (_.isNil(msisdn)) {
       return [];
     }
-
+    if (msisdn.length > 13) {
+      msisdn = _.split(msisdn, '_')[0];
+    }
     const result = await this.fetchData(url, data, msisdn);
     return result;
   }
@@ -246,7 +248,7 @@ class ChinaMobileService extends BaseService {
     };
 
     // 在 operType 为 9或 11 时，原因必传01：主动停复机
-    if ([9, 11].indexOf(operType) > -1 && _.isNil(reason)) {
+    if ([ 9, 11 ].indexOf(operType) > -1 && _.isNil(reason)) {
       data.reason = '01';
     }
 

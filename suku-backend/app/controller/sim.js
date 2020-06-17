@@ -303,28 +303,27 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney } = request.body;
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, oneLinkSimIds } = request.body;
     const data = {};
     let result = null;
     // TODO: 在调移动平台的接口前，检验这些卡号是同一个onelinkId
     // 套餐
     if (!_.isNil(otherComboIds)) data.otherComboIds = otherComboIds;
     // 停/复机
-    if (!_.isNil(cardStatus)) {
-      data.cardStatus = cardStatus;
-      const operType = cardStatus === '2' ? 11 : 9;
-      result = await service.chinaMobile.changeSimStatusBatch(simIds.join('_'), operType);
-      if (result.error) {
-        this.fail(result.errorCode, '', result.errorInfo);
-        return;
-      }
-      const jobId = (result[0] || {}).jobId;
-      const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
-      if (batchResult.failure) {
-        this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
+    if (!_.isNil(cardStatus) && !_.isNil(oneLinkSimIds)) {
+      result = await service.sim.updateCardStatusBatch(oneLinkSimIds, cardStatus);
+      if (result.code) {
+        this.fail(result.code, '', result);
         return;
       }
     }
+
+    // 停/复数据
+    if (!_.isNil(flowServStatus)) {
+      data.flowServStatus = flowServStatus;
+      // const voiceBatchResult = await operateSimCommunicationFuctionBatch(simIds.join('_'), );
+    }
+
     // 停/复语音
     if (!_.isNil(voiceServStatus)) {
       data.voiceServStatus = voiceServStatus;
