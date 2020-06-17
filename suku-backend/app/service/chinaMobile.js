@@ -99,10 +99,12 @@ class ChinaMobileService extends BaseService {
       errorLog.source = 1;
       errorLog.params = JSON.stringify(params);
       await this.ctx.service.errorLog.create(errorLog);
-      this.ctx.logger.error(res.message);
+      resData.errorCode = resData.status;
+      resData.errorInfo = resData.message;
+      this.ctx.logger.error(`【业务异常状态码】: ${resData.status} 【业务异常描述】:${resData.message}`);
       return resData;
     }
-    this.ctx.logger.error(`【异常状态码】: ${res.status}`);
+    this.ctx.logger.error(`【Http异常状态码】: ${res.status}`);
     return res;
   }
 
@@ -641,7 +643,7 @@ class ChinaMobileService extends BaseService {
    * }]
    */
   async querySimBatchResult(jobId, msisdn) {
-    const result = await this.handleBy(api.operate.sim_sms_function, msisdn, { jobId });
+    const result = await this.handleBy(api.query.sim_batch_result, msisdn, { jobId });
     return result;
   }
 }
