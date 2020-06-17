@@ -305,7 +305,7 @@ class SimController extends BaseController {
     ctx.validate(rule, request.body);
     const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, renewPrice } = request.body;
     const data = {};
-    // let result = null;
+    let result = null;
     // 套餐
     if (!_.isNil(otherComboIds)) data.otherComboIds = otherComboIds;
     // 停/复机

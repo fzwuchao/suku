@@ -204,38 +204,55 @@ class SimService extends BaseService {
     const startTime = moment().milliseconds();
     const params = {};
     // 被叫卡有激活时间，主叫卡有语音使用量
+    const promiseList = [];
+    // 激活时间
+    promiseList.push(service.chinaMobile.querySimBasicInfo(simId));
+    // 状态信息
+    promiseList.push(service.chinaMobile.querySimStatus(simId));
+    // imei
+    // promiseList.push(service.chinaMobile.querySimImei(simId));
+    // 开关机状态
+    promiseList.push(service.chinaMobile.queryOnOffStatus(simId));
+    // 通信功能开通
+    promiseList.push(service.chinaMobile.querySimCommunicationFunctionStatus(simId));
+    // 流量累计使用量
+    promiseList.push(service.chinaMobile.querySimDataUsage(simId));
+    // 语音累计使用量
     if (simType === 'B') {
-      // 语音累计使用量
-      const voiceAmount = await service.chinaMobile.querySimVoiceUsage(simId);
+      promiseList.push(service.chinaMobile.querySimVoiceUsage(simId));
+    }
+    const [ activeTime, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
+
+    if (voiceAmount) {
       params.voiceAmount = voiceAmount;
     }
-    // 激活时间
-    const activeTime = await service.chinaMobile.querySimBasicInfo(simId);
+
     if (activeTime) {
       params.activeTime = activeTime;
       params.isActive = 1;
     }
-    // 状态信息
-    const cardStatus = await service.chinaMobile.querySimStatus(simId);
+
     params.cardStatus = cardStatus;
-    // imei
-    // await service.chinaMobile.querySimImei(simId);
-    // 开关机状态
-    const openStatus = await service.chinaMobile.queryOnOffStatus(simId);
+    // params.imei = imei;
     params.openStatus = openStatus;
-    // 通信功能开通
-    const servStatus = await service.chinaMobile.querySimCommunicationFunctionStatus(simId);
     for (const key in servStatus) {
       params[key] = servStatus[key];
     }
-    // 流量累计使用量
-    const monthUsedFlow = await service.chinaMobile.querySimDataUsage(simId);
     params.monthUsedFlow = monthUsedFlow;
     const endTime = moment().milliseconds();
     logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
     await service.sim.updateBySimId(params, simId);
-
   }
+
+  async getActivedSim() {
+    const result = await this.app.model.Sim.findAll({
+      where: {
+        cardStatus: 2,
+      },
+    });
+    return result;
+  }
+
 }
 
 module.exports = SimService;
