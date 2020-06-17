@@ -35,10 +35,10 @@ class WriteListController extends BaseController {
     const res = await ctx.service.chinaMobile.configMemberVoiceWhitelist(1, phone, simId);
     if (!res.error) {
       await ctx.service.writeList.create(writeList);
+      this.success(res, '');
     } else {
       this.fail('99', res, '亲情号设置失败！');
     }
-    this.success(res, '');
   }
   async getWriteListBySimId() {
     const { ctx } = this;

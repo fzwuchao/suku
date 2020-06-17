@@ -55,6 +55,12 @@ const api = {
     sim_sms_function: '/ec/operate/sim-sms-function',
   },
 };
+const OPREATE_TYPE = {
+  query: 1,
+  change: 2,
+  config: 3,
+  operate: 4,
+};
 class ChinaMobileService extends BaseService {
   async getOnelink(simId) {
     const { onelinkId } = await this.ctx.service.sim.getSimBySimId(simId);
@@ -62,10 +68,11 @@ class ChinaMobileService extends BaseService {
     return oneLink;
   }
   async fetchData(url, data, simId, options) {
-    const { appId, apiHost, apiVersion, status } = await this.getOnelink(simId);
+    const { appId, apiHost, apiVersion, status, id } = await this.getOnelink(simId);
     if (status === 0) {
       return null;
     }
+    const params = JSON.parse(JSON.stringify(data));
     data.token = await this.getToken(simId);
     data.transid = getTransid(appId);
     const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
@@ -73,17 +80,25 @@ class ChinaMobileService extends BaseService {
       dataType: 'json',
       ...options,
     });
-    return this.getResult(res);
+    return await this.getResult(res, url, params, id);
   }
 
-  getResult(res) {
-    console.log(res);
+  async getResult(res, url, params, onelinkId) {
     if (res.status === 200) {
       const resData = res.data;
       if (resData.status === '0') {
         return resData.result;
       }
       resData.error = true;
+      const errorLog = {};
+      errorLog.type = OPREATE_TYPE[_.split(url, '/')[2]];
+      errorLog.onelinkId = onelinkId;
+      errorLog.url = url;
+      errorLog.status = resData.status;
+      errorLog.message = resData.message;
+      errorLog.source = 1;
+      errorLog.params = JSON.stringify(params);
+      await this.ctx.service.errorLog.create(errorLog);
       this.ctx.logger.error(res.message);
       return resData;
     }
@@ -149,7 +164,7 @@ class ChinaMobileService extends BaseService {
       },
       dataType: 'json',
     });
-    const result = this.getResult(res);
+    const result = await this.getResult(res);
     if (result.length > 0) {
       token = result[0].token;
     }
