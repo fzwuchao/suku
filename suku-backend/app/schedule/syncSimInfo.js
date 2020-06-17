@@ -15,10 +15,10 @@ class SyncSimInfo extends Subscription {
     const { service, logger } = this.ctx;
     logger.info('********************同步卡基本信息*********************');
     const startTime = moment().milliseconds();
-    const result = await service.getActivedSim();
+    const result = await service.sim.getActivedSim();
     const promises = result.map(sim => {
       const { simId, simType } = sim;
-      return service.syncUpdate(simId, simType);
+      return service.sim.syncUpdate(simId, simType);
     });
     Promise.all(promises).then(() => {
       const endTime = moment().milliseconds();

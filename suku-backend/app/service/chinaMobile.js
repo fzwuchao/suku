@@ -148,33 +148,38 @@ class ChinaMobileService extends BaseService {
    */
   async getToken(simId) {
     // 设置超时时间为50分钟，避免产生时间差
-    const EXPIRE_TIME = 50 * 60 * 1000;
-    const { nameKey, apiHost, appId, apiVersion, secretKey, status } = await this.getOnelink(simId);
+    const { nameKey, status } = await this.getOnelink(simId);
     if (status === 0) {
       return null;
     }
-    let token = await this.app.redis.get(nameKey);
+    const token = await this.app.redis.get(`${nameKey}_token`);
     if (token) {
       return token;
     }
+  }
 
-    const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.get_token}`, {
-      data: {
-        appid: appId,
-        password: secretKey,
-        transid: getTransid(appId),
-      },
-      dataType: 'json',
-    });
-    const result = await this.getResult(res);
-    if (result.length > 0) {
-      token = result[0].token;
+  async getTokenCurl() {
+    const results = await this.ctx.service.onelinkPlatform.getAllOnelinkDesc();
+    /* results = JSON.stringify(results);
+    console.log(results) */
+    for (let i = 0; i < results.length; i++) {
+      const { nameKey, apiHost, appId, apiVersion, secretKey } = results[i];
+      const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.get_token}`, {
+        data: {
+          appid: appId,
+          password: secretKey,
+          transid: getTransid(appId),
+        },
+        dataType: 'json',
+      });
+      const result = await this.getResult(res);
+      let token = null;
+      if (result.length > 0) {
+        token = result[0].token;
+      }
+      console.log(`#####${token}#####`);
+      await this.app.redis.set(`${nameKey}_token`, token);
     }
-
-    const pipeline = await this.app.redis.pipeline();
-    await pipeline.set(nameKey, token).pexpire(nameKey, EXPIRE_TIME).exec(() => { });
-
-    return token;
   }
 
   /**
