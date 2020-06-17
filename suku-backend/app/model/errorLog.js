@@ -5,7 +5,7 @@ const moment = require('moment');
 module.exports = app => {
   const { STRING, INTEGER, DATE, BIGINT } = app.Sequelize;
 
-  const ErrorLog = app.model.define('user', {
+  const ErrorLog = app.model.define('error_log', {
     id: {
       type: BIGINT(20),
       primaryKey: true,
@@ -49,9 +49,17 @@ module.exports = app => {
       },
       field: 'created_at',
     },
+    updatedAt: {
+      type: DATE, // '更新时间',
+      get() {
+        return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
+      field: 'updated_at',
+    },
   }, {
     timestamps: true,
     createdAt: 'created_at',
+    updatedAt: 'updated_at',
   });
 
 

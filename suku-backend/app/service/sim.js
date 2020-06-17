@@ -4,7 +4,7 @@
 /**
  */
 const BaseService = require('../core/baseService');
-
+const moment = require('moment');
 class SimService extends BaseService {
   async update(sim) {
     try {
@@ -197,6 +197,62 @@ class SimService extends BaseService {
     });
     return result;
   }
+
+  async syncUpdate(simId, simType) {
+    const ctx = this.ctx;
+    const { service, logger } = ctx;
+    const startTime = moment().milliseconds();
+    const params = {};
+    // 被叫卡有激活时间，主叫卡有语音使用量
+    const promiseList = [];
+    // 激活时间
+    promiseList.push(service.chinaMobile.querySimBasicInfo(simId));
+    // 状态信息
+    promiseList.push(service.chinaMobile.querySimStatus(simId));
+    // imei
+    // promiseList.push(service.chinaMobile.querySimImei(simId));
+    // 开关机状态
+    promiseList.push(service.chinaMobile.queryOnOffStatus(simId));
+    // 通信功能开通
+    promiseList.push(service.chinaMobile.querySimCommunicationFunctionStatus(simId));
+    // 流量累计使用量
+    promiseList.push(service.chinaMobile.querySimDataUsage(simId));
+    // 语音累计使用量
+    if (simType === 'B') {
+      promiseList.push(service.chinaMobile.querySimVoiceUsage(simId));
+    }
+    const [ activeTime, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
+
+    if (voiceAmount) {
+      params.voiceAmount = voiceAmount;
+    }
+
+    if (activeTime) {
+      params.activeTime = activeTime;
+      params.isActive = 1;
+    }
+
+    params.cardStatus = cardStatus;
+    // params.imei = imei;
+    params.openStatus = openStatus;
+    for (const key in servStatus) {
+      params[key] = servStatus[key];
+    }
+    params.monthUsedFlow = monthUsedFlow;
+    const endTime = moment().milliseconds();
+    logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
+    await service.sim.updateBySimId(params, simId);
+  }
+
+  async getActivedSim() {
+    const result = await this.app.model.Sim.findAll({
+      where: {
+        cardStatus: 2,
+      },
+    });
+    return result;
+  }
+
 }
 
 module.exports = SimService;

@@ -1,6 +1,6 @@
 'use strict';
 
-const moment = require('moment');
+
 const _ = require('lodash');
 
 const BaseController = require('../core/baseController');
@@ -76,7 +76,7 @@ class SimController extends BaseController {
     const params = { ...request.body };
     ctx.validate(rule, params);
 
-    const simExcelHeadField = ['MSISDN', 'ICCID'];
+    const simExcelHeadField = [ 'MSISDN', 'ICCID' ];
     const result = await service.sheet.parseFileWithHeadField(params.filepath);
 
     if (!result.parseSuccess) {
@@ -270,7 +270,7 @@ class SimController extends BaseController {
    */
   async syncUpdate() {
     const ctx = this.ctx;
-    const { request, service, helper, logger } = ctx;
+    const { request, helper } = ctx;
     const { sim } = helper.rules;
     const rule = {
       ...sim([ 'simId', 'simType' ]),
@@ -278,39 +278,7 @@ class SimController extends BaseController {
     ctx.validate(rule, request.query);
     const { simId, simType } = request.query;
 
-    const startTime = moment().milliseconds();
-    const params = {};
-    // 被叫卡有激活时间，主叫卡有语音使用量
-    if (simType === 'B') {
-      // 语音累计使用量
-      const voiceAmount = await service.chinaMobile.querySimVoiceUsage(simId);
-      params.voiceAmount = voiceAmount;
-    }
-    // 激活时间
-    const activeTime = await service.chinaMobile.querySimBasicInfo(simId);
-    if (activeTime) {
-      params.activeTime = activeTime;
-      params.isActive = 1;
-    }
-    // 状态信息
-    const cardStatus = await service.chinaMobile.querySimStatus(simId);
-    params.cardStatus = cardStatus;
-    // imei
-    // await service.chinaMobile.querySimImei(simId);
-    // 开关机状态
-    const openStatus = await service.chinaMobile.queryOnOffStatus(simId);
-    params.openStatus = openStatus;
-    // 通信功能开通
-    const servStatus = await service.chinaMobile.querySimCommunicationFunctionStatus(simId);
-    for (const key in servStatus) {
-      params[key] = servStatus[key];
-    }
-    // 流量累计使用量
-    const monthUsedFlow = await service.chinaMobile.querySimDataUsage(simId);
-    params.monthUsedFlow = monthUsedFlow;
-    const endTime = moment().milliseconds();
-    logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
-    await service.sim.updateBySimId(params, simId);
+    await ctx.service.sim.syncUpdate(simId, simType);
     this.success('', '同步更新完成');
   }
 
