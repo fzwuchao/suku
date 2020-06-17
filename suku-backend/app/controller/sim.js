@@ -322,7 +322,7 @@ class SimController extends BaseController {
       const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
       const { jobStatus } = batchResult[0];
       if (jobStatus === '2') {
-        console.log();
+        // console.log();
       } else if (jobStatus === '3' || jobStatus === '4') {
         const { resultList } = batchResult[0];
         const { message, resultId } = resultList[0];
@@ -343,7 +343,7 @@ class SimController extends BaseController {
     if (!_.isNil(privateMoney)) data.privateMoney = privateMoney;
     // 续费
     if (!_.isNil(renewPrice)) data.renewPrice = renewPrice;
-    // await service.sim.batchUpdateBySimIds(data, simIds);
+    await service.sim.batchUpdateBySimIds(data, simIds);
     this.success(null, '批量更新成功');
   }
 }

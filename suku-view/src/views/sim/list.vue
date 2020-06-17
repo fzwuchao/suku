@@ -448,8 +448,14 @@ export default {
           ...data
         },
         url: API.SIMLIST.SIM_BATCH_UPDATE
-      }).then(() => {
-        this.$router.push(`/sim/list/${this.simType}`);
+      }).then((r) => {
+        // this.$router.push(`/sim/list/${this.simType}`);
+        if (!r.success) {
+          this.$message({
+            message: r.msg,
+            type: 'warning',
+          })
+        }
       });
     },
     download(data, fileName, suffix) {
