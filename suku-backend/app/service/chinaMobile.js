@@ -241,7 +241,7 @@ class ChinaMobileService extends BaseService {
     };
 
     // 在 operType 为 9或 11 时，原因必传01：主动停复机
-    if ([ 9, 11 ].indexOf(operType) > -1 && _.isNil(reason)) {
+    if ([9, 11].indexOf(operType) > -1 && _.isNil(reason)) {
       data.reason = '01';
     }
 
@@ -633,13 +633,33 @@ class ChinaMobileService extends BaseService {
    * 集团客户可以通过物联卡批量处理的任务流水号接口查询物联卡业务批量办理的结果。
    * @param {string} jobId - 物联卡批量处理的任务流水号
    * @param {string} msisdn - 物联卡
-   * @return {array} [{
-   *  jobStatus, resultList: [{status, message, resultType, resultId}]
-   * }]
+   * @return {object} {failure?, failCode?, failInfo?, failData?} - 有错误时才有错误字段
    */
   async querySimBatchResult(jobId, msisdn) {
     const result = await this.handleBy(api.query.sim_batch_result, msisdn, { jobId });
-    return result;
+    const { jobStatus } = result[0];
+    const batchResult = {};
+    // 0：待处理，1：处理中，2: 处理完成，3：包含有处理失败记录的处理完成，4：处理失败
+    // resultList: jobStatus 为 2、3、4 时返回处理结果，为0、1 时无
+    if (jobStatus === '2') {
+      // console.log();
+    } else if (jobStatus === '3' || jobStatus === '4') {
+      const { resultList } = result[0];
+      // TODO: 是否只取resultList第一个元素，还是都要取出来？
+      const { message, resultId } = resultList[0];
+      batchResult.failure = true;
+      batchResult.failInfo = message;
+      batchResult.failData = resultId;
+    } else if (jobStatus === '0' || jobStatus === '1') {
+      const jobStatusMsg = {
+        0: '待处理',
+        1: '处理中',
+      };
+      batchResult.failure = true;
+      batchResult.failInfo = jobStatusMsg[jobStatus];
+    }
+
+    return batchResult;
   }
 }
 module.exports = ChinaMobileService;

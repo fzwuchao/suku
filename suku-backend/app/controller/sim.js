@@ -303,7 +303,7 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, renewPrice } = request.body;
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney } = request.body;
     const data = {};
     let result = null;
     // TODO: 在调移动平台的接口前，检验这些卡号是同一个onelinkId
@@ -320,29 +320,19 @@ class SimController extends BaseController {
       }
       const jobId = (result[0] || {}).jobId;
       const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
-      const { jobStatus } = batchResult[0];
-      if (jobStatus === '2') {
-        // console.log();
-      } else if (jobStatus === '3' || jobStatus === '4') {
-        const { resultList } = batchResult[0];
-        const { message, resultId } = resultList[0];
-        this.fail('', resultId, message);
-        return;
-      } else if (jobStatus === '0' || jobStatus === '1') {
-        const jobStatusMsg = {
-          0: '待处理',
-          1: '处理中',
-        };
-        this.fail('', '', jobStatusMsg[jobStatus]);
+      if (batchResult.failure) {
+        this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
         return;
       }
     }
     // 停/复语音
-    if (!_.isNil(voiceServStatus)) data.voiceServStatus = voiceServStatus;
+    if (!_.isNil(voiceServStatus)) {
+      data.voiceServStatus = voiceServStatus;
+      // const voiceBatchResult = await operateSimCommunicationFuctionBatch(simIds.join('_'), );
+    }
     // 续费增价
     if (!_.isNil(privateMoney)) data.privateMoney = privateMoney;
-    // 续费
-    if (!_.isNil(renewPrice)) data.renewPrice = renewPrice;
+
     await service.sim.batchUpdateBySimIds(data, simIds);
     this.success(null, '批量更新成功');
   }
