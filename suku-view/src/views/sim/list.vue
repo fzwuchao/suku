@@ -22,12 +22,12 @@
         @click="activate(true)"
       >复机</el-button>
       <el-button
-        type="primary"
+        type="warning"
         size="mini"
         @click="flowServStatus(false)"
       >停数据</el-button>
       <el-button
-        type="primary"
+        type="warning"
         size="mini"
         @click="flowServStatus(true)"
       >恢复数据</el-button>
@@ -403,7 +403,7 @@ export default {
     serveStatus(val) {
       const serveStatus = {
         1: "开",
-        2: "关"
+        0: "关"
       };
       return serveStatus[val];
     }
@@ -468,11 +468,19 @@ export default {
       });
     },
     flowServStatus(status) {
-      const handlingFlowServStatus = status? '2' : '1';
+      const handlingFlowServStatus = status? '0' : '1';
       const statusError = {
         1: "请确保所有卡的数据服务都是开启的",
-        2: "请确保所有卡的数据服务都是关闭的"
+        0: "请确保所有卡的数据服务都是关闭的",
+        3: "请确保所有卡都是已激活状态"
       };
+      if (!this.checkStatus('2')) {
+        this.$message({
+          type: "warning",
+          message: statusError[3]
+        });
+        return;
+      }
       if (!this.checkFloeServ(handlingFlowServStatus)) {
         this.$message({
           type: "warning",
@@ -489,16 +497,23 @@ export default {
     },
     checkVoiceServ(status) {
       return this.multipleSelection.every(item => {
-        console.log(item.flowServStatus, status)
-        return item.flowServStatus + '' === status;
+        return item.voiceServStatus + '' === status;
       });
     },
     voiceServStatus(status) {
-      const handlingVoiceServStatus = status? '2' : '1';
+      const handlingVoiceServStatus = status? '0' : '1';
       const statusError = {
         1: "请确保所有卡的语音服务都是开启的",
-        2: "请确保所有卡的语音服务都是关闭的"
+        0: "请确保所有卡的语音服务都是关闭的",
+        3: "请确保所有卡都是已激活状态"
       };
+      if (!this.checkStatus('2')) {
+        this.$message({
+          type: "warning",
+          message: statusError[3]
+        });
+        return;
+      }
       if (!this.checkVoiceServ(handlingVoiceServStatus)) {
         this.$message({
           type: "warning",

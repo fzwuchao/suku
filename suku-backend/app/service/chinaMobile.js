@@ -99,6 +99,9 @@ class ChinaMobileService extends BaseService {
       errorLog.source = 1;
       errorLog.params = JSON.stringify(params);
       await this.ctx.service.errorLog.create(errorLog);
+      if (resData.status === '12021') {
+        await this.app.runSchedule('tokenCurl');
+      }
       resData.errorCode = resData.status;
       resData.errorInfo = resData.message;
       this.ctx.logger.error(`【业务异常状态码】: ${resData.status} 【业务异常描述】:${resData.message}`);
@@ -261,6 +264,8 @@ class ChinaMobileService extends BaseService {
 
     const simId = _.split(msisdns, '_')[0];
     const result = await this.handleBy(api.change.sim_status_batch, simId, data);
+    const jobId = (result[0] || {}).jobId;
+    const batchResult = await this.querySimBatchResult(jobId, simId);
     return result;
   }
 

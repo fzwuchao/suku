@@ -5,7 +5,7 @@
       unique-opened
       :default-active="$route.meta && $route.meta.activeName"
       :collapse="isCollapse"
-      background-color="#304156"
+      background-color="#20222A"
       text-color="#fff"
       active-text-color="#409EFF"
     >

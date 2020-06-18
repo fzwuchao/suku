@@ -216,7 +216,7 @@ export default {
   right: 20px;
   top: 144px;
   width: 250px;
-  border: solid 1px #999;
+  border: 1px solid #EBEEF5;
   border-radius: 6px;
   background: #fff;
   max-height: 520px;

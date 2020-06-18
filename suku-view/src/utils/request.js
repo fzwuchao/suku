@@ -107,7 +107,7 @@ Axios
             loading = null
         }
         if (res.data && res.data.code !== 200) {
-            if (res.data.code === 1001) {
+            if (res.data.code === 10001) {
                 removeIsLogin()
                 router.push({
                     path: '/login'
@@ -128,11 +128,7 @@ Axios
             loading.close()
             loading = null
         }
-        if (!error.response) {
-            router.push({
-                path: '/login'
-            })
-        }
+        
         if (error.response && error.response.status === 404) {
             router.push({
                 path: '/404'

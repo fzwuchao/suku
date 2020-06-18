@@ -10,7 +10,7 @@
         :toggleClick="toggleSideBar"
         :isActive="sidebar.opened"
       ></hamburger>
-      <span class="title">速酷电子</span>
+      <span class="title">物联卡平台</span>
       <el-dropdown @command="handleCommand" class="current-user" trigger="click">
         <div class="user-info">
           <img
@@ -98,11 +98,11 @@ export default {
   width: 100%;
   height: 60px;
   line-height: 60px;
-  background-color: #031321;
+  background-color: #20222A;
   border-bottom: 2px solid #041f40;
   border-radius: 0px !important;
   padding-right: 60px;
-  z-index: 1000;
+  z-index: 2000;
   .hamburger-container {
     fill: #fff;
     line-height: 68px;
@@ -114,7 +114,7 @@ export default {
   }
   .title {
     color: #fff;
-    font-size: 30px;
+    font-size: 26px;
   }
   .current-user {
     position: absolute;
