@@ -53,6 +53,7 @@ module.exports = app => {
     menuOrder: {
       type: TINYINT(1),
       field: 'menu_order',
+      defaultValue: 0,
       comment: '菜单序号',
     },
     menuType: {

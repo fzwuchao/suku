@@ -22,6 +22,7 @@ class PermissionService extends BaseService {
       where: {
         id: roleId,
       },
+      // order: [ Permission, 'menuOrder', 'ASC' ],
       include: Permission,
       through: {
         attributes: [],

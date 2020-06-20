@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <div class="btn-list"></div>
-
+    <el-button type="primary" size="mini" @click.native="editRole()">增加</el-button>
     <el-table
       ref="multipleTable"
       header-row-class-name="table-head"
@@ -24,6 +24,19 @@
       </el-table-column>
       <el-table-column align="left" label="更新时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.updated_at }}</template>
+      </el-table-column>
+      <el-table-column
+        fixed="right"
+        label="操作"
+        width="150"
+      >
+        <template slot-scope="scope">
+          <el-button
+            type="text"
+            @click="editRole(scope.row)"
+            size="small"
+          >编辑</el-button>
+        </template>
       </el-table-column>
     </el-table>
     <div class="page">
@@ -55,6 +68,14 @@ export default {
     };
   },
   methods: {
+    editRole(row) {
+      console.log('row:', row)
+      if (row) {
+        this.$router.push(`/system/editRole/${row.id}`);
+      } else {
+        this.$router.push(`/system/editRole`);
+      }
+    },
     pageChange() {
       this.getlist();
     },
