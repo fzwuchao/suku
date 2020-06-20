@@ -14,34 +14,40 @@
       <el-button
         type="warning"
         size="mini"
+        :disabled="isOneRow"
         @click="activate(false)"
       >停机</el-button>
       <el-button
         type="warning"
         size="mini"
+        :disabled="isOneRow"
         @click="activate(true)"
       >复机</el-button>
       <el-button
         type="warning"
         size="mini"
-        @click="flowServStatus(false)"
+        :disabled="isOneRow"
+        @click="flowServStatus('1')"
       >停数据</el-button>
       <el-button
         type="warning"
         size="mini"
-        @click="flowServStatus(true)"
+        :disabled="isOneRow"
+        @click="flowServStatus('0')"
       >恢复数据</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
-        @click="voiceServStatus(false)"
+        :disabled="isOneRow"
+        @click="voiceServStatus('1')"
       >停语音</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
-        @click="voiceServStatus(true)"
+        :disabled="isOneRow"
+        @click="voiceServStatus('0')"
       >恢复语音</el-button>
       <el-button
         type="primary"
@@ -333,6 +339,7 @@ export default {
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
       pageSize: 10,
+      isOneRow: false,
       importDialog: false,
       comboDialog: false,
       priceDialog: false,
@@ -708,6 +715,11 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
+      if(val.length > 1) {
+        this.isOneRow = true;
+      }else {
+        this.isOneRow = false;
+      }
     }
   },
   mounted() {

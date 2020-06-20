@@ -276,6 +276,24 @@ class SimService extends BaseService {
     }
     return res;
   }
+
+  /**
+   * 单卡状态修改
+   */
+  async updateCardStatus(simId, cardStatus) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    data.cardStatus = cardStatus;
+    const operType = cardStatus === '2' ? 11 : 9;
+    const res = await service.chinaMobile.changeSimStatus(simId, operType);// 6: 待激活转已激活
+    if (!res.error) {
+      await this.batchUpdateBySimIds(data, [ simId ]);
+    }
+    return res;
+  }
+
+
   async getActivedSim() {
     const result = await this.app.model.Sim.findAll({
       where: {
@@ -319,6 +337,23 @@ class SimService extends BaseService {
     return res;
   }
 
+  /**
+   * 单卡数据服务开停
+   */
+  async updateFlowServStatus(simId, flowServStatus) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    data.flowServStatus = flowServStatus;
+    const operType = flowServStatus === '1' ? 0 : 1;
+    const res = await service.chinaMobile.operateSimApnFunction(operType, simId); // 数据服务开停
+    if (!res.error) {
+      await this.batchUpdateBySimIds(data, [ simId ]);
+    }
+    return res;
+  }
+
+
   async updateVoiceServStatusBatch(oneLinkSimIds, voiceServStatus) {
     const ctx = this.ctx;
     const { service } = ctx;
@@ -349,6 +384,22 @@ class SimService extends BaseService {
     }
     if (!res.code) {
       await this.batchUpdateBySimIds(data, allSimIds);
+    }
+    return res;
+  }
+
+  /**
+   * 单卡语音功能开通
+   */
+  async updateVoiceServStatus(simId, voiceServStatus) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    data.voiceServStatus = voiceServStatus;
+    const operType = voiceServStatus === '1' ? 0 : 1;
+    const res = await service.chinaMobile.operateSimCallFunction(operType, simId);
+    if (!res.error) {
+      await this.batchUpdateBySimIds(data, [ simId ]);
     }
     return res;
   }
