@@ -67,7 +67,7 @@ class SimOrderService extends BaseService {
       case 1: 
       case 4:
       case 3:
-        newSim.shengyuMoney = calc(`${sim.shengyuMoney} + ${order.money}+ ${order.awardMoney}`);
+        newSim.shengyuMoney = calc(`${sim.shengyuMoney ? sim.shengyuMoney : 0} + ${order.money}+ ${order.awardMoney}`);
         if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
           newSim.shengyuMoney = calc(`${newSim.shengyuMoney} - ${sim.monthRent}`);
           order.months = order.months - 1; 

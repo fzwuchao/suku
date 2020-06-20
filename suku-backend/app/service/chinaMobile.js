@@ -53,6 +53,7 @@ const api = {
     card_bind_by_bill_batch: '/ec/operate/card-bind-by-bill/batch',
     sim_call_function: '/ec/operate/sim-call-function',
     sim_sms_function: '/ec/operate/sim-sms-function',
+    sim_apn_function: '/ec/operate/sim-apn-function',
   },
 };
 const OPREATE_TYPE = {
@@ -265,7 +266,8 @@ class ChinaMobileService extends BaseService {
     const simId = _.split(msisdns, '_')[0];
     const result = await this.handleBy(api.change.sim_status_batch, simId, data);
     const jobId = (result[0] || {}).jobId;
-    const batchResult = await this.querySimBatchResult(jobId, simId);
+    await this.querySimBatchResult(jobId, simId, { operType, reason }, api.change.sim_status_batch);
+
     return result;
   }
 
@@ -445,6 +447,10 @@ class ChinaMobileService extends BaseService {
     }
     const simId = _.split(msisdns, '_')[0];
     const result = await this.handleBy(api.operate.sim_communication_function_batch, simId, data);
+    const jobId = (result[0] || {}).jobId;
+    await this.querySimBatchResult(jobId, simId,
+      { msisdns, serviceType, operType, apnName },
+      api.operate.sim_communication_function_batch);
     return result;
   }
 
@@ -570,6 +576,25 @@ class ChinaMobileService extends BaseService {
   }
 
   /**
+   * CMIOT_API23M07-单卡数据功能开停
+   * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）办理集团归属物联卡的语音功能开/停
+   * @param {string} operType - 0:开 1:停
+   * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
+   * @return {array} [{msisdn | imsi | iccid}]
+   */
+  async operateSimApnFunction(operType, msisdn) {
+    const data = {
+      operType,
+      msisdn,
+      apnName: 'CMIOT',
+    };
+
+    const result = await this.handleBy(api.operate.sim_apn_function, msisdn, data);
+    console.log(JSON.stringify(result));
+    return result;
+  }
+
+  /**
    * CMIOT_API25U03-物联卡单月 GPRS 流量使用量批量查询
    * 批量（100 张）查询物联卡指定月份的 GPRS 流量使用量，仅支持查询最近 6个月中某月的使用量，其中本月数据截止为前一天。
    * @param {string} queryDate - 查询最近 6 个月中的某月，其中本月数据截止为前一天，日期格式为 yyyyMM
@@ -645,18 +670,28 @@ class ChinaMobileService extends BaseService {
    * 集团客户可以通过物联卡批量处理的任务流水号接口查询物联卡业务批量办理的结果。
    * @param {string} jobId - 物联卡批量处理的任务流水号
    * @param {string} msisdn - 物联卡
+   * @param {string} params - 物联卡
+   * @param {string} url - 物联卡批量处理的任务流水号
    * @return {object} {failure?, failCode?, failInfo?, failData?} - 有错误时才有错误字段
    */
-  async querySimBatchResult(jobId, msisdn) {
+  async querySimBatchResult(jobId, msisdn, params, url) {
     const result = await this.handleBy(api.query.sim_batch_result, msisdn, { jobId });
     const { jobStatus } = result[0];
     const batchResult = {};
+    const jobLog = { jobStatus, jobId };
+    if (params) {
+      jobLog.params = JSON.stringify(params);
+    }
+    if (url) {
+      jobLog.url = url;
+    }
     // 0：待处理，1：处理中，2: 处理完成，3：包含有处理失败记录的处理完成，4：处理失败
     // resultList: jobStatus 为 2、3、4 时返回处理结果，为0、1 时无
     if (jobStatus === '2') {
       // console.log();
     } else if (jobStatus === '3' || jobStatus === '4') {
       const { resultList } = result[0];
+      jobLog.resultList = JSON.stringify(resultList);
       // TODO: 是否只取resultList第一个元素，还是都要取出来？
       const { message, resultId } = resultList[0];
       batchResult.failure = true;
@@ -670,7 +705,9 @@ class ChinaMobileService extends BaseService {
       batchResult.failure = true;
       batchResult.failInfo = jobStatusMsg[jobStatus];
     }
-
+    if (jobStatus !== '2') {
+      await this.ctx.service.jobLog.create(jobLog);
+    }
     return batchResult;
   }
 }
