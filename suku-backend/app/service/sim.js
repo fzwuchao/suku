@@ -285,11 +285,11 @@ class SimService extends BaseService {
     const { service } = ctx;
     const data = {};
     data.cardStatus = cardStatus;
-    const operType = cardStatus === '2' ? 11 : 9;
+    const operType = cardStatus === '2' ? 1 : 0;
     const res = await service.chinaMobile.changeSimStatus(simId, operType);// 6: 待激活转已激活
-    if (!res.error) {
+    /* if (!res.error) {
       await this.batchUpdateBySimIds(data, [ simId ]);
-    }
+    } */
     return res;
   }
 
@@ -331,9 +331,9 @@ class SimService extends BaseService {
         continue;
       }
     }
-    if (!res.code) {
+    /* if (!res.code) {
       await this.batchUpdateBySimIds(data, allSimIds);
-    }
+    } */
     return res;
   }
 
@@ -343,13 +343,14 @@ class SimService extends BaseService {
   async updateFlowServStatus(simId, flowServStatus) {
     const ctx = this.ctx;
     const { service } = ctx;
+    /*
     const data = {};
-    data.flowServStatus = flowServStatus;
-    const operType = flowServStatus === '1' ? 0 : 1;
+    data.flowServStatus = flowServStatus === 1 ? 2 : 1; */
+    const operType = flowServStatus;
     const res = await service.chinaMobile.operateSimApnFunction(operType, simId); // 数据服务开停
-    if (!res.error) {
+    /* if (!res.error) {
       await this.batchUpdateBySimIds(data, [ simId ]);
-    }
+    } */
     return res;
   }
 
@@ -394,13 +395,11 @@ class SimService extends BaseService {
   async updateVoiceServStatus(simId, voiceServStatus) {
     const ctx = this.ctx;
     const { service } = ctx;
-    const data = {};
-    data.voiceServStatus = voiceServStatus;
-    const operType = voiceServStatus === '1' ? 0 : 1;
+    const operType = voiceServStatus;
     const res = await service.chinaMobile.operateSimCallFunction(operType, simId);
-    if (!res.error) {
+    /* if (!res.error) {
       await this.batchUpdateBySimIds(data, [ simId ]);
-    }
+    } */
     return res;
   }
 

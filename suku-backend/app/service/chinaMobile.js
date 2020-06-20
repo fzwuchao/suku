@@ -73,7 +73,7 @@ class ChinaMobileService extends BaseService {
     if (status === 0) {
       return null;
     }
-    const params = JSON.parse(JSON.stringify(data));
+    // const params = JSON.parse(JSON.stringify(data));
     data.token = await this.getToken(simId);
     data.transid = getTransid(appId);
     const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
@@ -81,7 +81,7 @@ class ChinaMobileService extends BaseService {
       dataType: 'json',
       ...options,
     });
-    return await this.getResult(res, url, params, id);
+    return await this.getResult(res, url, data, id);
   }
 
   async getResult(res, url, params, onelinkId) {

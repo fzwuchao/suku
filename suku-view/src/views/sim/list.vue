@@ -27,27 +27,27 @@
         type="warning"
         size="mini"
         :disabled="isOneRow"
-        @click="flowServStatus('1')"
+        @click="flowServStatus(true)"
       >停数据</el-button>
       <el-button
         type="warning"
         size="mini"
         :disabled="isOneRow"
-        @click="flowServStatus('0')"
+        @click="flowServStatus(false)"
       >恢复数据</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
         :disabled="isOneRow"
-        @click="voiceServStatus('1')"
+        @click="voiceServStatus(true)"
       >停语音</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
         :disabled="isOneRow"
-        @click="voiceServStatus('0')"
+        @click="voiceServStatus(false)"
       >恢复语音</el-button>
       <el-button
         type="primary"
@@ -513,7 +513,7 @@ export default {
       });
     },
     flowServStatus(status) {
-      const handlingFlowServStatus = status? '0' : '1';
+      const handlingFlowServStatus = status? '1' : '0';
       const statusError = {
         1: "请确保所有卡的数据服务都是开启的",
         0: "请确保所有卡的数据服务都是关闭的",
@@ -533,8 +533,8 @@ export default {
         });
         return;
       }
-      const flowServStatus = status? 1 : 2;
-      this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
+      const flowServStatus = status? 1 : 0;
+      this.confirm(`是否批量${!status ? "恢复" : "关闭"}选中的卡`, () => {
         this.batchUpdate({
           flowServStatus
         });
@@ -546,7 +546,7 @@ export default {
       });
     },
     voiceServStatus(status) {
-      const handlingVoiceServStatus = status? '0' : '1';
+      const handlingVoiceServStatus = status? '1' : '0';
       const statusError = {
         1: "请确保所有卡的语音服务都是开启的",
         0: "请确保所有卡的语音服务都是关闭的",
@@ -566,8 +566,8 @@ export default {
         });
         return;
       }
-      const voiceServStatus = status? 1 : 2;
-      this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
+      const voiceServStatus = status? 1 : 0;
+      this.confirm(`是否批量${!status ? "恢复" : "关闭"}选中的卡`, () => {
         this.batchUpdate({
           voiceServStatus
         });
@@ -597,7 +597,7 @@ export default {
       this.axios({
         method: "post",
         data: {
-          oneLinkSimIds: this.oneLinkSimIds,
+          // oneLinkSimIds: this.oneLinkSimIds,
           simIds: this.simIds,
           ...data
         },

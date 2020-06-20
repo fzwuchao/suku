@@ -303,15 +303,16 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simIds, simId, otherComboIds, cardStatus, voiceServStatus, privateMoney, oneLinkSimIds, flowServStatus, uid, uname } = request.body;
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, flowServStatus, uid, uname } = request.body;
     const data = {};
     let result = null;
     // TODO: 在调移动平台的接口前，检验这些卡号是同一个onelinkId
     // 套餐
     if (!_.isNil(otherComboIds)) data.otherComboIds = otherComboIds;
     // 停/复机
-    if (!_.isNil(cardStatus) && !_.isNil(simId)) {
-      result = await service.sim.updateCardStatus(simId, cardStatus);
+    if (!_.isNil(cardStatus) && !_.isNil(simIds)) {
+      data.cardStatus = cardStatus;
+      result = await service.sim.updateCardStatus(simIds[0], cardStatus);
       if (result.error) {
         this.fail(result.status, '', result.message);
         return;
@@ -320,8 +321,8 @@ class SimController extends BaseController {
 
     // 停/复数据
     if (!_.isNil(flowServStatus)) {
-      data.flowServStatus = flowServStatus;
-      result = await service.sim.updateFlowServStatus(simId, flowServStatus);
+      data.flowServStatus = flowServStatus === 1 ? 2 : 1;
+      result = await service.sim.updateFlowServStatus(simIds[0], flowServStatus);
       if (result.error) {
         this.fail(result.status, '', result.message);
         return;
@@ -330,8 +331,8 @@ class SimController extends BaseController {
 
     // 停/复语音
     if (!_.isNil(voiceServStatus)) {
-      data.voiceServStatus = voiceServStatus;
-      result = await service.sim.updateVoiceServStatus(simId, voiceServStatus);
+      data.voiceServStatus = voiceServStatus === 1 ? 2 : 1;
+      result = await service.sim.updateVoiceServStatus(simIds[0], voiceServStatus);
       if (result.error) {
         this.fail(result.status, '', result.message);
         return;
