@@ -303,7 +303,7 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, oneLinkSimIds, flowServStatus } = request.body;
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, oneLinkSimIds, flowServStatus, uid, uname } = request.body;
     const data = {};
     let result = null;
     // TODO: 在调移动平台的接口前，检验这些卡号是同一个onelinkId
@@ -339,6 +339,11 @@ class SimController extends BaseController {
     }
     // 续费增价
     if (!_.isNil(privateMoney)) data.privateMoney = privateMoney;
+
+    if (!_.isNil(uid)) {
+      data.uid = uid;
+      data.uname = uname;
+    }
 
     await service.sim.batchUpdateBySimIds(data, simIds);
     this.success(null, '批量更新成功');

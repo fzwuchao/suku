@@ -46,10 +46,12 @@
       <el-button
         type="primary"
         size="mini"
+        @click="changeUser"
       >转让</el-button>
       <el-button
         type="primary"
         size="mini"
+        @click="handlePrice"
       >用户增价</el-button>
       <el-button
         type="primary"
@@ -298,6 +300,20 @@
         @close="closeComboChange"
       ></combo-change>
     </el-dialog>
+
+    <el-dialog
+      title="用户增价"
+      :visible.sync="priceDialog"
+    >
+      <user-price @save="userAddPrice"></user-price>
+    </el-dialog>
+    <el-dialog
+      title="转让"
+      :visible.sync="userDialog"
+    >
+      <user-list @save="saveUser"></user-list>
+    </el-dialog>
+    
   </div>
 </template>
 
@@ -306,6 +322,8 @@ import API from "@/api";
 import searchBar from "@/components/SearchBar";
 import comImport from "./com-import";
 import comboChange from "./combo-change";
+import userPrice from "./user-price";
+import userList from "./user-list";
 import { getTableHeight } from "@/utils";
 export default {
   data() {
@@ -317,6 +335,8 @@ export default {
       pageSize: 10,
       importDialog: false,
       comboDialog: false,
+      priceDialog: false,
+      userDialog: false,
       tableHeight: null,
       list: [],
       data: null,
@@ -411,10 +431,28 @@ export default {
   components: {
     searchBar,
     comImport,
-    comboChange
+    comboChange,
+    userPrice,
+    userList
   },
 
   methods: {
+    changeUser() {
+      const isNonSelected = this.multipleSelection.length === 0;
+      if (isNonSelected) {
+        this.$message({
+          message: '请先勾选要转让的卡',
+          type: 'warning',
+        })
+        return;
+      }
+      this.userDialog = true;
+    },
+    saveUser(user) {
+      this.batchUpdate({
+        ...user
+      })
+    },
     activate(isActivated) {
       // 对应要复机/停机的卡的状态
       const handlingSimStatus = isActivated ? "4" : "2";
@@ -528,21 +566,48 @@ export default {
         });
       });
     },
+    userAddPrice(privateMoney) {
+      this.batchUpdate({
+        privateMoney
+      })
+    },
+    closeDialog() {
+      this.priceDialog = false;
+      this.userDialog = false;
+    },
+    handlePrice() {
+      const isNonSelected = this.multipleSelection.length === 0;
+      if (isNonSelected) {
+        this.$message({
+          message: '请先勾选要增价的卡',
+          type: 'warning',
+        })
+        return;
+      }
+      this.priceDialog = true;
+    },
     batchUpdate(data) {
       this.axios({
         method: "post",
         data: {
           oneLinkSimIds: this.oneLinkSimIds,
+          simIds: this.simIds,
           ...data
         },
         url: API.SIMLIST.SIM_BATCH_UPDATE
       }).then((r) => {
-        // this.$router.push(`/sim/list/${this.simType}`);
         if (!r.success) {
           this.$message({
             message: r.msg,
             type: 'warning',
           })
+        } else {
+          this.$message({
+            message: '批量更新成功',
+            type: 'success'
+          })
+          this.getlist();
+          this.closeDialog();
         }
       });
     },
