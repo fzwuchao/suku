@@ -234,6 +234,7 @@ export default {
     closePay() {
       this.isShowPay = false;
       this.payInfo = {};
+      this.getSim();
     }
   },
   mounted() {},

@@ -34,9 +34,10 @@ class MessageSendController extends BaseController {
     order.uid = sim.uid;
     const newOrdere = await ctx.service.simOrder.create(order);
     await ctx.service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
-    await ctx.service.chinaMobile.operateSimCommunicationFuctionBatch(simId, '11', '1', 'CMIOT'); // 开启数据服务
+    await ctx.service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
     await ctx.service.simOrder.changeSim(sim, order);
     await ctx.service.simOrder.update({ orderId: newOrdere.orderId, orderStatus: 2 });
+    await ctx.service.sim.syncUpdate(simId, sim.simType);
     this.success(true, '');
   }
 

@@ -5,7 +5,7 @@ const moment = require('moment');
 module.exports = app => {
   const { STRING, INTEGER, DATE, BIGINT } = app.Sequelize;
 
-  const ErrorLog = app.model.define('error_log', {
+  const JobLog = app.model.define('job_log', {
     id: {
       type: BIGINT(20),
       primaryKey: true,
@@ -14,11 +14,14 @@ module.exports = app => {
     params: {
       type: STRING(1500),
     },
-    status: {
-      type: STRING(10),
+    jobStatus: {
+      type: STRING(2),
+      field: 'job_status',
+      comment: '0：待处理 1：处理中 2：处理完成 3：包含有处理失败记录的处理完成 4：处理失败',
     },
-    message: {
-      type: STRING(100),
+    resultList: {
+      type: STRING(3500),
+      field: 'result_list',
     },
     url: STRING(100), // '邮箱',
     isExec: {
@@ -26,21 +29,9 @@ module.exports = app => {
       field: 'is_exec',
       comment: '是否被重新执行过：1，执行过；0：未执行过',
     },
-    source: {
-      type: INTEGER(1),
-      comment: '产生错误的平台，1:调移动端接口，2:本地平台',
-    },
-    type: {
-      type: INTEGER(1),
-      comment: '接口的请求类型：1:query,2:change,3:config,4:operate',
-    },
     jobId: {
-      type: STRING(10),
+      type: STRING(30),
       field: 'job_id',
-    },
-    onelinkId: {
-      type: BIGINT(20),
-      field: 'onelink_id',
     },
     createdAt: {
       type: DATE, // '创建时间',
@@ -63,5 +54,5 @@ module.exports = app => {
   });
 
 
-  return ErrorLog;
+  return JobLog;
 };
