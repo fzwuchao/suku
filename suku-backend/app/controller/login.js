@@ -27,7 +27,6 @@ class LoginController extends BaseController {
       });
 
       const token = await ctx.service.token.getToken(username);
-      // const permissions = await ctx.service.permission.getPermission(user.roleId);
 
       if (token === null) {
         this.fail(1002, null, 'token设置失败');

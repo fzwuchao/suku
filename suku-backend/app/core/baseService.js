@@ -4,6 +4,10 @@ const { Service } = require('egg');
 const { Op } = require('sequelize');
 const uniqid = require('uniqid');
 class BaseService extends Service {
+  async getTransaction() {
+    return await this.ctx.model.transaction();
+  }
+
   getCurUser() {
     const curUser = this.ctx.helper.loginUser.parse(this.ctx.cookies.get('loginUserInfo')) || {};
     return curUser;

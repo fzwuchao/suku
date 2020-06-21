@@ -2,7 +2,7 @@
 const moment = require('moment');
 // 权限表对象
 module.exports = app => {
-  const { STRING, DATE, BIGINT, TINYINT, VIRTUAL } = app.Sequelize;
+  const { STRING, DATE, BIGINT, TINYINT, VIRTUAL, INTEGER } = app.Sequelize;
 
   const Permission = app.model.define('permission', {
     id: {
@@ -51,7 +51,7 @@ module.exports = app => {
       comment: '',
     },
     menuOrder: {
-      type: TINYINT(4),
+      type: INTEGER,
       field: 'menu_order',
       defaultValue: 0,
       comment: '菜单序号',
@@ -69,6 +69,9 @@ module.exports = app => {
       type: STRING(30),
       field: 'menu_icon',
       comment: '',
+    },
+    isHalfChecked: {
+      type: VIRTUAL, // 判断是否是半选状态
     },
     subMenuList: {
       type: VIRTUAL, // 这种类型的字段，不存在于表中，只在model中

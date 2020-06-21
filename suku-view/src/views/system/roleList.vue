@@ -20,10 +20,10 @@
         <template slot-scope="scope">{{ scope.row.displayName}}</template>
       </el-table-column>
       <el-table-column align="left" label="创建时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.created_at }}</template>
+        <template slot-scope="scope">{{ scope.row.createdAt }}</template>
       </el-table-column>
       <el-table-column align="left" label="更新时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.updated_at }}</template>
+        <template slot-scope="scope">{{ scope.row.updatedAt }}</template>
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -69,9 +69,9 @@ export default {
   },
   methods: {
     editRole(row) {
-      console.log('row:', row)
       if (row) {
-        this.$router.push(`/system/editRole/${row.id}`);
+        const { id, name, displayName, level } = row;
+        this.$router.push({ path: `/system/editRole/${id}`, query: { name, displayName, level }});
       } else {
         this.$router.push(`/system/editRole`);
       }
