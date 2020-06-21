@@ -1,7 +1,8 @@
 <template>
   <div class="dashboard-container">
-    <div class="btn-list"></div>
-    <el-button type="primary" size="mini" @click.native="editRole()">增加</el-button>
+    <div class="btn-list">
+      <el-button type="primary" size="mini" @click.native="editRole()">增加</el-button>
+    </div>
     <el-table
       ref="multipleTable"
       header-row-class-name="table-head"
