@@ -13,28 +13,39 @@ const BaseService = require('../core/baseService');
 class ErrorLogService extends BaseService {
 
 
-  async getErrorLogPage(pageSize, pageNum) {
-    const attributes = [ 'id', 'params', 'status', 'message', 'url', 'source', 'type', 'jobId', 'createdAt' ];
-    // const Op = this.getOp();
+  async getErrorLogPage(pageSize, pageNum, status, name) {
+    const attributes = [ 'id', 'params', 'name', 'status', 'message', 'url', 'source', 'type', 'result', 'isExec', 'createdAt' ];
+    const Op = this.getOp();
+    const where = { isExec: 0 };
+    if (name) {
+      where.name = { [Op.substring]: name };
+    }
+    if (status) {
+      where.status = status;
+    }
     const result = await this.findAndCountAll('ErrorLog', pageSize, pageNum, {
       attributes,
-      // where: { id: { [Op.in]: ids } },
+      where,
+      include: {
+        model: this.app.model.OnelinkPlatform,
+      },
     });
     return result;
-  }
-
-  async create(errorLog) {
-    try {
-      await this.app.model.ErrorLog.create(errorLog);
-    } catch (e) {
-      return false;
-    }
-    return true;
   }
 
   async update(errorLog) {
     try {
       await this.app.model.ErrorLog.update(errorLog, { where: { id: errorLog.id } });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+  async bulkUpdate(ids, value, oper) {
+    try {
+      const values = {};
+      values[oper] = value;
+      await this.app.model.ErrorLog.update(values, { where: { id: { [this.getOp().in]: ids } } });
     } catch (e) {
       return false;
     }

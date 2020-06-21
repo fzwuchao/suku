@@ -303,37 +303,38 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, oneLinkSimIds, flowServStatus, uid, uname } = request.body;
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, flowServStatus, uid, uname } = request.body;
     const data = {};
     let result = null;
     // TODO: 在调移动平台的接口前，检验这些卡号是同一个onelinkId
     // 套餐
     if (!_.isNil(otherComboIds)) data.otherComboIds = otherComboIds;
     // 停/复机
-    if (!_.isNil(cardStatus) && !_.isNil(oneLinkSimIds)) {
-      result = await service.sim.updateCardStatusBatch(oneLinkSimIds, cardStatus);
-      if (result.code) {
-        this.fail(result.code, '', result);
+    if (!_.isNil(cardStatus) && !_.isNil(simIds)) {
+      data.cardStatus = cardStatus;
+      result = await service.sim.updateCardStatus(simIds[0], cardStatus);
+      if (result.error) {
+        this.fail(result.status, '', result.message);
         return;
       }
     }
 
     // 停/复数据
     if (!_.isNil(flowServStatus)) {
-      data.flowServStatus = flowServStatus;
-      result = await service.sim.updateFlowServStatusBatch(oneLinkSimIds, flowServStatus);
-      if (result.code) {
-        this.fail(result.code, '', result);
+      data.flowServStatus = flowServStatus === 1 ? 2 : 1;
+      result = await service.sim.updateFlowServStatus(simIds[0], flowServStatus);
+      if (result.error) {
+        this.fail(result.status, '', result.message);
         return;
       }
     }
 
     // 停/复语音
     if (!_.isNil(voiceServStatus)) {
-      data.voiceServStatus = voiceServStatus;
-      result = await service.sim.updateVoiceServStatusBatch(oneLinkSimIds, voiceServStatus);
-      if (result.code) {
-        this.fail(result.code, '', result);
+      data.voiceServStatus = voiceServStatus === 1 ? 2 : 1;
+      result = await service.sim.updateVoiceServStatus(simIds[0], voiceServStatus);
+      if (result.error) {
+        this.fail(result.status, '', result.message);
         return;
       }
     }

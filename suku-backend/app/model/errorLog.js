@@ -14,6 +14,9 @@ module.exports = app => {
     params: {
       type: STRING(1500),
     },
+    name: {
+      type: STRING(80),
+    },
     status: {
       type: STRING(10),
     },
@@ -34,9 +37,9 @@ module.exports = app => {
       type: INTEGER(1),
       comment: '接口的请求类型：1:query,2:change,3:config,4:operate',
     },
-    jobId: {
-      type: STRING(10),
-      field: 'job_id',
+    result: {
+      type: STRING(200),
+      field: 'result',
     },
     onelinkId: {
       type: BIGINT(20),
@@ -62,6 +65,11 @@ module.exports = app => {
     updatedAt: 'updated_at',
   });
 
+  ErrorLog.associate = function() {
+    // 与Classes存在多对一关系，所以使用belongsTo()
+    app.model.ErrorLog.belongsTo(app.model.OnelinkPlatform, { foreignKey: 'onelinkId', targetKey: 'id' });
+
+  };
 
   return ErrorLog;
 };

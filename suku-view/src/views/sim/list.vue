@@ -14,34 +14,40 @@
       <el-button
         type="warning"
         size="mini"
+        :disabled="isOneRow"
         @click="activate(false)"
       >停机</el-button>
       <el-button
         type="warning"
         size="mini"
+        :disabled="isOneRow"
         @click="activate(true)"
       >复机</el-button>
       <el-button
         type="warning"
         size="mini"
-        @click="flowServStatus(false)"
+        :disabled="isOneRow"
+        @click="flowServStatus(true)"
       >停数据</el-button>
       <el-button
         type="warning"
         size="mini"
-        @click="flowServStatus(true)"
+        :disabled="isOneRow"
+        @click="flowServStatus(false)"
       >恢复数据</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
-        @click="voiceServStatus(false)"
+        :disabled="isOneRow"
+        @click="voiceServStatus(true)"
       >停语音</el-button>
       <el-button
         type="warning"
         v-if="simType === 'B'"
         size="mini"
-        @click="voiceServStatus(true)"
+        :disabled="isOneRow"
+        @click="voiceServStatus(false)"
       >恢复语音</el-button>
       <el-button
         type="primary"
@@ -333,6 +339,7 @@ export default {
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
       pageSize: 10,
+      isOneRow: false,
       importDialog: false,
       comboDialog: false,
       priceDialog: false,
@@ -506,7 +513,7 @@ export default {
       });
     },
     flowServStatus(status) {
-      const handlingFlowServStatus = status? '0' : '1';
+      const handlingFlowServStatus = status? '1' : '0';
       const statusError = {
         1: "请确保所有卡的数据服务都是开启的",
         0: "请确保所有卡的数据服务都是关闭的",
@@ -526,8 +533,8 @@ export default {
         });
         return;
       }
-      const flowServStatus = status? 1 : 2;
-      this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
+      const flowServStatus = status? 1 : 0;
+      this.confirm(`是否批量${!status ? "恢复" : "关闭"}选中的卡`, () => {
         this.batchUpdate({
           flowServStatus
         });
@@ -539,7 +546,7 @@ export default {
       });
     },
     voiceServStatus(status) {
-      const handlingVoiceServStatus = status? '0' : '1';
+      const handlingVoiceServStatus = status? '1' : '0';
       const statusError = {
         1: "请确保所有卡的语音服务都是开启的",
         0: "请确保所有卡的语音服务都是关闭的",
@@ -559,8 +566,8 @@ export default {
         });
         return;
       }
-      const voiceServStatus = status? 1 : 2;
-      this.confirm(`是否批量${status ? "恢复" : "关闭"}选中的卡`, () => {
+      const voiceServStatus = status? 1 : 0;
+      this.confirm(`是否批量${!status ? "恢复" : "关闭"}选中的卡`, () => {
         this.batchUpdate({
           voiceServStatus
         });
@@ -590,7 +597,7 @@ export default {
       this.axios({
         method: "post",
         data: {
-          oneLinkSimIds: this.oneLinkSimIds,
+          // oneLinkSimIds: this.oneLinkSimIds,
           simIds: this.simIds,
           ...data
         },
@@ -708,6 +715,11 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
+      if(val.length > 1) {
+        this.isOneRow = true;
+      }else {
+        this.isOneRow = false;
+      }
     }
   },
   mounted() {

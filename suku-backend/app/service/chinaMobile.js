@@ -4,7 +4,7 @@ const moment = require('moment');
 const _ = require('lodash');
 
 const BaseService = require('../core/baseService');
-
+const { getApi } = require('../extend/api')();
 // 8位序号, 如：00000001
 let index = 0;
 const getIndexStr = () => {
@@ -23,81 +23,57 @@ const getTransid = appid => {
   return `${appid}${getNowStr()}${getIndexStr()}`;
 };
 
-const api = {
-  get_token: '/ec/get/token',
-  query: {
-    sim_base_info: '/ec/query/sim-basic-info',
-    sim_status: '/ec/query/sim-status',
-    sim_data_usage: '/ec/query/sim-data-usage',
-    sim_imei: '/ec/query/sim-imei',
-    sim_session: '/ec/query/sim-session',
-    on_off_status: '/ec/query/on-off-status',
-    member_voice_whitelist: '/ec/query/member-voice-whitelist',
-    group_by_member: '/ec/query/group-by-member',
-    sim_communication_function_status: '/ec/query/sim-communication-function-status',
-    sim_data_margin: '/ec/query/sim-data-margin',
-    sim_voice_margin: '/ec/query/sim-voice-margin',
-    sim_voice_usage: '/ec/query/sim-voice-usage',
-    sim_data_usage_monthly_batch: '/ec/query/sim-data-usage-monthly/batch',
-    sim_batch_result: '/ec/query/sim-batch-result',
-  },
-  change: {
-    sim_status: '/ec/change/sim-status',
-    sim_status_batch: '/ec/change/sim-status/batch',
-  },
-  config: {
-    member_voice_whitelist: '/ec/config/member-voice-whitelist',
-  },
-  operate: {
-    sim_communication_function_batch: '/ec/operate/sim-communication-function/batch',
-    card_bind_by_bill_batch: '/ec/operate/card-bind-by-bill/batch',
-    sim_call_function: '/ec/operate/sim-call-function',
-    sim_sms_function: '/ec/operate/sim-sms-function',
-    sim_apn_function: '/ec/operate/sim-apn-function',
-  },
-};
-const OPREATE_TYPE = {
+/* const OPREATE_TYPE = {
   query: 1,
   change: 2,
   config: 3,
   operate: 4,
-};
+}; */
 class ChinaMobileService extends BaseService {
   async getOnelink(simId) {
     const { onelinkId } = await this.ctx.service.sim.getSimBySimId(simId);
     const oneLink = await this.ctx.service.onelinkPlatform.getOnelinkById(onelinkId);
     return oneLink;
   }
-  async fetchData(url, data, simId, options) {
+  async fetchData(apiKey, data, simId, options) {
     const { appId, apiHost, apiVersion, status, id } = await this.getOnelink(simId);
     if (status === 0) {
       return null;
     }
-    const params = JSON.parse(JSON.stringify(data));
+    // const params = JSON.parse(JSON.stringify(data));
     data.token = await this.getToken(simId);
     data.transid = getTransid(appId);
-    const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
+    const api = getApi(apiKey);
+    const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.url}`, {
       data,
       dataType: 'json',
       ...options,
     });
-    return await this.getResult(res, url, params, id);
+    return await this.getResult(res, api, data, id);
   }
 
-  async getResult(res, url, params, onelinkId) {
+  async getResult(res, api, params, onelinkId) {
     if (res.status === 200) {
       const resData = res.data;
       if (resData.status === '0') {
+        const jobId = (resData.result[0] || {}).jobId;
+        if (jobId) {
+          await this.querySimBatchResult(jobId, params.msisdn,
+            params,
+            api, onelinkId);
+        }
         return resData.result;
       }
       resData.error = true;
       const errorLog = {};
-      errorLog.type = OPREATE_TYPE[_.split(url, '/')[2]];
+      errorLog.type = api.type;
       errorLog.onelinkId = onelinkId;
-      errorLog.url = url;
+      errorLog.url = api.url;
+      errorLog.name = api.name;
       errorLog.status = resData.status;
       errorLog.message = resData.message;
       errorLog.source = 1;
+      errorLog.result = JSON.stringify(res);
       errorLog.params = JSON.stringify(params);
       await this.ctx.service.errorLog.create(errorLog);
       if (resData.status === '12021') {
@@ -166,9 +142,10 @@ class ChinaMobileService extends BaseService {
     const results = await this.ctx.service.onelinkPlatform.getAllOnelinkDesc();
     /* results = JSON.stringify(results);
     console.log(results) */
+    const url = getApi(1);
     for (let i = 0; i < results.length; i++) {
       const { nameKey, apiHost, appId, apiVersion, secretKey } = results[i];
-      const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.get_token}`, {
+      const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
         data: {
           appid: appId,
           password: secretKey,
@@ -210,7 +187,7 @@ class ChinaMobileService extends BaseService {
    * @return {datetime} activeDate - 激活日期（首次）
    */
   async querySimBasicInfo(msisdn) {
-    const result = await this.handleBy(api.query.sim_base_info, msisdn, { msisdn });
+    const result = await this.handleBy(2, msisdn, { msisdn });
     const { activeDate } = result[0] || {};
     let activeDt = null;
     if (activeDate !== ' ' && !_.isNil(activeDate)) {
@@ -230,7 +207,7 @@ class ChinaMobileService extends BaseService {
       operType,
       msisdn: simId,
     };
-    const result = await this.handleBy(api.change.sim_status, simId, data);
+    const result = await this.handleBy(16, simId, data);
     return result;
   }
 
@@ -264,9 +241,9 @@ class ChinaMobileService extends BaseService {
     data.msisdns = msisdns;
 
     const simId = _.split(msisdns, '_')[0];
-    const result = await this.handleBy(api.change.sim_status_batch, simId, data);
-    const jobId = (result[0] || {}).jobId;
-    await this.querySimBatchResult(jobId, simId, { operType, reason }, api.change.sim_status_batch);
+    const result = await this.handleBy(17, simId, data);
+    // const jobId = (result[0] || {}).jobId;
+    // await this.querySimBatchResult(jobId, simId, { operType, reason }, api.change.sim_status_batch);
 
     return result;
   }
@@ -278,7 +255,7 @@ class ChinaMobileService extends BaseService {
    * @return {string} cardStatus - 物联卡状态
    */
   async querySimStatus(msisdn) {
-    const result = await this.handleBy(api.query.sim_status, msisdn, { msisdn });
+    const result = await this.handleBy(3, msisdn, { msisdn });
     const { cardStatus } = result[0] || {};
     return cardStatus;
   }
@@ -290,7 +267,7 @@ class ChinaMobileService extends BaseService {
    * @return {number} usedFlow - 已用流量(M)
    */
   async querySimDataUsage(msisdn) {
-    const result = await this.handleBy(api.query.sim_data_usage, msisdn, { msisdn });
+    const result = await this.handleBy(4, msisdn, { msisdn });
     const { dataAmount } = result[0] || {};
     // 单位：M
     let usedFlow = 0;
@@ -308,7 +285,7 @@ class ChinaMobileService extends BaseService {
    * @return {array} [{imei}] - IMEI 号码
    */
   async querySimImei(msisdn) {
-    const result = await this.handleBy(api.query.sim_imei, msisdn, { msisdn });
+    const result = await this.handleBy(5, msisdn, { msisdn });
     return result;
   }
 
@@ -321,7 +298,7 @@ class ChinaMobileService extends BaseService {
    * }]
    */
   async querySimSession(msisdn) {
-    const result = await this.handleBy(api.query.sim_session, msisdn, { msisdn });
+    const result = await this.handleBy(6, msisdn, { msisdn });
     return result;
   }
 
@@ -332,7 +309,7 @@ class ChinaMobileService extends BaseService {
    * @return {string} status - 终端的开关机状态, 0:关机 1:开机
    */
   async queryOnOffStatus(msisdn) {
-    const result = await this.handleBy(api.query.on_off_status, msisdn, { msisdn });
+    const result = await this.handleBy(7, msisdn, { msisdn });
     const { status } = result[0] || {};
     return status;
   }
@@ -350,7 +327,7 @@ class ChinaMobileService extends BaseService {
    * }]
    */
   async queryMemberVoiceWhitelist(groupId, msisdn) {
-    const result = await this.handleBy(api.query.member_voice_whitelist, msisdn, { msisdn, groupId });
+    const result = await this.handleBy(8, msisdn, { msisdn, groupId });
     return result;
   }
 
@@ -375,7 +352,7 @@ class ChinaMobileService extends BaseService {
       return groupId;
     }
 
-    const result = await this.handleBy(api.query.group_by_member, msisdn, { msisdn });
+    const result = await this.handleBy(9, msisdn, { msisdn });
     if (result.length > 0) {
       groupId = result[0].groupList[0].groupId;
     }
@@ -414,7 +391,7 @@ class ChinaMobileService extends BaseService {
       whiteNumber,
     };
 
-    const result = await this.handleBy(api.config.member_voice_whitelist, msisdn, data);
+    const result = await this.handleBy(18, msisdn, data);
     return result;
   }
 
@@ -446,11 +423,11 @@ class ChinaMobileService extends BaseService {
       return [];
     }
     const simId = _.split(msisdns, '_')[0];
-    const result = await this.handleBy(api.operate.sim_communication_function_batch, simId, data);
-    const jobId = (result[0] || {}).jobId;
-    await this.querySimBatchResult(jobId, simId,
-      { msisdns, serviceType, operType, apnName },
-      api.operate.sim_communication_function_batch);
+    const result = await this.handleBy(19, simId, data);
+    // const jobId = (result[0] || {}).jobId;
+    // await this.querySimBatchResult(jobId, simId,
+    //   { msisdns, serviceType, operType, apnName },
+    //   api.operate.sim_communication_function_batch);
     return result;
   }
 
@@ -461,7 +438,7 @@ class ChinaMobileService extends BaseService {
    * @return {object} {voiceServStatus, msgServStatus, flowServStatus}
    */
   async querySimCommunicationFunctionStatus(msisdn) {
-    const result = await this.handleBy(api.query.sim_communication_function_status, msisdn, { msisdn });
+    const result = await this.handleBy(10, msisdn, { msisdn });
     const { serviceTypeList = [] } = result[0] || {};
     const servStatus = {};
     const serviceType = {
@@ -484,7 +461,7 @@ class ChinaMobileService extends BaseService {
    * }]
    */
   async querySimDataMargin(msisdn) {
-    const result = await this.handleBy(api.query.sim_data_margin, msisdn, { msisdn });
+    const result = await this.handleBy(11, msisdn, { msisdn });
     return result;
   }
 
@@ -524,7 +501,7 @@ class ChinaMobileService extends BaseService {
     }
 
     const simId = _.split(msisdns, '_')[0];
-    const result = await this.handleBy(api.operate.card_bind_by_bill_batch, simId, data);
+    const result = await this.handleBy(20, simId, data);
     return result;
   }
 
@@ -537,7 +514,7 @@ class ChinaMobileService extends BaseService {
    * }]
    */
   async querySimVoiceMargin(msisdn) {
-    const result = await this.handleBy(api.query.sim_voice_margin, msisdn, { msisdn });
+    const result = await this.handleBy(12, msisdn, { msisdn });
     return result;
   }
 
@@ -548,7 +525,7 @@ class ChinaMobileService extends BaseService {
    * @return {number} voiceAmount - 语音累积量值，单位：分钟
    */
   async querySimVoiceUsage(msisdn) {
-    const result = await this.handleBy(api.query.sim_voice_usage, msisdn, { msisdn });
+    const result = await this.handleBy(13, msisdn, { msisdn });
     const va = (result[0] || {}).voiceAmount;
     let voiceAmount = 0;
     // 返回" "时,表示卡未产生用量或者未订购套餐
@@ -571,7 +548,7 @@ class ChinaMobileService extends BaseService {
       msisdn,
     };
 
-    const result = await this.handleBy(api.operate.sim_call_function, msisdn, data);
+    const result = await this.handleBy(21, msisdn, data);
     return result;
   }
 
@@ -589,8 +566,7 @@ class ChinaMobileService extends BaseService {
       apnName: 'CMIOT',
     };
 
-    const result = await this.handleBy(api.operate.sim_apn_function, msisdn, data);
-    console.log(JSON.stringify(result));
+    const result = await this.handleBy(23, msisdn, data);
     return result;
   }
 
@@ -621,7 +597,7 @@ class ChinaMobileService extends BaseService {
     };
 
     const simId = _.split(msisdns, '_')[0];
-    const result = await this.handleBy(api.query.sim_data_usage_monthly_batch, simId, data);
+    const result = await this.handleBy(14, simId, data);
     return result;
   }
 
@@ -635,7 +611,7 @@ class ChinaMobileService extends BaseService {
       msisdn,
       operType,
     };
-    const result = await this.handleBy(api.operate.sim_sms_function, msisdn, data);
+    const result = await this.handleBy(22, msisdn, data);
     return result;
   }
 
@@ -649,7 +625,7 @@ class ChinaMobileService extends BaseService {
    * @param {*} limitValue - 限额值：单位 MB
    * @param {*} actionRule - 限额规则：达到限额值，将执行的业务规则 1:停数据通信服务 2:使用流量池外资费
    */
-  async limitGroupMemberDataUsage(msisdn, groupId, offerId, apnName, operType, limitValue, actionRule) {
+  /* async limitGroupMemberDataUsage(msisdn, groupId, offerId, apnName, operType, limitValue, actionRule) {
     const data = {
       msisdn,
       groupId,
@@ -663,7 +639,7 @@ class ChinaMobileService extends BaseService {
 
     const result = await this.handleBy(api.operate.sim_sms_function, msisdn, data);
     return result;
-  }
+  } */
 
   /**
    * CMIOT_API23M10-物联卡业务批量办理结果查询
@@ -674,16 +650,22 @@ class ChinaMobileService extends BaseService {
    * @param {string} url - 物联卡批量处理的任务流水号
    * @return {object} {failure?, failCode?, failInfo?, failData?} - 有错误时才有错误字段
    */
-  async querySimBatchResult(jobId, msisdn, params, url) {
-    const result = await this.handleBy(api.query.sim_batch_result, msisdn, { jobId });
+  async querySimBatchResult(jobId, msisdn, params, api, onelinkId) {
+    const result = await this.handleBy(15, msisdn, { jobId });
     const { jobStatus } = result[0];
     const batchResult = {};
     const jobLog = { jobStatus, jobId };
+    jobLog.result = JSON.stringify(result);
     if (params) {
       jobLog.params = JSON.stringify(params);
     }
-    if (url) {
-      jobLog.url = url;
+    if (api) {
+      jobLog.url = api.url;
+      jobLog.name = api.name;
+    }
+
+    if (onelinkId) {
+      jobLog.onelinkId = onelinkId;
     }
     // 0：待处理，1：处理中，2: 处理完成，3：包含有处理失败记录的处理完成，4：处理失败
     // resultList: jobStatus 为 2、3、4 时返回处理结果，为0、1 时无
@@ -691,7 +673,6 @@ class ChinaMobileService extends BaseService {
       // console.log();
     } else if (jobStatus === '3' || jobStatus === '4') {
       const { resultList } = result[0];
-      jobLog.resultList = JSON.stringify(resultList);
       // TODO: 是否只取resultList第一个元素，还是都要取出来？
       const { message, resultId } = resultList[0];
       batchResult.failure = true;
@@ -705,9 +686,9 @@ class ChinaMobileService extends BaseService {
       batchResult.failure = true;
       batchResult.failInfo = jobStatusMsg[jobStatus];
     }
-    if (jobStatus !== '2') {
-      await this.ctx.service.jobLog.create(jobLog);
-    }
+    // if (jobStatus !== '2') {
+    await this.ctx.service.jobLog.create(jobLog);
+    // }
     return batchResult;
   }
 }

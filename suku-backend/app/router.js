@@ -137,4 +137,15 @@ module.exports = app => {
   // 根据simId查询
   router.get('/writeList/getWriteListBySimId', controller.writeList.getWriteListBySimId);
 
+
+  // 获取onelink错误日志
+  router.get('/errorLog/getErrorLogs', controller.errorLog.getErrorLogs);
+  // 处理onelink错误日志
+  router.post('/errorLog/deal', controller.errorLog.deal);
+
+  // 获取onelink Job
+  router.get('/jobLog/getJobLogs', controller.jobLog.getJobLogs);
+  // 处理onelink Job
+  router.post('/jobLog/deal', controller.jobLog.deal);
+
 };
