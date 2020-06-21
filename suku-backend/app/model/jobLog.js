@@ -14,14 +14,21 @@ module.exports = app => {
     params: {
       type: STRING(1500),
     },
+    name: {
+      type: STRING(80),
+    },
     jobStatus: {
       type: STRING(2),
       field: 'job_status',
       comment: '0：待处理 1：处理中 2：处理完成 3：包含有处理失败记录的处理完成 4：处理失败',
     },
-    resultList: {
+    result: {
       type: STRING(3500),
-      field: 'result_list',
+      field: 'result',
+    },
+    onelinkId: {
+      type: BIGINT(20),
+      field: 'onelink_id',
     },
     url: STRING(100), // '邮箱',
     isExec: {
@@ -53,6 +60,11 @@ module.exports = app => {
     updatedAt: 'updated_at',
   });
 
+  JobLog.associate = function() {
+    // 与Classes存在多对一关系，所以使用belongsTo()
+    app.model.JobLog.belongsTo(app.model.OnelinkPlatform, { foreignKey: 'onelinkId', targetKey: 'id' });
+
+  };
 
   return JobLog;
 };

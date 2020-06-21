@@ -8,6 +8,7 @@ import ONELINK from './onelink'
 import SIMLOGISTICS from './simLogistics'
 import MESSAGE from './message'
 import ORDER from './order'
+import LOGS from './logs'
 export default {
     SIMCOMBO,
     SIMLIST,
@@ -18,5 +19,6 @@ export default {
     ONELINK,
     SIMLOGISTICS,
     MESSAGE,
-    ORDER
+    ORDER,
+    LOGS
 }
