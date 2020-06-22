@@ -23,11 +23,12 @@ class PermissionService extends BaseService {
         id: roleId,
       },
       order: [[Permission, 'menuOrder', 'ASC']],
-      include: Permission,
-      through: {
-        attributes: [],
+      include: {
+        model: Permission,
+        through: {
+          attributes: [],
+        },
       },
-      // joinTableAttributes: [],
     });
 
     const map = {};
