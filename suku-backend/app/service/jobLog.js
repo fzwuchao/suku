@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 'use strict';
 
 // const path = require('path');
@@ -14,7 +15,7 @@ class JobLogService extends BaseService {
 
 
   async getJobLogPage(pageSize, pageNum, status, name) {
-    const attributes = [ 'id', 'params', 'name', 'jobStatus', 'url', 'jobId', 'result', 'isExec', 'createdAt' ];
+    const attributes = [ 'id', 'params', 'name', 'jobStatus', 'url', 'jobId', 'errorSim', 'result', 'isExec', 'createdAt' ];
     const Op = this.getOp();
     const where = { isExec: 0 };
     if (name) {
@@ -31,6 +32,34 @@ class JobLogService extends BaseService {
       },
     });
     return result;
+  }
+
+  async dealUnfinishedJobs() {
+    const Op = this.getOp();
+    const { ctx } = this;
+    const { service } = ctx;
+    const result = await this.app.model.JobLog.findAll({
+      where: {
+        jobStatus: {
+          [Op.or]: [ '0', '1' ],
+        },
+        isExec: 0,
+      },
+    });
+    for (let i = 0; i < result.length; i++) {
+      const { params, name, onelinkId, jobId, url, id } = result[i];
+      const api = {
+        name,
+        url,
+      };
+      const params1 = JSON.parse(params);
+      const res = await service.chinaMobile.querySimBatchResult(jobId, params1.msisdns, params1, api, onelinkId);
+      if (res.sucessIds) {
+        // await service.sim.batchUpdateBySimIds({ cardStatus: '4' }, res.sucessIds);
+      }
+      this.update({ isExec: 1, id });
+    }
+    return true;
   }
 
   async create(jobLog) {

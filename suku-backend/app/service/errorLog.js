@@ -51,6 +51,14 @@ class ErrorLogService extends BaseService {
     }
     return true;
   }
+  async create(errorLog) {
+    try {
+      await this.app.model.ErrorLog.create(errorLog);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
 
 
 }

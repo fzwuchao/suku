@@ -36,7 +36,7 @@ class ErrorLogController extends BaseController {
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.body);
     const { ids, isExec } = request.body;
-    const result = await ctx.service.user.bulkUpdate(ids, isExec, 'isExec');
+    const result = await ctx.service.errorLog.bulkUpdate(ids, isExec, 'isExec');
     this.success(result, '');
   }
 }

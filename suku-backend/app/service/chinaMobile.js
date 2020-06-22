@@ -58,9 +58,10 @@ class ChinaMobileService extends BaseService {
       if (resData.status === '0') {
         const jobId = (resData.result[0] || {}).jobId;
         if (jobId) {
-          await this.querySimBatchResult(jobId, params.msisdn,
+          const result = await this.querySimBatchResult(jobId, params.msisdns,
             params,
             api, onelinkId);
+          return result;
         }
         return resData.result;
       }
@@ -142,7 +143,8 @@ class ChinaMobileService extends BaseService {
     const results = await this.ctx.service.onelinkPlatform.getAllOnelinkDesc();
     /* results = JSON.stringify(results);
     console.log(results) */
-    const url = getApi(1);
+    const url = getApi(1).url;
+
     for (let i = 0; i < results.length; i++) {
       const { nameKey, apiHost, appId, apiVersion, secretKey } = results[i];
       const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
@@ -242,9 +244,6 @@ class ChinaMobileService extends BaseService {
 
     const simId = _.split(msisdns, '_')[0];
     const result = await this.handleBy(17, simId, data);
-    // const jobId = (result[0] || {}).jobId;
-    // await this.querySimBatchResult(jobId, simId, { operType, reason }, api.change.sim_status_batch);
-
     return result;
   }
 
@@ -647,13 +646,16 @@ class ChinaMobileService extends BaseService {
    * @param {string} jobId - 物联卡批量处理的任务流水号
    * @param {string} msisdn - 物联卡
    * @param {string} params - 物联卡
-   * @param {string} url - 物联卡批量处理的任务流水号
+   * @param {string} api - 物联卡批量处理的任务流水号
+   * @param {string} onelinkId - 物联卡批量处理的任务流水号
    * @return {object} {failure?, failCode?, failInfo?, failData?} - 有错误时才有错误字段
    */
   async querySimBatchResult(jobId, msisdn, params, api, onelinkId) {
     const result = await this.handleBy(15, msisdn, { jobId });
+    if (result.length === 0) {
+      return;
+    }
     const { jobStatus } = result[0];
-    const batchResult = {};
     const jobLog = { jobStatus, jobId };
     jobLog.result = JSON.stringify(result);
     if (params) {
@@ -669,27 +671,42 @@ class ChinaMobileService extends BaseService {
     }
     // 0：待处理，1：处理中，2: 处理完成，3：包含有处理失败记录的处理完成，4：处理失败
     // resultList: jobStatus 为 2、3、4 时返回处理结果，为0、1 时无
-    if (jobStatus === '2') {
-      // console.log();
-    } else if (jobStatus === '3' || jobStatus === '4') {
-      const { resultList } = result[0];
-      // TODO: 是否只取resultList第一个元素，还是都要取出来？
-      const { message, resultId } = resultList[0];
-      batchResult.failure = true;
-      batchResult.failInfo = message;
-      batchResult.failData = resultId;
-    } else if (jobStatus === '0' || jobStatus === '1') {
-      const jobStatusMsg = {
-        0: '待处理',
-        1: '处理中',
-      };
-      batchResult.failure = true;
-      batchResult.failInfo = jobStatusMsg[jobStatus];
-    }
-    // if (jobStatus !== '2') {
-    await this.ctx.service.jobLog.create(jobLog);
+    // if (jobStatus === '2') {
+    //   batchResult.status = 'true';
+    // } else if (jobStatus === '3' || jobStatus === '4') {
+    //   const { resultList } = result[0];
+    //   // TODO: 是否只取resultList第一个元素，还是都要取出来？
+    //   const { message, resultId } = resultList[0];
+    //   batchResult.failure = true;
+    //   batchResult.failInfo = message;
+    //   batchResult.failData = resultId;
+    // } else if (jobStatus === '0' || jobStatus === '1') {
+    //   const jobStatusMsg = {
+    //     0: '待处理',
+    //     1: '处理中',
+    //   };
+    //   batchResult.failure = true;
+    //   batchResult.failInfo = jobStatusMsg[jobStatus];
     // }
-    return batchResult;
+    if (jobStatus === '3' || jobStatus === '2' || jobStatus === '4') {
+      const { resultList } = result[0];
+      const errorIds = [];
+      const sucessIds = [];
+      for (let i = 0; i < resultList.length; i++) {
+        if (resultList[i].status === '0') {
+          sucessIds.push(resultList[i].resultId);
+        } else {
+          errorIds.push(resultList[i].resultId);
+        }
+      }
+      result.sucessIds = sucessIds;
+      result.errorIds = errorIds;
+      jobLog.errorSim = JSON.stringify(errorIds);
+    }
+    if (jobStatus !== '2') {
+      await this.ctx.service.jobLog.create(jobLog);
+    }
+    return result;
   }
 }
 module.exports = ChinaMobileService;

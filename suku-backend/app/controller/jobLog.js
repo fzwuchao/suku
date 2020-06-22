@@ -18,7 +18,7 @@ class JobLogController extends BaseController {
     };
     ctx.validate(rule, request.query);
     const { pageNum, pageSize, name, status } = request.query;
-    const result = await ctx.service.errorLog.getJobLogPage(pageSize, pageNum, status, name);
+    const result = await ctx.service.jobLog.getJobLogPage(pageSize, pageNum, status, name);
     this.success(result, '');
   }
   async deal() {
@@ -36,7 +36,7 @@ class JobLogController extends BaseController {
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.body);
     const { ids, isExec } = request.body;
-    const result = await ctx.service.user.bulkUpdate(ids, isExec, 'isExec');
+    const result = await ctx.service.jobLog.bulkUpdate(ids, isExec, 'isExec');
     this.success(result, '');
   }
 }

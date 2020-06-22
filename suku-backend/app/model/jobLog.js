@@ -36,6 +36,10 @@ module.exports = app => {
       field: 'is_exec',
       comment: '是否被重新执行过：1，执行过；0：未执行过',
     },
+    errorSim: {
+      type: STRING(1500),
+      field: 'error_sim',
+    },
     jobId: {
       type: STRING(30),
       field: 'job_id',

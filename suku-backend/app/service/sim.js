@@ -65,7 +65,8 @@ class SimService extends BaseService {
   async getSimPageData({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
     const result = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
-
+    // await this.updateCardStatusBatch('2');
+    await this.ctx.service.jobLog.dealUnfinishedJobs();
     return simData;
   }
 
@@ -243,38 +244,23 @@ class SimService extends BaseService {
     logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
     await service.sim.updateBySimId(params, simId);
   }
-  async updateCardStatusBatch(oneLinkSimIds, cardStatus) {
+  async updateCardStatusBatch(cardStatus) {
     const ctx = this.ctx;
     const { service } = ctx;
     const data = {};
-    const allSimIds = [];
-    data.cardStatus = cardStatus;
-    const operType = cardStatus === '2' ? 11 : 9;
-    const res = {};
+    data.cardStatus = cardStatus === '2' ? '4' : '2';
+    const operType = cardStatus === '2' ? 9 : 11;
+    const { oneLinkSimIds } = await this.getOnelinkSimIds({ cardStatus });
     for (const key in oneLinkSimIds) {
       const simIds = oneLinkSimIds[key];
-      Array.prototype.push.apply(allSimIds, simIds);
-      const result = await service.chinaMobile.changeSimStatusBatch(simIds.join('_'), operType);
-      if (result.error) {
-        // this.fail(result.errorCode, '', result.errorInfo);
-        res.code = 1001;
-        res[key] = result;
-        continue;
-      }
-      const jobId = (result[0] || {}).jobId;
-      const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
-      if (batchResult.failure) {
-        // this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
-        // return;
-        res.code = 1002;
-        res[key] = batchResult;
-        continue;
+      for (let i = 0; i < simIds.length; i++) {
+        const result = await service.chinaMobile.changeSimStatusBatch(simIds[i], operType);
+        if (result.sucessIds) {
+          await this.batchUpdateBySimIds(data, result.sucessIds);
+        }
       }
     }
-    if (!res.code) {
-      await this.batchUpdateBySimIds(data, allSimIds);
-    }
-    return res;
+    return true;
   }
 
   /**
@@ -287,9 +273,7 @@ class SimService extends BaseService {
     data.cardStatus = cardStatus;
     const operType = cardStatus === '2' ? 1 : 0;
     const res = await service.chinaMobile.changeSimStatus(simId, operType);// 6: 待激活转已激活
-    /* if (!res.error) {
-      await this.batchUpdateBySimIds(data, [ simId ]);
-    } */
+
     return res;
   }
 
@@ -301,6 +285,38 @@ class SimService extends BaseService {
       },
     });
     return result;
+  }
+  async getOnelinkSimIds(where) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const onelinks = await service.onelinkPlatform.getAllOnelinkDesc();
+    const oneLinkSimIds = {};
+    const simIds = [];
+    for (let i = 0; i < onelinks.length; i++) {
+      where.onelinkId = onelinks[i].id;
+      // const result = await this.app.model.Sim.findAll({
+      //   attributes: [ 'simId' ],
+      //   where,
+      // });
+      const result1 = await this.findAndCountAll('Sim', 3, 4, { attributes: [ 'simId' ], where });
+      const simStrList = [];
+      let osimIds = [];
+      const result = result1.list;
+      for (let j = 0; j < result.length; j++) { // result.length
+        osimIds.push(result[j].simId);
+        simIds.push(result[j].simId);
+        if ((j + 1) % 2 === 0) {
+          simStrList.push(osimIds.join('_'));
+          osimIds = [];
+        }
+        if ((result.length % 2) !== 0 && j === (result.length - 1)) {
+          simStrList.push(osimIds.join('_'));
+        }
+
+      }
+      oneLinkSimIds[onelinks[i].id] = simStrList;
+    }
+    return { oneLinkSimIds, simIds };
   }
 
   async updateFlowServStatusBatch(oneLinkSimIds, flowServStatus) {
@@ -402,6 +418,7 @@ class SimService extends BaseService {
     } */
     return res;
   }
+
 
 }
 
