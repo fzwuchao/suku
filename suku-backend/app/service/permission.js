@@ -27,6 +27,7 @@ class PermissionService extends BaseService {
       through: {
         attributes: [],
       },
+      // joinTableAttributes: [],
     });
 
     const map = {};

@@ -1,6 +1,7 @@
 'use strict';
 
 // 角色权限映射表对象
+const moment = require('moment');
 
 module.exports = app => {
   const { DATE, BIGINT } = app.Sequelize;
@@ -18,19 +19,34 @@ module.exports = app => {
     },
     createdAt: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'created_at',
       comment: '创建时间',
     },
     updatedAt: {
       type: DATE,
+      get() {
+        return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
       field: 'updated_at',
       comment: '更新时间',
     },
+    deletedAt: {
+      type: DATE,
+      get() {
+        return moment(this.getDataValue('deletedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
+      field: 'deleted_at',
+    },
   }, {
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
     indexes: [{ unique: true, fields: [ 'role_id', 'permission_id' ] }],
+    paranoid: true,
+    deletedAt: 'deletedAt',
   });
 
   RolePermissionMap.associate = () => {

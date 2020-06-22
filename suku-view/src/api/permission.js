@@ -4,4 +4,5 @@ export default {
   GET_ALL_PERMISSION: '/permission/allPermission',
   PERMISSION_SAVE: '/permission/save',
   GET_PERMISSION_BY_ROLE_ID: '/permission/permissionByRoleId',
+  DELETE: '/role/delete',
 }

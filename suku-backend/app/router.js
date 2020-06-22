@@ -33,6 +33,8 @@ module.exports = app => {
   router.get('/permission/allPermission', controller.permission.getAllPermission);
   // 编辑和新增
   router.post('/permission/save', controller.permission.save);
+  // 删除
+  router.delete('/role/delete', controller.role.delete);
 
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);

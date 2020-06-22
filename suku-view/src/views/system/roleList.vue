@@ -1,7 +1,11 @@
 <template>
   <div class="dashboard-container">
     <div class="btn-list">
-      <el-button type="primary" size="mini" @click.native="editRole()">增加</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        @click.native="editRole()"
+      >增加</el-button>
     </div>
     <el-table
       ref="multipleTable"
@@ -14,16 +18,32 @@
       style="width: 100%"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" align="center" width="55"></el-table-column>
+      <el-table-column
+        type="selection"
+        align="center"
+        width="55"
+      ></el-table-column>
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
-      <el-table-column align="left" label="名称" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="名称"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.displayName}}</template>
       </el-table-column>
-      <el-table-column align="left" label="创建时间" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="创建时间"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.createdAt }}</template>
       </el-table-column>
-      <el-table-column align="left" label="更新时间" show-overflow-tooltip>
+      <el-table-column
+        align="left"
+        label="更新时间"
+        show-overflow-tooltip
+      >
         <template slot-scope="scope">{{ scope.row.updatedAt }}</template>
       </el-table-column>
       <el-table-column
@@ -37,6 +57,11 @@
             @click="editRole(scope.row)"
             size="small"
           >编辑</el-button>
+          <el-button
+            type="text"
+            @click="deleteRole(scope.row.id)"
+            size="small"
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -69,10 +94,40 @@ export default {
     };
   },
   methods: {
+    deleteRole(id) {
+      console.log('id:', id)
+      this.$confirm("此操作将删除该角色, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.axios({
+            method: "delete",
+            data: {
+              id
+            },
+            url: API.PERMISSION.DELETE
+          }).then(r => {
+            if (r.success) {
+              this.getlist();
+            } else {
+              this.$message({
+                type: "error",
+                message: r.msg
+              });
+            }
+          });
+        })
+        .catch(() => {});
+    },
     editRole(row) {
       if (row) {
         const { id, name, displayName, level } = row;
-        this.$router.push({ path: `/system/editRole/${id}`, query: { name, displayName, level }});
+        this.$router.push({
+          path: `/system/editRole/${id}`,
+          query: { name, displayName, level }
+        });
       } else {
         this.$router.push(`/system/editRole`);
       }
