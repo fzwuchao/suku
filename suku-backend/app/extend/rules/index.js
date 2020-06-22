@@ -8,6 +8,8 @@ const simLogistics = require('./simLogistics');
 const messageSend = require('./messageSend');
 const simOrder = require('./simOrder');
 const writeList = require('./writeList');
+const permission = require('./permission');
+const role = require('./role');
 
 const pageRules = {
   pageNum: {
@@ -42,5 +44,7 @@ module.exports = () => {
     messageSend: createRule(messageSend),
     simOrder: createRule(simOrder),
     writeList: createRule(writeList),
+    permission: createRule(permission),
+    role: createRule(role),
   };
 };

@@ -33,6 +33,16 @@ module.exports = app => {
     indexes: [{ unique: true, fields: [ 'role_id', 'permission_id' ] }],
   });
 
-  // RolePermissionMap.hasMany(app.model.Role, app.model.Permission);
+  RolePermissionMap.associate = () => {
+    const { Role, Permission } = app.model;
+    Role.belongsToMany(Permission, {
+      through: RolePermissionMap,
+      foreignKey: 'roleId',
+    });
+    Permission.belongsToMany(Role, {
+      through: RolePermissionMap,
+      foreignKey: 'permissionId',
+    });
+  };
   return RolePermissionMap;
 };

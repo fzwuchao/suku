@@ -26,7 +26,13 @@ module.exports = app => {
   // router.post('/export', controller.user.exportFile);
 
   // 获取角色的权限
-  router.get('/permission', controller.permission.getPermission);
+  router.get('/permission/rolePermission', controller.permission.getPermission);
+  // 获取角色的权限
+  router.get('/permission/permissionByRoleId', controller.permission.getPermissionByRoleId);
+  // 获取所有的权限树
+  router.get('/permission/allPermission', controller.permission.getAllPermission);
+  // 编辑和新增
+  router.post('/permission/save', controller.permission.save);
 
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);

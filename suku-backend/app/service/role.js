@@ -2,6 +2,7 @@
 
 // const uuid = require('uuid');
 // const path = require('path');
+const _ = require('lodash');
 
 const BaseService = require('../core/baseService');
 
@@ -37,6 +38,34 @@ class RoleService extends BaseService {
     return result;
   }
 
+  async createRole(role, option) {
+    return await this.app.model.Role.create({ ...role }, option);
+  }
+
+  async isRepeatedName(name, displayName, id) {
+    const Op = this.getOp();
+    const condition = {};
+    if (!_.isNil(id)) {
+      condition.id = {
+        [Op.ne]: id,
+      };
+    }
+    const result = await this.app.model.Role.findOne({
+      where: {
+        [Op.or]: [
+          { name },
+          { displayName },
+        ],
+        ...condition,
+      },
+    });
+
+    return result;
+  }
+
+  async update(data, options) {
+    await this.app.model.Role.update(data, options);
+  }
 }
 
 module.exports = RoleService;
