@@ -62,15 +62,15 @@ class SimService extends BaseService {
    * }
    * @return {{count, rows}} - 总条数，一页的数据
    */
-  async getSimPageData({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
-    const result = this.getWhereCondition({ simId, simIdRange, username, netStatus, isActive, simType, activeMenuName });
+  async getSimPageData({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
+    const result = this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
     // await this.updateCardStatusBatch('2');
     await this.ctx.service.jobLog.dealUnfinishedJobs();
     return simData;
   }
 
-  getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName }) {
+  getWhereCondition({ simId, simIdRange, uname, cardStatus, isActive, simType, activeComboName }) {
     const Op = this.getOp();
     const condition = {};
     const queryKey = {};
@@ -106,11 +106,11 @@ class SimService extends BaseService {
       queryKey['uname'] = uname;
     }
 
-    if (netStatus !== undefined) {
-      condition['netStatus'] = {
-        [Op.eq]: netStatus,
+    if (cardStatus !== undefined) {
+      condition['cardStatus'] = {
+        [Op.eq]: cardStatus,
       };
-      queryKey['netStatus'] = netStatus;
+      queryKey['cardStatus'] = cardStatus;
     }
 
     if (isActive !== undefined) {
@@ -263,6 +263,18 @@ class SimService extends BaseService {
     return true;
   }
 
+  async monthCalculate() {
+    let updateSql = 'update sim set';
+    updateSql += ' shengyu_money = shengyu_money - monthRent,'; // 余额减去月租
+    updateSql += ' month_used_flow =0,'; // 已用流量清零
+    updateSql += ' month_used_voice_duration=0,'; // 已用语音清零
+    updateSql += ' month_overlap_voice_duration=0,'; // 叠加语音清零
+    updateSql += ' month_overlap_flow=0,'; // 叠加流量清零
+    updateSql += ' where shengyu_money > 0';
+    updateSql += '  and isActive = 1';
+    await this.app.model.query(updateSql);
+  }
+
   /**
    * 单卡状态修改
    */
@@ -273,7 +285,6 @@ class SimService extends BaseService {
     data.cardStatus = cardStatus;
     const operType = cardStatus === '2' ? 1 : 0;
     const res = await service.chinaMobile.changeSimStatus(simId, operType);// 6: 待激活转已激活
-
     return res;
   }
 
@@ -294,19 +305,22 @@ class SimService extends BaseService {
     const simIds = [];
     for (let i = 0; i < onelinks.length; i++) {
       where.onelinkId = onelinks[i].id;
-      // const result = await this.app.model.Sim.findAll({
-      //   attributes: [ 'simId' ],
-      //   where,
-      // });
-      const result1 = await this.findAndCountAll('Sim', 3, 4, { attributes: [ 'simId' ], where });
+      const result = await this.app.model.Sim.findAll({
+        attributes: [ 'simId' ],
+        where,
+      });
+      // const result1 = await this.findAndCountAll('Sim', 3, 4, { attributes: [ 'simId' ], where });
+      // const result = result1.list;
       const simStrList = [];
+      // const simArrayList = [];
       let osimIds = [];
-      const result = result1.list;
+
       for (let j = 0; j < result.length; j++) { // result.length
         osimIds.push(result[j].simId);
         simIds.push(result[j].simId);
         if ((j + 1) % 2 === 0) {
           simStrList.push(osimIds.join('_'));
+          // simArrayList.push()
           osimIds = [];
         }
         if ((result.length % 2) !== 0 && j === (result.length - 1)) {
