@@ -66,6 +66,33 @@ class RoleService extends BaseService {
   async update(data, options) {
     await this.app.model.Role.update(data, options);
   }
+
+  async del(id, options) {
+    await this.app.model.Role.destroy({
+      where: {
+        id,
+      },
+      ...options,
+    });
+  }
+
+  async delByRoleId(id) {
+    const t = await this.getTransaction();
+    const transaction = { transaction: t };
+    try {
+      await this.del(id, transaction);
+      await this.ctx.service.rolePermissionMap.deleteByRoleId({
+        where: { roleId: id },
+        ...transaction,
+      });
+      await t.commit();
+      return true;
+    } catch (error) {
+      this.ctx.logger.error(error);
+      await t.rollback();
+      return false;
+    }
+  }
 }
 
 module.exports = RoleService;

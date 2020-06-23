@@ -40,5 +40,22 @@ class UserController extends BaseController {
     const result = await ctx.service.role.getRoles(role.level);
     this.success(result, '');
   }
+
+  async delete() {
+    const { ctx } = this;
+    const { request, service, helper } = ctx;
+    const { role } = helper.rules;
+    const rule = {
+      ...role([ 'id' ]),
+    };
+    ctx.validate(rule, request.body);
+    const { id } = request.body;
+    const result = await service.role.delByRoleId(id);
+    if (result) {
+      this.success(null, '删除成功');
+    } else {
+      this.fail(null, null, '删除失败');
+    }
+  }
 }
 module.exports = UserController;

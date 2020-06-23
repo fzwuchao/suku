@@ -61,8 +61,8 @@ module.exports = app => {
     },
   }, {
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
   });
 
   ErrorLog.associate = function() {

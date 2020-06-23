@@ -61,10 +61,19 @@ module.exports = app => {
       field: 'updated_at',
       comment: '更新时间',
     },
+    deletedAt: {
+      type: DATE,
+      get() {
+        return moment(this.getDataValue('deletedAt')).format('YYYY-MM-DD HH:mm:ss');
+      },
+      field: 'deleted_at',
+    },
   }, {
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    paranoid: true,
+    deletedAt: 'deletedAt',
   });
 
   ComboPack.associate = () => {
