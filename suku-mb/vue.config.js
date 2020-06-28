@@ -8,6 +8,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     outputDir: 'suku-mb',
     devServer: {
+      disableHostCheck: true,
         proxy: {
             '/shanyuan': {
                 // 开发环境

@@ -658,37 +658,17 @@ class ChinaMobileService extends BaseService {
     const { jobStatus } = result[0];
     const jobLog = { jobStatus, jobId };
     jobLog.result = JSON.stringify(result);
-    if (params) {
-      jobLog.params = JSON.stringify(params);
-    }
     if (api) {
       jobLog.url = api.url;
       jobLog.name = api.name;
     }
-
     if (onelinkId) {
       jobLog.onelinkId = onelinkId;
     }
-    // 0：待处理，1：处理中，2: 处理完成，3：包含有处理失败记录的处理完成，4：处理失败
-    // resultList: jobStatus 为 2、3、4 时返回处理结果，为0、1 时无
-    // if (jobStatus === '2') {
-    //   batchResult.status = 'true';
-    // } else if (jobStatus === '3' || jobStatus === '4') {
-    //   const { resultList } = result[0];
-    //   // TODO: 是否只取resultList第一个元素，还是都要取出来？
-    //   const { message, resultId } = resultList[0];
-    //   batchResult.failure = true;
-    //   batchResult.failInfo = message;
-    //   batchResult.failData = resultId;
-    // } else if (jobStatus === '0' || jobStatus === '1') {
-    //   const jobStatusMsg = {
-    //     0: '待处理',
-    //     1: '处理中',
-    //   };
-    //   batchResult.failure = true;
-    //   batchResult.failInfo = jobStatusMsg[jobStatus];
-    // }
     if (jobStatus === '3' || jobStatus === '2' || jobStatus === '4') {
+      if (params) {
+        jobLog.params = JSON.stringify(params);
+      }
       const { resultList } = result[0];
       const errorIds = [];
       const sucessIds = [];
@@ -702,9 +682,17 @@ class ChinaMobileService extends BaseService {
       result.sucessIds = sucessIds;
       result.errorIds = errorIds;
       jobLog.errorSim = JSON.stringify(errorIds);
+    } else {
+      if (params) {
+        jobLog.params = params;
+      }
     }
-    if (jobStatus !== '2') {
+    if (jobStatus === '3' || jobStatus === '4') {
       await this.ctx.service.jobLog.create(jobLog);
+    }
+    if (jobStatus === '0' || jobStatus === '1') {
+      this.app.queue.create('jobLog', jobLog).delay(10000 * 60) // 延时多少毫秒
+        .save();
     }
     return result;
   }
