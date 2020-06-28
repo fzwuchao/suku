@@ -37,4 +37,9 @@ module.exports = {
     enable: true,
     package: 'egg-validate',
   },
+  // 队列
+  queue: {
+    enable: true,
+    package: 'egg-delayed-queue',
+  },
 };

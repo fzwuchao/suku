@@ -5,6 +5,7 @@
  */
 const BaseService = require('../core/baseService');
 const moment = require('moment');
+const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, SIM_VOICE_SERV_STATUS, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
 class SimService extends BaseService {
   async update(sim) {
     try {
@@ -66,7 +67,7 @@ class SimService extends BaseService {
     const result = this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
     // await this.updateCardStatusBatch('2');
-    await this.ctx.service.jobLog.dealUnfinishedJobs();
+
     return simData;
   }
 
@@ -244,13 +245,22 @@ class SimService extends BaseService {
     logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
     await service.sim.updateBySimId(params, simId);
   }
-  async updateCardStatusBatch(cardStatus) {
+  /**
+   * 批量设置卡的状态
+   * @param {*} cardStatus 需要设置卡的状态
+   * @param {*} query  获取ids的其他查询条件
+   */
+  async updateCardStatusBatch(cardStatus, query) {
     const ctx = this.ctx;
     const { service } = ctx;
     const data = {};
-    data.cardStatus = cardStatus === '2' ? '4' : '2';
-    const operType = cardStatus === '2' ? 9 : 11;
-    const { oneLinkSimIds } = await this.getOnelinkSimIds({ cardStatus });
+    if (!query) {
+      query = {};
+    }
+    data.cardStatus = cardStatus;
+    const operType = cardStatus === SIM_CARD_STATUS.ACTIVE ? OPER_TYPE_BATCH.STOP_ACTIVE : OPER_TYPE_BATCH.ACTIVE_STOP;
+    query.cardStatus = cardStatus === SIM_CARD_STATUS.ACTIVE ? SIM_CARD_STATUS.STOP : SIM_CARD_STATUS.ACTIVE;
+    const { oneLinkSimIds } = await this.getOnelinkSimIds(query);
     for (const key in oneLinkSimIds) {
       const simIds = oneLinkSimIds[key];
       for (let i = 0; i < simIds.length; i++) {
@@ -262,18 +272,73 @@ class SimService extends BaseService {
     }
     return true;
   }
+  /**
+   * 批量设置流量服务
+   * @param {*} flowServStatus  需要设置的流量服务状态
+   * @param {*} query  获取ids的其他查询条件
+   */
+  async updateFlowServStatusBatch(flowServStatus, query) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    if (!query) {
+      query = {};
+    }
+    data.flowServStatus = flowServStatus;
+    const operType = flowServStatus === SIM_FLOW_SERV_STATUS.OFF ? SERV_OP_BATCH.OFF : SERV_OP_BATCH.ON;
+    query.flowServStatus = flowServStatus === SIM_FLOW_SERV_STATUS.OFF ? SIM_FLOW_SERV_STATUS.ON : SIM_FLOW_SERV_STATUS.OFF;
+    const { oneLinkSimIds } = await this.getOnelinkSimIds(query);
+    for (const key in oneLinkSimIds) {
+      const simIds = oneLinkSimIds[key];
+      for (let i = 0; i < simIds.length; i++) {
+        const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(
+          simIds[i],
+          SERVICE_TYPE.FLOW,
+          operType,
+          'CMIOT'
+        );
+        if (result.sucessIds) {
+          await this.batchUpdateBySimIds(data, result.sucessIds);
+        }
+      }
+    }
 
-  async monthCalculate() {
-    let updateSql = 'update sim set';
-    updateSql += ' shengyu_money = shengyu_money - monthRent,'; // 余额减去月租
-    updateSql += ' month_used_flow =0,'; // 已用流量清零
-    updateSql += ' month_used_voice_duration=0,'; // 已用语音清零
-    updateSql += ' month_overlap_voice_duration=0,'; // 叠加语音清零
-    updateSql += ' month_overlap_flow=0,'; // 叠加流量清零
-    updateSql += ' where shengyu_money > 0';
-    updateSql += '  and isActive = 1';
-    await this.app.model.query(updateSql);
+    return true;
   }
+  /**
+ * 批量修改语音状态
+ * @param {*} voiceServStatus
+ * @param {*} query  获取ids的其他查询条件
+ */
+  async updateVoiceServStatusBatch(voiceServStatus, query) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const data = {};
+    if (!query) {
+      query = {};
+    }
+    data.voiceServStatus = voiceServStatus;
+    const operType = voiceServStatus === SIM_VOICE_SERV_STATUS.OFF ? SERV_OP_BATCH.OFF : SERV_OP_BATCH.ON;
+    query.voiceServStatus = voiceServStatus === SIM_VOICE_SERV_STATUS.OFF ? SIM_VOICE_SERV_STATUS.ON : SIM_VOICE_SERV_STATUS.OFF;
+    const { oneLinkSimIds } = await this.getOnelinkSimIds(query);
+    for (const key in oneLinkSimIds) {
+      const simIds = oneLinkSimIds[key];
+      for (let i = 0; i < simIds.length; i++) {
+        const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(
+          simIds[i],
+          SERVICE_TYPE.VOICE,
+          operType,
+          'CMIOT'
+        );
+        if (result.sucessIds) {
+          await this.batchUpdateBySimIds(data, result.sucessIds);
+        }
+      }
+    }
+
+    return true;
+  }
+
 
   /**
    * 单卡状态修改
@@ -333,39 +398,6 @@ class SimService extends BaseService {
     return { oneLinkSimIds, simIds };
   }
 
-  async updateFlowServStatusBatch(oneLinkSimIds, flowServStatus) {
-    const ctx = this.ctx;
-    const { service } = ctx;
-    const data = {};
-    const allSimIds = [];
-    data.flowServStatus = flowServStatus;
-    const operType = flowServStatus === '1' ? 1 : 0;
-    const res = {};
-    for (const key in oneLinkSimIds) {
-      const simIds = oneLinkSimIds[key];
-      Array.prototype.push.apply(allSimIds, simIds);
-      const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(simIds.join('_'), '11', operType, 'CMIOT');
-      if (result.error) {
-        // this.fail(result.errorCode, '', result.errorInfo);
-        res.code = 1001;
-        res[key] = result;
-        continue;
-      }
-      const jobId = (result[0] || {}).jobId;
-      const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
-      if (batchResult.failure) {
-        // this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
-        // return;
-        res.code = 1002;
-        res[key] = batchResult;
-        continue;
-      }
-    }
-    /* if (!res.code) {
-      await this.batchUpdateBySimIds(data, allSimIds);
-    } */
-    return res;
-  }
 
   /**
    * 单卡数据服务开停
@@ -381,41 +413,6 @@ class SimService extends BaseService {
     /* if (!res.error) {
       await this.batchUpdateBySimIds(data, [ simId ]);
     } */
-    return res;
-  }
-
-
-  async updateVoiceServStatusBatch(oneLinkSimIds, voiceServStatus) {
-    const ctx = this.ctx;
-    const { service } = ctx;
-    const data = {};
-    const allSimIds = [];
-    data.voiceServStatus = voiceServStatus;
-    const operType = voiceServStatus === '1' ? 1 : 0;
-    const res = {};
-    for (const key in oneLinkSimIds) {
-      const simIds = oneLinkSimIds[key];
-      Array.prototype.push.apply(allSimIds, simIds);
-      const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(simIds.join('_'), '01', operType, 'CMIOT');
-      if (result.error) {
-        // this.fail(result.errorCode, '', result.errorInfo);
-        res.code = 1001;
-        res[key] = result;
-        continue;
-      }
-      const jobId = (result[0] || {}).jobId;
-      const batchResult = await service.chinaMobile.querySimBatchResult(jobId, simIds[0]);
-      if (batchResult.failure) {
-        // this.fail(batchResult.failCode, batchResult.failData, batchResult.failInfo);
-        // return;
-        res.code = 1002;
-        res[key] = batchResult;
-        continue;
-      }
-    }
-    if (!res.code) {
-      await this.batchUpdateBySimIds(data, allSimIds);
-    }
     return res;
   }
 

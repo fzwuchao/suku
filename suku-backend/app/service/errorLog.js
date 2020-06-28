@@ -59,6 +59,14 @@ class ErrorLogService extends BaseService {
     }
     return true;
   }
+  async deleteBatch() {
+    try {
+      await this.app.model.ErrorLog.destroy({ where: { isExec: 1 } });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
 
 
 }

@@ -34,30 +34,21 @@ class JobLogService extends BaseService {
     return result;
   }
 
-  async dealUnfinishedJobs() {
-    const Op = this.getOp();
+  async dealUnfinishedJobs(jobLog) {
     const { ctx } = this;
     const { service } = ctx;
-    const result = await this.app.model.JobLog.findAll({
-      where: {
-        jobStatus: {
-          [Op.or]: [ '0', '1' ],
-        },
-        isExec: 0,
-      },
-    });
-    for (let i = 0; i < result.length; i++) {
-      const { params, name, onelinkId, jobId, url, id } = result[i];
-      const api = {
-        name,
-        url,
-      };
-      const params1 = JSON.parse(params);
-      const res = await service.chinaMobile.querySimBatchResult(jobId, params1.msisdns, params1, api, onelinkId);
-      if (res.sucessIds) {
-        // await service.sim.batchUpdateBySimIds({ cardStatus: '4' }, res.sucessIds);
+    const { params, name, onelinkId, jobId, url } = jobLog;
+    const api = {
+      name,
+      url,
+    };
+    const res = await service.chinaMobile.querySimBatchResult(jobId, params.msisdns, params, api, onelinkId);
+    if (res.sucessIds) {
+      const data = {};
+      if (params.cardStatus) {
+        data.cardStatus = params.cardStatus === '2' ? '4' : '2';
       }
-      this.update({ isExec: 1, id });
+      await service.sim.batchUpdateBySimIds(data, res.sucessIds);
     }
     return true;
   }
@@ -85,6 +76,15 @@ class JobLogService extends BaseService {
       const values = {};
       values[oper] = value;
       await this.app.model.JobLog.update(values, { where: { id: { [this.getOp().in]: ids } } });
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
+  async deleteBatch() {
+    try {
+      await this.app.model.JobLog.destroy({ where: { isExec: 1 } });
     } catch (e) {
       return false;
     }

@@ -100,6 +100,19 @@ module.exports = appInfo => {
     convert: true, // 入参的数据类型自动转换
     widelyUndefined: true, // 值为空字符串、NaN、Null转换成undefined
   };
+  config.queue = {
+    client: {
+      queuePrefix: 'q',
+      redis: {
+        port: 6379,
+        host: '127.0.0.1',
+        auth: 'auth',
+        db: 3,
+        options: {
+        },
+      },
+    },
+  };
 
   // add your user config here
   const userConfig = {
