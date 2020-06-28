@@ -82,6 +82,7 @@ Axios
 
         // 加上csrf token
         config.headers['x-csrf-token'] = getToken()
+        config.url = `/api${config.url}`
         return config
     }, error => {
         if (loading) {
