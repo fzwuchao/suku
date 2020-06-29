@@ -6,8 +6,8 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
   }
 } */
 module.exports = {
-    outputDir: "suku",
-    // publicPath: '/admin/',
+    outputDir: "admin",
+    publicPath: '/admin/',
     devServer: {
         proxy: {
             "/api": {
