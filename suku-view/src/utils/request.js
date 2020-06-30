@@ -11,6 +11,7 @@ import {
     removeIsLogin,
     getToken
 } from './auth'
+import { urlPrefix } from '@/utils'
 
 const Axios = axios.create({
     baseURL: '/', // 因为我本地做了反向代理
@@ -82,7 +83,7 @@ Axios
 
         // 加上csrf token
         config.headers['x-csrf-token'] = getToken()
-        config.url = `/api${config.url}`
+        config.url = `${urlPrefix}${config.url}`
         return config
     }, error => {
         if (loading) {
