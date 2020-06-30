@@ -44,6 +44,7 @@ Axios
         if (localStorage.token) {
             config.headers.Authorization = localStorage.token;
         }
+        config.url = `/api${config.url}`
         return config;
     }, error => {
         if (!hideError) {
