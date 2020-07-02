@@ -68,7 +68,7 @@
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
-        :current-page="data.pageNum"
+        :current-page="pageNum"
         @current-change="pageChange"
         :page-sizes="[20, 30, 50, 100]"
         background
@@ -132,7 +132,8 @@ export default {
         this.$router.push(`/system/editRole`);
       }
     },
-    pageChange() {
+    pageChange(page) {
+      this.pageNum = page;
       this.getlist();
     },
     editUser(user) {
