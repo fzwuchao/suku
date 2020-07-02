@@ -24,15 +24,15 @@ export function getOpenId() {
   return new Promise((resolve) => {
     axios({
       method: 'get',
-      url: '/wechat/getOpenId',
+      url: '/api/wechat/getOpenId',
       params: {
         code: codeList[1]
       }
     }).then((res) => {
-      // if (res.data.code === 200) {
-      //   sessionStorage.setItem('openId', res.data.data.openid);
+       if (res.data.code === 200) {
+         sessionStorage.setItem('openId', res.data.data.data.openid);
          resolve(res);
-      // }
+       }
     });
   });
 }

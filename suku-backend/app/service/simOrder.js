@@ -119,6 +119,17 @@ class SimOrderService extends BaseService {
     }
   }
 
+  async getOrderByOrderId(orderId) {
+    const [ simOrder ] = await this.app.model.SimOrder.findAll({
+      where: {
+        orderId,
+      },
+    });
+
+    return simOrder;
+  }
+
+
 }
 
 SimOrderService.ACTIVE_PREFIX = 'PRE'; // 激活订单前缀

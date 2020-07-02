@@ -35,7 +35,7 @@
 <script>
 import { Toast } from "vant";
 import { validateTel } from "../utils/validate"
-import { getOpenId } from '../utils/index'
+
 export default {
   data() {
     return {
@@ -77,18 +77,9 @@ export default {
         }
       });
     } */
-    getCode() {
-      this.axios({
-        method: "get",
-        url: "/wechat/getOpenId"
-      }).then(() => {
-        
-      });
-    }
   },
   mounted() {
     // this.getCode()
-    getOpenId();
   }
 };
 </script>

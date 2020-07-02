@@ -61,6 +61,17 @@ export default {
     }
   },
   methods: {
+    onBridgeReady() {
+      // WeixinJSBridge.invoke(
+      //   'getBrandWCPayRequest', json,
+      //    function(res){
+      //      if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+      //        this.$emit("clickLeft")
+      //      }
+      //    }
+      // );
+    },
+    
     createOrder() {
       if(!this.radioCheck) {
         Toast('请选择支付方式！');
@@ -70,12 +81,14 @@ export default {
         Toast('请确认sim卡号！');
         return;
       }
+      this.payInfo.openid = sessionStorage.getItem('openId')
       this.axios({
         method: "post",
         data: this.payInfo,
         url: "/simOrder/save"
-      }).then(() => {
-        this.$emit("clickLeft")
+      }).then((r) => {
+        this.onBridgeReady(r.data)
+        // this.$emit("clickLeft")
       });
 
     },
@@ -91,6 +104,14 @@ export default {
   },
   created() {
     this.payInfo = this.pay;
+    if (typeof WeixinJSBridge == "undefined"){
+      if( document.addEventListener ){
+        document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
+      }else if (document.attachEvent){
+        document.attachEvent('WeixinJSBridgeReady', this.onBridgeReady); 
+        document.attachEvent('onWeixinJSBridgeReady', this.onBridgeReady);
+      }
+    }
   }
 };
 </script>

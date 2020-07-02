@@ -1,5 +1,5 @@
 'use strict';
-
+const { payApi } = require('./extend/wechat')();
 /**
  * @param {Egg.Application} app - egg application
  */
@@ -159,5 +159,6 @@ module.exports = app => {
   router.get('/tMsgSendUpgoing', controller.testMsgSend.tMsgSendUpgoing);
 
   router.get('/wechat/getOpenId', controller.wechat.getOpenId);
+  router.get('/wechat/payBack', payApi.middleware('refund'), controller.wechat.payBack);
 
 };

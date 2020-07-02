@@ -112,15 +112,20 @@ module.exports = appInfo => {
       redis: {
         port: REDIS_PARAMS.PORT,
         host: REDIS_PARAMS.HOST,
-        // auth: 'auth',
-        password: REDIS_PARAMS.PASSWORD,
+        auth: REDIS_PARAMS.PASSWORD,
+        // password: REDIS_PARAMS.PASSWORD,
         db: 3,
         options: {
         },
       },
     },
   };
-
+  config.bodyParser = {
+    enableTypes: ['json', 'form', 'text'],
+    extendTypes: {
+      text: ['text/xml', 'application/xml'],
+    },
+  };
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',

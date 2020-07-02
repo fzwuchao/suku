@@ -1,7 +1,7 @@
 'use strict';
 
 const BaseController = require('../core/baseController');
-
+const { payApi } = require('../extend/wechat')();
 class MessageSendController extends BaseController {
 
   async getSimOrderlist() {
@@ -29,17 +29,16 @@ class MessageSendController extends BaseController {
     const { simId } = request.body;
     const sim = await ctx.service.sim.getSimBySimId(simId);
     const order = request.body;
-    // 缺少调用移动端发送短信的接口，在此位置调用
     order.uname = sim.uname;
     order.uid = sim.uid;
     const newOrdere = await ctx.service.simOrder.create(order);
-    await ctx.service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
-    await ctx.service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
-    await ctx.service.simOrder.changeSim(sim, order);
-    await ctx.service.simOrder.update({ orderId: newOrdere.orderId, orderStatus: 2 });
-    await ctx.service.sim.syncUpdate(simId, sim.simType);
-    this.success(true, '');
+    const result = await payApi.getPayParams({
+      out_trade_no: newOrdere.orderId,
+      body: 'sim pay',
+      total_fee: newOrdere.dealAmount * 100,
+      openid: order.openid,
+    });
+    this.success(result, '');
   }
-
 }
 module.exports = MessageSendController;
