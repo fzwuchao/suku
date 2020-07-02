@@ -150,6 +150,12 @@ module.exports = app => {
   // 处理onelink Job
   router.post('/jobLog/deal', controller.jobLog.deal);
 
+  // 用于模拟发送短信，之后可删除
+  router.post('/testMsgSend', controller.testMsgSend.testMsgSend);
+  router.post('/testMsgSendUpgoing', controller.testMsgSend.testMsgSend);
+  router.get('/tMsgSend', controller.testMsgSend.tMsgSend);
+  router.get('/tMsgSendUpgoing', controller.testMsgSend.tMsgSendUpgoing);
+
   router.get('/wechat/getOpenId', controller.wechat.getOpenId);
 
 };

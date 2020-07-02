@@ -2,6 +2,18 @@
 
 const moment = require('moment');
 const _ = require('lodash');
+const xml2js = require('xml2js');
+const parser = new xml2js.Parser();
+const retcodeMap = {
+  '00': '成功',
+  '01': '失败',
+  '02': '接收方号码为空',
+  '03': '接收方号码错误',
+  '04': '短信内容为空',
+  '05': '鉴权ID为空',
+  '06': '鉴权失败',
+};
+
 
 const BaseService = require('../core/baseService');
 const { getApi } = require('../extend/api')();
@@ -30,6 +42,37 @@ const getTransid = appid => {
   operate: 4,
 }; */
 class ChinaMobileService extends BaseService {
+  async sendXML(xml, interfaceType) {
+    const interfaceTypeMap = {
+      send: 'http://localhost:7001/testMsgSend',
+      delivery: 'http://localhost:7001/testMsgSendUpgoing',
+    };
+    const url = interfaceTypeMap[interfaceType];
+    const resState = { success: false, msg: '', data: null };
+    const result = await this.ctx.curl(url, {
+      method: 'POST',
+      contentType: 'text/xml; charset=utf-8',
+      data: xml,
+      dataType: 'text',
+    });
+    if (result.status !== 200) {
+      this.ctx.logger.error(`【Http异常状态码】: ${result.status}`);
+      resState.success = false;
+      resState.msg = result.status;
+      return resState;
+    }
+    resState.success = true;
+
+    await parser.parseStringPromise(result.data).then(rs => {
+      resState.data = rs;
+    }).catch(err => {
+      resState.success = false;
+      resState.msg = err;
+    });
+
+    return resState;
+  }
+
   async getOnelink(simId) {
     const { onelinkId } = await this.ctx.service.sim.getSimBySimId(simId);
     const oneLink = await this.ctx.service.onelinkPlatform.getOnelinkById(onelinkId);
@@ -231,7 +274,7 @@ class ChinaMobileService extends BaseService {
     };
 
     // 在 operType 为 9或 11 时，原因必传01：主动停复机
-    if ([ 9, 11 ].indexOf(operType) > -1 && _.isNil(reason)) {
+    if ([9, 11].indexOf(operType) > -1 && _.isNil(reason)) {
       data.reason = '01';
     }
 
@@ -694,6 +737,83 @@ class ChinaMobileService extends BaseService {
       this.app.queue.create('jobLog', jobLog).delay(10000 * 60) // 延时多少毫秒
         .save();
     }
+    return result;
+  }
+
+  /**
+   * 发送短信
+   * @param {string} id - MAS分配编号
+   * @param {string} pwd - MAS分配密钥
+   * @param {string} phone - 接收方号码, 多个号码用英文逗号隔开
+   * @param {string} content - 短信内容
+   */
+  async sendMessage(id, pwd, phone, content) {
+    const xml = `<?xmlversion="1.0" encoding="UTF-8"?>
+    <svc_init ver="2.0.0">
+    <sms ver="2.0.0">
+    <client>
+    <id>${id}</id>
+    <pwd>${pwd}/pwd>
+    <serviceid></serviceid>
+    </client>
+    <sms_info>
+    <phone>${phone}</phone>
+    <content>${content}</content>
+    </sms_info>
+    </sms>
+    </svc_init>`;
+    const result = await this.sendXML(xml, 'send');
+    if (!result.success) {
+      return result;
+    }
+    const { response_info } = result.data.svc_result;
+    const { gwid, retcode, retmesg } = response_info[0];
+    const gwidValue = gwid[0];
+    const retcodeValue = retcode[0];
+    const retmesgValue = retmesg[0];
+    result.success = true;
+    result.msg = retcodeMap[retcodeValue];
+    result.data = { gwid: gwidValue, retmesg: retmesgValue, retcode: retcodeValue };
+
+    return result;
+  }
+
+  /**
+   * 上行短信查询接口
+   * @param {string} id - MAS分配编号
+   * @param {string} pwd - MAS分配密钥
+   */
+  async sendUpgoingMessage(id, pwd) {
+    const xml = `<?xmlversion="1.0" encoding="UTF-8"?>
+    <svc_initver="2.0.0">
+    <sms ver="2.0.0">
+    <client>
+    <id>${id}</id>
+    <pwd>${pwd}</pwd>
+    </client>
+    </sms>
+    </svc_init>`;
+    const result = await this.sendXML(xml, 'delivery');
+    if (!result.success) {
+      return result;
+    }
+    const { itemlist = [], retcode, retmesg } = result.data.svc_result;
+    const retcodeValue = retcode[0];
+    const retmesgValue = retmesg[0];
+    result.success = true;
+    result.msg = retcodeMap[retcodeValue];
+
+    let messageData = [];
+    if (itemlist.length > 0) {
+      messageData = itemlist[0].item;
+      messageData.forEach(m => {
+        m.content = m.content[0];
+        m.phone = m.phone[0];
+        m.time = m.time[0];
+      });
+    }
+    result.data = { messageData, retmesg: retmesgValue, retcode: retcodeValue };
+
     return result;
   }
 }
