@@ -150,4 +150,6 @@ module.exports = app => {
   // 处理onelink Job
   router.post('/jobLog/deal', controller.jobLog.deal);
 
+  router.get('/wechat/getOpenId', controller.wechat.getOpenId);
+
 };

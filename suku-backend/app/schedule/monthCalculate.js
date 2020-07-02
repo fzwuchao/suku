@@ -5,7 +5,7 @@ class MonthCalculate extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      interval: '59m', // 59 分钟间隔
+      interval: '59000000000m', // 59 分钟间隔
       type: 'all', // 指定所有的 worker 都需要执行
       immediate: true,
     };
