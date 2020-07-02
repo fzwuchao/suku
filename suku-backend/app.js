@@ -12,6 +12,12 @@ class AppBootHook {
 
     // 例如：从数据库加载数据到内存缓存
     // this.app.cacheData = await this.app.model.query(QUERY_CACHE_SQL);
+    // this.app.use(bodyParser({
+    //   enableTypes: [ 'json', 'form', 'text' ],
+    //   extendTypes: {
+    //     text: [ 'text/xml', 'application/xml' ],
+    //   },
+    // }));
   }
   async didReady() {
     // 应用已经启动完毕
