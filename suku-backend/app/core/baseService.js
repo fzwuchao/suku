@@ -24,18 +24,18 @@ class BaseService extends Service {
   async findAndCountAll(modelNmale, pageSize, pageNum, query, queryKey) {
     const { helper } = this.ctx;
     let result = null;
-    // if (queryKey) {
-    //   const redisKey = `${modelNmale}:${JSON.stringify(queryKey)}:${pageSize}:${pageNum}`;
-    //   result = await this.app.redis.get(redisKey);
-    //   if (!result) {
-    //     result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
-    //     this.app.redis.set(redisKey, JSON.stringify(result));
-    //   } else {
-    //     result = JSON.parse(result);
-    //   }
-    // } else {
-    result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
-    // }
+    if (queryKey) {
+      const redisKey = `${modelNmale}:${JSON.stringify(queryKey)}:${pageSize}:${pageNum}`;
+      result = await this.app.redis.get(redisKey);
+      if (!result) {
+        result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
+        this.app.redis.set(redisKey, JSON.stringify(result));
+      } else {
+        result = JSON.parse(result);
+      }
+    } else {
+      result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
+    }
     return helper.pageModel(result, pageSize, pageNum);
   }
 

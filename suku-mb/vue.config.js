@@ -6,7 +6,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
   }
 } */
 module.exports = {
-    outputDir: 'suku-mb',
+    outputDir: "weixin",
+    publicPath: '/weixin/',
     devServer: {
       disableHostCheck: true,
         proxy: {
@@ -26,12 +27,12 @@ module.exports = {
                 },
                 changeOrigin: true
             },
-            "/": {
+            "/api": {
               // 开发环境
               target: "http://127.0.0.1:7001",
               // 测试环境 target : 'http://10.2.30.193:58080',
               pathRewrite: {
-                  "^/": "/"
+                  "^/api": "/"
               },
               changeOrigin: true
           }

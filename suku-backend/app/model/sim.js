@@ -4,7 +4,28 @@
 // sim卡
 const moment = require('moment');
 const calc = require('calculatorjs');
+const hooksName = [
+  'afterBulkCreate',
+  'afterBulkDestroy',
+  'afterBulkUpdate',
+  'afterCreate',
+  'afterDestroy',
+  'afterUpdate',
+  'afterSave',
+];
 module.exports = app => {
+  const delRedisCache = async () => {
+    const ctx = app.createAnonymousContext();
+    await ctx.service.redisCacheService.batchDelKey('Sim*');
+  };
+
+  const hooks = {};
+  hooksName.forEach(name => {
+    hooks[name] = () => {
+      delRedisCache();
+    };
+  });
+
   const { STRING, DATE, TINYINT, DECIMAL, CHAR, BIGINT, VIRTUAL } = app.Sequelize;
 
   const Sim = app.model.define('sim', {
@@ -236,7 +257,9 @@ module.exports = app => {
     updatedAt: 'updatedAt',
     paranoid: true,
     deletedAt: 'deletedAt',
+    hooks,
   });
+
 
   return Sim;
 };

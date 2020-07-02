@@ -100,7 +100,7 @@
       >
         <el-upload
           class="upload-demo"
-          action="/sheet/upload"
+          :action="url"
           :headers="uploadHeaders"
           :on-success="handleSuccess"
         >
@@ -128,9 +128,11 @@
 <script>
 import API from "@/api";
 import { getToken } from "@/utils/auth";
+import { urlPrefix } from "@/utils";
 export default {
   data() {
     return {
+      url: `${urlPrefix}/sheet/upload`,
       uploadHeaders: {
         "x-csrf-token": getToken()
       },
