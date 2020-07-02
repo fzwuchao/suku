@@ -57,5 +57,8 @@ class UserController extends BaseController {
       this.fail(null, null, '删除失败');
     }
   }
+  getRoleType() {
+    this.success(this.ctx.helper.ROLE_TYPE, null);
+  }
 }
 module.exports = UserController;

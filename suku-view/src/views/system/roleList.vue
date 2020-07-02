@@ -123,10 +123,10 @@ export default {
     },
     editRole(row) {
       if (row) {
-        const { id, name, displayName, level } = row;
+        const { id, name, displayName, level, roleType } = row;
         this.$router.push({
           path: `/system/editRole/${id}`,
-          query: { name, displayName, level }
+          query: { name, displayName, level, roleType }
         });
       } else {
         this.$router.push(`/system/editRole`);

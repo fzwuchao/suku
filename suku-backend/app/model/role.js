@@ -32,6 +32,12 @@ module.exports = app => {
       allowNull: false,
       comment: '角色中文名',
     },
+    roleType: {
+      type: TINYINT(1),
+      field: 'role_type',
+      allowNull: false,
+      comment: '角色类型:1-系统管理员, 2-仓库管理员, 3-业务员, 4-运营客服, 5-经销商, 6-分销商',
+    },
     createdAt: {
       type: DATE,
       field: 'created_at',

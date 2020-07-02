@@ -10,22 +10,40 @@
         ref="ruleForm"
       >
         <el-form-item
+          label="角色"
+          prop="roleType"
+        >
+          <el-select
+          v-model="role.roleType"
+          clearable
+          placeholder="请选择"
+          @change="changeRoleType"
+          >
+            <el-option
+            v-for="rt in roleTypeList"
+            :key="rt.code"
+            :label="rt.displayName"
+            :value="rt.code">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
           label="角色英文名"
           prop="name"
         >
-          <el-input v-model="role.name"></el-input>
+          <el-input v-model="role.name" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item
           label="角色中文名"
           prop="displayName"
         >
-          <el-input v-model="role.displayName"></el-input>
+          <el-input v-model="role.displayName" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item
           label="级别"
           prop="level"
         >
-          <el-input v-model="role.level"></el-input>
+          <el-input v-model="role.level" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item
           label="权限"
@@ -62,18 +80,21 @@
 <script>
 import EditBar from "../../components/EditBar";
 import API from "@/api";
+import { ROLE_TYPE_LIST } from '@/utils/utils';
 export default {
   components: {
     EditBar
   },
   data() {
     return {
+      roleTypeList: [],
       role: {
         id: null,
         name: "",
         displayName: "",
         permissions: [],
         level: '',
+        roleType: null,
       },
       rules: {
         name: [
@@ -118,6 +139,9 @@ export default {
               }
             }
           }
+        ],
+        roleType: [
+          { required: true, message: "请选择角色类型" }
         ]
       },
       permissionsList: [],
@@ -156,6 +180,19 @@ export default {
       this.$refs["ruleForm"].resetFields();
       this.$router.push("/system/roleList");
     },
+    getRoleType(code) {
+      const [ roleType ] = this.roleTypeList.filter(roleType => roleType.code === code);
+      return roleType;
+    },
+    changeRoleType(val) {
+      const roleType = this.getRoleType(val);
+      this.role.name = roleType ? roleType.name : null;
+      this.role.displayName = roleType ? roleType.displayName : null;
+      this.role.level = roleType ? roleType.level : null;
+    },
+    getRoleTypeList() {
+      ROLE_TYPE_LIST.then(val => this.roleTypeList = val);
+    },
     getPermission() {
       this.axios({
         method: "get",
@@ -181,10 +218,11 @@ export default {
       // 编辑时，回显相关信息
       if (this.$route.params.id) {
         this.role.id = this.$route.params.id;
-        const { name, displayName, level } = this.$route.query;
+        const { name, displayName, level, roleType } = this.$route.query;
         this.role.name = name;
         this.role.displayName = displayName;
         this.role.level = level;
+        this.role.roleType = roleType;
         // this.role.permissions = this.checkedAndHalfKeys.checkedKeys;
         this.getRolePermission();
       }
@@ -193,6 +231,7 @@ export default {
   mounted() {
     this.getPermission();
     this.initRole();
+    this.getRoleTypeList();
   }
 };
 </script>

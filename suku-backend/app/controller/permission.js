@@ -40,7 +40,7 @@ class PermissionController extends BaseController {
       ...permission(),
     };
     ctx.validate(rule, request.body);
-    const { id, name, displayName, permissions, level } = request.body;
+    const { id, name, displayName, permissions, level, roleType } = request.body;
     const result = await service.role.isRepeatedName(name, displayName, id);
     if (result) {
       this.fail(null, null, '角色英文名或中文名重复');
@@ -48,7 +48,7 @@ class PermissionController extends BaseController {
     }
     // 添加
     if (id === undefined) {
-      const result = await service.permission.save({ name, displayName, level }, permissions);
+      const result = await service.permission.save({ name, displayName, level, roleType }, permissions);
       if (result) {
         this.success(null, '保存成功');
       } else {
