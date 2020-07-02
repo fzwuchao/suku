@@ -11,13 +11,13 @@ class TestMsgSendController extends BaseController {
     <retmesg></retmesg>
     <itemlist>
     <item>
-    <phone>13911111111</phone>
-    <content>xxxx</content>
+    <phone>14805999787</phone>
+    <content>叫个外卖</content>
     <time>20200701</time>
     </item>
     <item>
-    <phone>13911111444</phone>
-    <content>yyyy</content>
+    <phone>14805999754</phone>
+    <content>你真帅</content>
     <time>20200701</time>
     </item>
     </itemlist>
@@ -45,6 +45,5 @@ class TestMsgSendController extends BaseController {
     const { service } = this.ctx;
     await service.chinaMobile.sendMessage('1', '2', '13911199999', 'hello');
   }
-
 }
 module.exports = TestMsgSendController;

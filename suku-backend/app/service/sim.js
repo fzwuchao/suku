@@ -200,6 +200,29 @@ class SimService extends BaseService {
     return result;
   }
 
+  /**
+   * @param {array} simIds - 卡号
+   * @return {object} - { [simId]: { uid, uname }}
+   */
+  async getSimIdToUserMapBySimIds(simIds) {
+    const { Sim } = this.app.model;
+    const Op = this.getOp();
+    const result = await Sim.findAll({
+      where: {
+        simId: {
+          [Op.in]: simIds,
+        },
+      },
+      attributes: [ 'simId', 'uid', 'uname' ],
+    });
+
+    const simIdToUserMap = {};
+    result.forEach(sim => {
+      simIdToUserMap[sim.simId] = { uid: sim.uid, uname: sim.uname };
+    });
+    return simIdToUserMap;
+  }
+
   async syncUpdate(simId, simType) {
     const ctx = this.ctx;
     const { service, logger } = ctx;
