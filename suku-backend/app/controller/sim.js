@@ -4,7 +4,7 @@
 const _ = require('lodash');
 
 const BaseController = require('../core/baseController');
-
+const { SERV_STATUS, SERV_OP_SINGLE } = require('../extend/constant')();
 class SimController extends BaseController {
   // 查询
   async search() {
@@ -303,7 +303,7 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simIds, otherComboIds, cardStatus, voiceServStatus, privateMoney, flowServStatus, uid, uname } = request.body;
+    const { simIds, otherComboIds, cardStatus, voiceServStatus, msgServStatus, privateMoney, flowServStatus, uid, uname } = request.body;
     const data = {};
     let result = null;
     // TODO: 在调移动平台的接口前，检验这些卡号是同一个onelinkId
@@ -321,7 +321,7 @@ class SimController extends BaseController {
 
     // 停/复数据
     if (!_.isNil(flowServStatus)) {
-      data.flowServStatus = flowServStatus === 1 ? 2 : 1;
+      data.flowServStatus = flowServStatus === SERV_OP_SINGLE.OFF ? SERV_STATUS.OFF : SERV_STATUS.ON;
       result = await service.sim.updateFlowServStatus(simIds[0], flowServStatus);
       if (result.error) {
         this.fail(result.status, '', result.message);
@@ -331,13 +331,23 @@ class SimController extends BaseController {
 
     // 停/复语音
     if (!_.isNil(voiceServStatus)) {
-      data.voiceServStatus = voiceServStatus === 1 ? 2 : 1;
+      data.voiceServStatus = voiceServStatus === SERV_OP_SINGLE.OFF ? SERV_STATUS.OFF : SERV_STATUS.ON;
       result = await service.sim.updateVoiceServStatus(simIds[0], voiceServStatus);
       if (result.error) {
         this.fail(result.status, '', result.message);
         return;
       }
     }
+    // 停/复短信
+    if (!_.isNil(msgServStatus)) {
+      data.msgServStatus = msgServStatus === SERV_OP_SINGLE.OFF ? SERV_STATUS.OFF : SERV_STATUS.ON;
+      result = await service.sim.updateMsgServStatus(simIds[0], msgServStatus);
+      if (result.error) {
+        this.fail(result.status, '', result.message);
+        return;
+      }
+    }
+
     // 续费增价
     if (!_.isNil(privateMoney)) data.privateMoney = privateMoney;
 

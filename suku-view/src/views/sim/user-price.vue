@@ -7,7 +7,7 @@
       ref="ruleForm"
     >
       <el-form-item
-        label="用户增价"
+        label="用户月增价"
         prop="privateMoney"
       >
         <el-input-number

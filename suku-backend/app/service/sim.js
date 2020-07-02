@@ -452,6 +452,19 @@ class SimService extends BaseService {
     } */
     return res;
   }
+  /**
+   * 单卡短信功能开通
+   */
+  async updateMsgServStatus(simId, msgServStatus) {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const operType = msgServStatus;
+    const res = await service.chinaMobile.operateSimSmsFunction(operType, simId);
+    /* if (!res.error) {
+      await this.batchUpdateBySimIds(data, [ simId ]);
+    } */
+    return res;
+  }
 
 
 }

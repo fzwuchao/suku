@@ -108,6 +108,7 @@
 <script>
 import { Toast } from "vant";
 import Pay from './pay';
+import calcu from 'calculatorjs';
 export default {
   data() {
     return {
@@ -188,12 +189,13 @@ export default {
           let packs = combo.packs
           for(let j=0;j<packs.length;j++) {
             let pack = packs[j];
-            let packMoney = (pack.awardMoney-0) + (pack.money-0)
-            let packMonths = (packMoney/combo.monthRent);
+            let packMoney = calcu(`${pack.awardMoney} + ${pack.money}`)
+            let packMonths = calcu(`${packMoney}/${this.sim.monthRent}`);
             pack.months = packMonths;
+            pack.money = calcu(`${pack.money}+(${this.sim.privateMoney}*${packMonths})`)
             if(pack.comboType == 1 || pack.comboType == 3) {
-              pack.monthFlow =  packMonths * combo.monthFlow;
-              pack.monthVoice = packMonths * combo.monthVoice;
+              pack.monthFlow =  calcu(`${packMonths} * ${this.sim.monthFlow}`);
+              pack.monthVoice = calcu(`${packMonths} * ${this.sim.monthVoice}`);
             }  
           }
         }
@@ -221,11 +223,11 @@ export default {
         pay.months = pack.months;
         pay.orderType = combo.comboType
       } else {
-        pay.dealAmount = combo.monthRent * combo.months;
-        pay.flow = combo.monthFlow * combo.months;
-        pay.voice = combo.monthVoice * combo.months;
+        pay.dealAmount = calcu(`(${combo.monthRent}+${this.sim.privateMoney}) * ${combo.months}`);
+        pay.flow = calcu(`${combo.monthFlow} * ${combo.months}`);
+        pay.voice = calcu(`${combo.monthVoice} * ${combo.months}`);
         pay.months = combo.months;
-        pay.money = combo.monthRent * combo.months;
+        pay.money = calcu(`(${combo.monthRent}+${this.sim.privateMoney}) * ${combo.months}`);
         pay.orderType = 4;
       }
       this.payInfo = pay;

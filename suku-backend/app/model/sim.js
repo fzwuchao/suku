@@ -194,7 +194,7 @@ module.exports = app => {
       type: TINYINT(1),
       field: 'msg_serv_status',
       defaultValue: 2,
-      comment: '流量服务关停状态: 1-开, 2-关',
+      comment: '流量服务关停状态: 1-开, 0-关',
     },
     netStatus: {
       type: TINYINT(2),

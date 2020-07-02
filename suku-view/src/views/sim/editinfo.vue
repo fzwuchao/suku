@@ -86,22 +86,13 @@
         <span>{{ sim.createdAt }}</span>
       </el-form-item>
       <el-form-item
-        label="套餐增价"
-        prop="sim_id"
-      >
-        <el-input-number
-          v-model="sim.privateMoney"
-          :controls="false"
-        ></el-input-number>
-        <span class="unit">元</span>
-      </el-form-item>
-      <el-form-item
         label="套餐"
         prop="comboIds"
       >
         <el-select
           v-model="comboIds"
           clearable
+          disabled="true"
           placeholder="请选择"
           multiple
         >
@@ -114,6 +105,17 @@
           </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item
+        label="用户月增价"
+        prop="privateMoney"
+      >
+        <el-input-number
+          v-model="sim.privateMoney"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">元</span>
+      </el-form-item>
+      
       <el-form-item label="过期时间">
         <el-date-picker
           v-model="sim.overdueTime"
@@ -181,7 +183,7 @@ export default {
     serveStatus(val) {
       const serveStatus = {
         1: "开",
-        2: "关"
+        0: "关"
       };
       return serveStatus[val];
     }

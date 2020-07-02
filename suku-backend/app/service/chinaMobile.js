@@ -274,7 +274,7 @@ class ChinaMobileService extends BaseService {
     };
 
     // 在 operType 为 9或 11 时，原因必传01：主动停复机
-    if ([9, 11].indexOf(operType) > -1 && _.isNil(reason)) {
+    if ([ 9, 11 ].indexOf(operType) > -1 && _.isNil(reason)) {
       data.reason = '01';
     }
 
@@ -648,7 +648,7 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号
    * @param {string} operType - 0:开 1:停
    */
-  async operateSimSmsFunction(msisdn, operType) {
+  async operateSimSmsFunction(operType, msisdn) {
     const data = {
       msisdn,
       operType,

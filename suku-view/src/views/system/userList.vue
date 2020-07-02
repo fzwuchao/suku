@@ -3,9 +3,9 @@
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
       <el-button type="primary" size="mini" @click.native="addUser">增加</el-button>
-      <el-button type="primary" size="mini" @click.native="openMsg">开通短信</el-button>
+      <!--<el-button type="primary" size="mini" @click.native="openMsg">开通短信</el-button>
       <el-button type="primary" size="mini" @click.native="openAutoTransfer(1)">开启自动转账</el-button>
-      <el-button type="primary" size="mini" @click.native="openAutoTransfer(0)">关闭自动转账</el-button>
+      <el-button type="primary" size="mini" @click.native="openAutoTransfer(0)">关闭自动转账</el-button>-->
     </div>
 
     <el-table

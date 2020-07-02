@@ -37,6 +37,18 @@
       >恢复数据</el-button>
       <el-button
         type="warning"
+        size="mini"
+        :disabled="isOneRow"
+        @click="msgServStatus(true)"
+      >停短信</el-button>
+      <el-button
+        type="warning"
+        size="mini"
+        :disabled="isOneRow"
+        @click="msgServStatus(false)"
+      >恢复短信</el-button>
+      <el-button
+        type="warning"
         v-if="simType === 'B'"
         size="mini"
         :disabled="isOneRow"
@@ -134,7 +146,8 @@
       </el-table-column>
       <el-table-column
         align="left"
-        label="用户增价"
+        label="用户月增价"
+        min-width="120px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.privateMoney }}</template>
@@ -240,6 +253,15 @@
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.voiceServStatus | serveStatus }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
+        v-if="simType === 'B'"
+        label="短信服务状态"
+        min-width="100px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.msgServStatus | serveStatus }}</template>
       </el-table-column>
 
       <el-table-column
@@ -485,7 +507,7 @@ export default {
       }
       // 对应复机/停机后卡的状态
       const cardStatus = isActivated ? "2" : "4";
-      this.confirm(`是否批量${isActivated ? "复机" : "停机"}选中的卡`, () => {
+      this.confirm(`是否${isActivated ? "复机" : "停机"}选中的卡`, () => {
         this.batchUpdate({
           cardStatus
         });
@@ -534,9 +556,43 @@ export default {
         return;
       }
       const flowServStatus = status? 1 : 0;
-      this.confirm(`是否批量${!status ? "恢复" : "关闭"}选中的卡`, () => {
+      this.confirm(`是否${!status ? "恢复" : "关闭"}选中的卡`, () => {
         this.batchUpdate({
           flowServStatus
+        });
+      });
+    },
+    
+    checkMsgServ(status) {
+      return this.multipleSelection.every(item => {
+        return item.msgServStatus + '' === status;
+      });
+    },
+    msgServStatus(status) {
+      const handlingMsgServStatus = status? '1' : '0';
+      const statusError = {
+        1: "请确保所有卡的语音服务都是开启的",
+        0: "请确保所有卡的语音服务都是关闭的",
+        3: "请确保所有卡都是已激活状态"
+      };
+      if (!this.checkStatus('2')) {
+        this.$message({
+          type: "warning",
+          message: statusError[3]
+        });
+        return;
+      }
+      if (!this.checkMsgServ(handlingMsgServStatus)) {
+        this.$message({
+          type: "warning",
+          message: statusError[handlingMsgServStatus]
+        });
+        return;
+      }
+      const msgServStatus = status? 1 : 0;
+      this.confirm(`是否${!status ? "恢复" : "关闭"}选中的卡`, () => {
+        this.batchUpdate({
+          msgServStatus
         });
       });
     },
