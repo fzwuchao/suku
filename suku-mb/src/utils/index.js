@@ -29,10 +29,10 @@ export function getOpenId() {
         code: codeList[1]
       }
     }).then((res) => {
-      // if (res.data.code === 200) {
-      //   sessionStorage.setItem('openId', res.data.data.openid);
+       if (res.data.code === 200) {
+         sessionStorage.setItem('openId', res.data.data.openid);
          resolve(res);
-      // }
+       }
     });
   });
 }

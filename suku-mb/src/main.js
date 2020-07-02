@@ -36,7 +36,7 @@ import {
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-
+import { getOpenId } from './utils/index'
 import axios from './utils/axiosPlugin';
 let vantComponents = [
     Button,
@@ -69,6 +69,15 @@ Vue.component("SvgIcon", SvgIcon);
 Vue.use(axios);
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
+router.beforeEach((to, from, next) => {
+  if (to.query.preview === 'yes') {
+    next();
+  } else {
+    getOpenId().then(() => {
+      next();
+    });
+  }
+});
 new Vue({
     name: "APP",
     router,
