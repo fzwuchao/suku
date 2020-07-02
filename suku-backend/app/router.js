@@ -35,6 +35,8 @@ module.exports = app => {
   router.post('/permission/save', controller.permission.save);
   // 删除
   router.delete('/role/delete', controller.role.delete);
+  // 获取角色类型
+  router.get('/role/roleType', controller.role.getRoleType);
 
   // 查询sim卡
   router.get('/sim/search', controller.sim.search);

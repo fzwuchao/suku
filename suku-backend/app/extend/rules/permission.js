@@ -16,6 +16,9 @@ const PermissionRules = {
   roleId: {
     type: 'int?',
   },
+  roleType: {
+    type: 'int?',
+  },
 };
 
 module.exports = PermissionRules;
