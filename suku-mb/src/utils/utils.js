@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable no-control-regex */
 // 求数组中的最大值和最小值
 
 export const getByteLen = function(val, maxLen) {
@@ -20,6 +22,7 @@ export const getByteLen = function(val, maxLen) {
     }
     return len
 }
+
 
 export const formatterText = function(text, num) {
     var len = 0
@@ -78,7 +81,6 @@ export function param2Obj(url) {
     return JSON.parse('{"' + decodeURIComponent(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
 }
 
-/*global toString:true*/
 
 // utils is a library of generic helper functions non-specific to axios
 

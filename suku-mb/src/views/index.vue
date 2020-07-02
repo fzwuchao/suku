@@ -35,6 +35,7 @@
 <script>
 import { Toast } from "vant";
 import { validateTel } from "../utils/validate"
+import { getOpenId } from '../utils/index'
 export default {
   data() {
     return {
@@ -69,15 +70,26 @@ export default {
           Toast("此卡号不是本平台的卡，请仔细检查！");
         }
       });
-    }
+    },
     /* doWechatPay(json) {
       WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
         if (res.err_msg == "get_brand_wcpay_request:ok") {
         }
       });
     } */
+    getCode() {
+      this.axios({
+        method: "get",
+        url: "/wechat/getOpenId"
+      }).then(() => {
+        
+      });
+    }
   },
-  mounted() {}
+  mounted() {
+    // this.getCode()
+    getOpenId();
+  }
 };
 </script>
 <style lang="scss">
