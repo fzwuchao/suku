@@ -803,13 +803,14 @@ class ChinaMobileService extends BaseService {
     result.success = true;
     result.msg = retcodeMap[retcodeValue];
 
-    let messageData = [];
+    const messageData = [];
     if (itemlist.length > 0) {
-      messageData = itemlist[0].item;
-      messageData.forEach(m => {
-        m.content = m.content[0];
-        m.phone = m.phone[0];
-        m.time = m.time[0];
+      itemlist[0].item.forEach(m => {
+        messageData.push({
+          content: m.content[0],
+          simId: m.phone[0],
+          // time: m.time[0],
+        });
       });
     }
     result.data = { messageData, retmesg: retmesgValue, retcode: retcodeValue };

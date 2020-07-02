@@ -45,13 +45,13 @@
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
-        :current-page="data.pageNum"
+        :current-page="pageNum"
         @current-change="pageChange"
         :page-sizes="[20, 30, 50, 100]"
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
   </div>
@@ -71,7 +71,8 @@ export default {
     };
   },
   methods: {
-    pageChange() {
+    pageChange(page) {
+      this.pageNum = page;
       this.getlist();
     },
     editOnelink(user) {

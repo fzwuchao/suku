@@ -152,7 +152,7 @@ module.exports = app => {
 
   // 用于模拟发送短信，之后可删除
   router.post('/testMsgSend', controller.testMsgSend.testMsgSend);
-  router.post('/testMsgSendUpgoing', controller.testMsgSend.testMsgSend);
+  router.post('/testMsgSendUpgoing', controller.testMsgSend.testMsgSendUpgoing);
   router.get('/tMsgSend', controller.testMsgSend.tMsgSend);
   router.get('/tMsgSendUpgoing', controller.testMsgSend.tMsgSendUpgoing);
 

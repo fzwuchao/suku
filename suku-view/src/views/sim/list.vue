@@ -729,7 +729,10 @@ export default {
     type: function(newVal) {
       const isSame = this.simType === newVal;
       this.simType = newVal;
-      !isSame && this.getlist();
+      if (!isSame) {
+        this.pageNum = 1;
+        this.getlist();
+      }
       // 由于动态展示列表字段，当被叫卡切换到主叫卡时，主叫卡的数据部份top,height计算不对，导致未显示出来
       this.$nextTick(() => {
         this.$refs["multipleTable"].doLayout();
