@@ -108,6 +108,7 @@ export default {
     let checkUsername = (rule, value, callback) => {
       if((value && value.trim() == '') || !value) {
         callback("请输入用户名");
+        return;
       }
       if(!this.initUsername || this.initUsername != this.user.username){
         this.axios({
@@ -121,8 +122,30 @@ export default {
             callback();
           }
         });
+      } else {
+        callback();
       }
-      callback();
+    };
+    let checkName = (rule, value, callback) => {
+      if((value && value.trim() == '') || !value) {
+        callback("请输入昵称");
+        return;
+      }
+      if(!this.initName || this.initName != this.user.name){
+        this.axios({
+          method: "get",
+          params: {name:value},
+          url: API.USERS.GET_USER_BY_NAME
+        }).then((r) => {
+          if(r.data.exit) {
+            callback(r.msg);
+          } else {
+            callback();
+          }
+        });
+      } else {
+        callback();
+      }
     };
     return {
       isSysManager: false,
@@ -138,12 +161,13 @@ export default {
         "roleId": null      
       },
       initUsername: '',
+      initName: '',
       rules: {
         username: [
           { required: true, validator: checkUsername,  trigger: "blur" }
         ],
         name: [
-          { required: true, message: "请输入昵称", trigger: "blur" }
+          { required: true, validator: checkName, trigger: "blur" }
         ],
         phone:[
           {validator: checkPhone, trigger: 'blur'}
@@ -176,6 +200,8 @@ export default {
         url: API.USERS.GET_USER_BY_ID
       }).then((r) => {
         this.user = r.data
+        this.initUsername = this.user.username;
+        this.initName = this.user.name;
       });
     },
     getRoles() {

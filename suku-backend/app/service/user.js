@@ -32,6 +32,15 @@ class UserService extends BaseService {
 
     return user;
   }
+  async getUserByName(name) {
+    const user = await this.app.model.User.findOne({
+      where: {
+        name,
+      },
+    });
+
+    return user;
+  }
   async getUserById(id) {
     const attributes = [ 'id', 'phone', 'name', 'username', 'email', 'mchId', 'rate', 'roleId' ];
     const [ user ] = await this.app.model.User.findAll({ attributes,
@@ -135,6 +144,10 @@ class UserService extends BaseService {
 
   async update(user) {
     try {
+      if (user.password && user.username) {
+        user.uuid = uuid();
+        user.password = MD5(user.username + user.password + 'sukuwulian');
+      }
       await this.app.model.User.update(user, { where: { id: user.id } });
     } catch (e) {
       return false;

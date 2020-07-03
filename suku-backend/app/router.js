@@ -80,6 +80,8 @@ module.exports = app => {
   router.get('/user/searchUser', controller.user.getUserlist);
   // 根据用户名获取用户
   router.get('/user/getUserByUsername', controller.user.getUserByUsername);
+  // 根据昵称获取用户
+  router.get('/user/getUserByName', controller.user.getUserByName);
   // 根据用户Id获取用户
   router.get('/user/getUserById', controller.user.getUserById);
   // 保存或者更新用户
@@ -92,7 +94,8 @@ module.exports = app => {
   router.get('/user/getSelectUsers', controller.user.getSelectUsers);
   // 获取一级子用户
   router.get('/user/getChildUsers', controller.user.getChildUsers);
-
+  // 更新密码
+  router.post('/user/updatePwd', controller.user.updatePwd);
 
   // 获取onelink配置列表
   router.get('/onelink/searchOnelink', controller.onelinkPlatform.getOnelinklist);
