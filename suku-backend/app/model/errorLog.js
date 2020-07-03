@@ -38,7 +38,7 @@ module.exports = app => {
       comment: '接口的请求类型：1:query,2:change,3:config,4:operate',
     },
     result: {
-      type: STRING(200),
+      type: STRING(3000),
       field: 'result',
     },
     onelinkId: {
@@ -67,7 +67,7 @@ module.exports = app => {
 
   ErrorLog.associate = function() {
     // 与Classes存在多对一关系，所以使用belongsTo()
-    app.model.ErrorLog.belongsTo(app.model.OnelinkPlatform, { foreignKey: 'onelinkId', targetKey: 'id' });
+    app.model.ErrorLog.belongsTo(app.model.OnelinkPlatform, { foreignKey: 'onelinkId', targetKey: 'id', as: 'onelink' });
 
   };
 

@@ -1,8 +1,8 @@
 <template>
   <div class="sim-list">
     <div class="btn-list">
-      <el-button type="primary" size="mini" @click="openWithdrawal">提现</el-button>
-      <span>开启自动转账的用户所有订单提现状态都是已完成</span>
+     <!-- <el-button type="primary" size="mini" @click="openWithdrawal">提现</el-button>
+      <span>开启自动转账的用户所有订单提现状态都是已完成</span> -->
     </div>
 
     <el-table
@@ -57,12 +57,12 @@
       <el-table-column align="left" label="创建时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.createdAt }}</template>
       </el-table-column>
-      <el-table-column align="left" min-width="120px" label="提现流水号" show-overflow-tooltip>
+      <!-- <el-table-column align="left" min-width="120px" label="提现流水号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
-      </el-table-column>
-      <el-table-column align="left" label="提现状态" show-overflow-tooltip>
+      </el-table-column> -->
+      <!-- <el-table-column align="left" label="提现状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.renewPrice }}</template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <div class="page">
       <el-pagination

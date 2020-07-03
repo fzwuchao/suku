@@ -28,6 +28,7 @@ class ErrorLogService extends BaseService {
       where,
       include: {
         model: this.app.model.OnelinkPlatform,
+        as: 'onelink',
       },
     });
     return result;

@@ -15,7 +15,7 @@
       @selection-change="handleSelectionChange"
     >
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
-
+      <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
       <el-table-column
         align="left"
         fixed="left"
