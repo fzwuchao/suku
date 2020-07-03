@@ -21,9 +21,9 @@
           >
             <el-option
             v-for="rt in roleTypeList"
-            :key="rt.code"
-            :label="rt.displayName"
-            :value="rt.code">
+            :key="rt.CODE"
+            :label="rt.DISPLAYNAME"
+            :value="rt.CODE">
             </el-option>
           </el-select>
         </el-form-item>
@@ -181,7 +181,7 @@ export default {
       this.$router.push("/system/roleList");
     },
     getRoleType(code) {
-      const [ roleType ] = this.roleTypeList.filter(roleType => roleType.code === code);
+      const [ roleType ] = this.roleTypeList.filter(roleType => roleType.CODE === code);
       return roleType;
     },
     changeRoleType(val) {

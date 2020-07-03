@@ -14,7 +14,7 @@ module.exports = app => {
   router.post('/login', controller.login.login);
 
   // 退出登录
-  router.put('/logout', controller.login.logout);
+  router.post('/logout', controller.login.logout);
 
   // 获取验证码
   router.get('/getCaptcha', controller.captcha.getCaptcha);

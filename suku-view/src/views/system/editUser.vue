@@ -32,6 +32,7 @@
         <el-input v-model="user.email"></el-input>
       </el-form-item>
       <el-form-item
+        v-if="isSysManager"
         label="分成率"
         prop="rate"
       >
@@ -124,6 +125,7 @@ export default {
       callback();
     };
     return {
+      isSysManager: false,
       user: {
         "id": null,
         "name": "",
@@ -213,10 +215,14 @@ export default {
           return false;
         }
       });
-    }
+    },
+    getRoleType() {
+      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager = userInfo.roleType === 1;
+    },
   },
   mounted() {
-
+    this.getRoleType();
   },
   created() {
     let { id } = this.$route.params;

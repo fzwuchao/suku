@@ -1,5 +1,5 @@
 'use strict';
-
+const { ROLE_TYPE } = require('../extend/constant')();
 const BaseController = require('../core/baseController');
 
 class UserController extends BaseController {
@@ -57,8 +57,10 @@ class UserController extends BaseController {
       this.fail(null, null, '删除失败');
     }
   }
+
   getRoleType() {
-    this.success(this.ctx.helper.ROLE_TYPE, null);
+    this.success(ROLE_TYPE, null);
   }
+
 }
 module.exports = UserController;

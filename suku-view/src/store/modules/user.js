@@ -7,7 +7,7 @@ import {
     removeIsLogin
 } from '@/utils/auth'
 import API from '@/api'
-import GLOBAL from '@/utils/global'
+// import GLOBAL from '@/utils/global'
 import {
     MD5
 } from '@/utils/md5'
@@ -121,8 +121,8 @@ const user = {
         LogOut() {
             return new Promise((resolve, reject) => {
                 request({
-                    url: GLOBAL.API.POST_LOGOUT,
-                    method: 'get'
+                    url: API.LOGIN.LOGOUT,
+                    method: 'post'
                 }).then(response => {
                     removeIsLogin()
                     localStorage.removeItem('loginUsername')

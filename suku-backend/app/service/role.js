@@ -93,6 +93,11 @@ class RoleService extends BaseService {
       return false;
     }
   }
+
+  async getRoleTypeById(id) {
+    const role = await this.ctx.model.Role.findByPk(id);
+    return role ? role.roleType : null;
+  }
 }
 
 module.exports = RoleService;

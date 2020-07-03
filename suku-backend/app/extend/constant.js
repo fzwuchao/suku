@@ -83,6 +83,17 @@ const SERVICE_TYPE = {
   FLOW: '11',
   MSG: '08',
 };
+
+// 角色类型:1-系统管理员, 2-仓库管理员, 3-业务员, 4-运营客服, 5-经销商, 6-分销商
+const ROLE_TYPE = [
+  { NAME: 'sysManager', DISPLAYNAME: '系统管理员', CODE: 1, LEVEL: 0 },
+  { NAME: 'warehouseManager', DISPLAYNAME: '仓库管理员', CODE: 2, LEVEL: 1 },
+  { NAME: 'clerk', DISPLAYNAME: '业务员', CODE: 3, LEVEL: 2 },
+  { NAME: 'operation_service', DISPLAYNAME: '运营客服', CODE: 4, LEVEL: 1 },
+  { NAME: 'dealer', DISPLAYNAME: '经销商', CODE: 5, LEVEL: 3 },
+  { NAME: 'reseller', DISPLAYNAME: '分销商', CODE: 6, LEVEL: 4 },
+];
+
 module.exports = () => {
   return {
     SERV_STATUS,
@@ -103,5 +114,6 @@ module.exports = () => {
     ORDER_STATUS,
     ORDER_TYPE,
     SERVICE_TYPE,
+    ROLE_TYPE,
   };
 };

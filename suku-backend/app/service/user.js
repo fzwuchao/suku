@@ -33,7 +33,7 @@ class UserService extends BaseService {
     return user;
   }
   async getUserById(id) {
-    const attributes = [ 'id', 'phone', 'name', 'username', 'email', 'mchId', 'rate' ];
+    const attributes = [ 'id', 'phone', 'name', 'username', 'email', 'mchId', 'rate', 'roleId' ];
     const [ user ] = await this.app.model.User.findAll({ attributes,
       where: {
         id,
