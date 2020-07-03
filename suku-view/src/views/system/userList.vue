@@ -50,9 +50,10 @@
         <template slot-scope="scope">{{ scope.row.pname}}</template>
       </el-table-column>
 
-      <el-table-column fixed="right" label="操作" width="100">
+      <el-table-column fixed="right" label="操作" width="120">
         <template slot-scope="scope">
           <el-button type="text" @click="editUser(scope.row)" size="small">编辑</el-button>
+          <el-button type="text" @click="modifyPwd(scope.row)" size="small">修改密码</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -68,14 +69,22 @@
         :total="data.totalRecords"
       ></el-pagination>
     </div>
+    <modify-pwd :dialogVisible="dialogVisible" @close="close" :userId="userId" :username="username"></modify-pwd>
   </div>
 </template>
 
 <script>
 import API from "@/api";
+import ModifyPwd from "@/components/ModifyPwd";
 export default {
+  components: {
+    ModifyPwd,
+  },
   data() {
     return {
+      username: '',
+      userId: null,
+      dialogVisible: false,
       pageNum: 1,
       pageTotal: 1,
       pageSize: 10,
@@ -90,6 +99,15 @@ export default {
     }
   },
   methods: {
+    modifyPwd({ id, username }) {
+      this.userId = id;
+      this.username = username;
+      this.dialogVisible = true;
+    },
+    close() {
+      this.dialogVisible = false;
+      this.userId = null;
+    },
     pageChange(page) {
       this.pageNum = page;
       this.getlist();

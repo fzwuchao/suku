@@ -26,6 +26,7 @@ module.exports = app => {
     name: {
       type: STRING(30), // '用户名'
       allowNull: false,
+      unique: true,
     },
     email: STRING(30), // '邮箱',
     mchId: {

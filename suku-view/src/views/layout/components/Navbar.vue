@@ -29,6 +29,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </el-menu>
+    <modify-pwd :dialogVisible="dialogVisible" @close="close" :userId="userId" :username="loginUsername"></modify-pwd>
   </div>
 </template>
 
@@ -37,30 +38,49 @@ import GLOBAL from "../../../utils/global";
 import { mapGetters } from "vuex";
 // import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
+import ModifyPwd from "@/components/ModifyPwd";
 
 export default {
   components: {
     // Breadcrumb,
-    Hamburger
+    Hamburger,
+    ModifyPwd
   },
   data() {
     return {
       host: GLOBAL.HOST,
-      user: {}
+      user: {},
+      dialogVisible: false,
     };
   },
   computed: {
+    userId() {
+      return JSON.parse(localStorage.getItem('userInfo')).id;
+    },
     loginUsername() {
       return localStorage.getItem("loginUsername");
     },
     ...mapGetters(["sidebar", "avatar"])
   },
   methods: {
+    close() {
+      this.dialogVisible = false;
+      this.$message({
+        showClose: true,
+        message: '密码已修改，将自动跳转到登录页',
+        type: 'warning',
+        onClose: () => {
+          this.logout();
+        }
+      });
+      
+    },
     handleCommand(command) {
       if (command === "modify") {
-        this.$router.push({
-          path: "/user/changepassword"
-        });
+        // this.$router.push({
+        //   path: "/user/changepassword"
+        // });
+        this.dialogVisible = true;
       } else if (command === "logout") {
         this.logout();
       }
