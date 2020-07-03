@@ -81,12 +81,6 @@ export default {
       data: null,
       searchData: [
         {
-          name: "name",
-          title: "SIM卡号",
-          type: "inputText",
-          value: ""
-        },
-        {
           name: "status",
           title: "接口返回状态码",
           type: "inputText",

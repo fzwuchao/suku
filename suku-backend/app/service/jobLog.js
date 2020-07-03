@@ -29,14 +29,18 @@ class JobLogService extends BaseService {
       where,
       include: {
         model: this.app.model.OnelinkPlatform,
+        as: 'onelink',
       },
     });
+    // await this.ctx.service.schedule.monthCalculate();
+    await this.ctx.service.schedule.syncUpdateBatch();
     return result;
   }
 
   async dealUnfinishedJobs(jobLog) {
     const { ctx } = this;
-    const { service } = ctx;
+    const { service, logger } = ctx;
+    logger.info(`【开始执行队列：】:${jobLog.name} ms`);
     const { params, name, onelinkId, jobId, url } = jobLog;
     const api = {
       name,
