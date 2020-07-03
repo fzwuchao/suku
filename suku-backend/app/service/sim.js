@@ -66,7 +66,6 @@ class SimService extends BaseService {
   async getSimPageData({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
     const result = this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
-    // await this.updateCardStatusBatch('2');
 
     return simData;
   }

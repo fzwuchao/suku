@@ -39,7 +39,7 @@
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">卡状态</p>
-            <p class="recharge-info-value">{{sim.cardStatus | cardStatus}}</p>
+            <p class="recharge-info-value">{{sim | cardStatus}}</p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">过期时间</p>
@@ -127,6 +127,7 @@ export default {
   },
   filters: {
     cardStatus(val) {
+      let str = '';
       const status= {
         '1' : "待激活",
         '2' : "正常",
@@ -135,7 +136,12 @@ export default {
         '21': "注销",
         '22': "欠费"
       }
-      return status[val];
+      if(val.flowServStatus == 0 && val.voiceServStatus == 0) {
+        str = '停机';
+      } else {
+        str = status[val.cardStatus];
+      }
+      return str;
     }
   },
   methods: {

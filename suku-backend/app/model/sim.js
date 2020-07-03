@@ -116,8 +116,9 @@ module.exports = app => {
         const monthFlow = this.getDataValue('monthFlow') || 0;
         const monthOverlapFlow = this.getDataValue('monthOverlapFlow') || 0;
         const monthUsedFlow = this.getDataValue('monthUsedFlow') || 0;
+        const virtualMult = this.getDataValue('virtualMult') || 1;
 
-        return calc(`${monthFlow} + ${monthOverlapFlow} - ${monthUsedFlow}`);
+        return calc(`${monthFlow} + ${monthOverlapFlow} - ${monthUsedFlow} * ${virtualMult}`);
       },
     },
     // 总流量
@@ -177,6 +178,14 @@ module.exports = app => {
       type: DECIMAL(10, 3),
       field: 'shengyu_money',
       comment: '剩余金额',
+    },
+    virtualMult: {
+      type: DECIMAL(10, 2),
+      field: 'virtual_mult',
+      get() {
+        return this.getDataValue('virtualMult') || 1;
+      },
+      comment: '大流量卡已使用流量的虚拟倍数',
     },
     voiceServStatus: {
       type: TINYINT(1),

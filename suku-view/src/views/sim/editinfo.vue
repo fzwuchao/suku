@@ -92,7 +92,7 @@
         <el-select
           v-model="comboIds"
           clearable
-          disabled="true"
+          :disabled="true"
           placeholder="请选择"
           multiple
         >
@@ -114,6 +114,16 @@
           :controls="false"
         ></el-input-number>
         <span class="unit">元</span>
+      </el-form-item>
+      <el-form-item
+        label="虚拟倍数"
+        prop="virtualMult"
+      >
+        <el-input-number
+          v-model="sim.virtualMult"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">倍</span>
       </el-form-item>
       
       <el-form-item label="过期时间">

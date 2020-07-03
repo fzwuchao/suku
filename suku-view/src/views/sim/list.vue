@@ -14,12 +14,14 @@
       <el-button
         type="warning"
         size="mini"
+        v-if="simType === 'A'"
         :disabled="isOneRow"
         @click="activate(false)"
       >停机</el-button>
       <el-button
         type="warning"
         size="mini"
+        v-if="simType === 'A'"
         :disabled="isOneRow"
         @click="activate(true)"
       >复机</el-button>
@@ -183,6 +185,14 @@
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.monthUsedFlow ? scope.row.monthUsedFlow : 0}` }}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
+        label="虚拟倍数"
+        min-width="100px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ `${scope.row.virtualMult}` }}</template>
       </el-table-column>
       <el-table-column
         align="left"
