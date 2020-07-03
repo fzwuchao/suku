@@ -227,6 +227,7 @@ class SimController extends BaseController {
         onelinkId: params.onelinkId,
         onelinkName: params.onelinkName,
         simType: params.simType,
+        virtualMult: params.virtualMult,
         monthFlow,
         monthVoice,
         renewPrice,

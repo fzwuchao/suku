@@ -25,6 +25,16 @@
         </el-select>
       </el-form-item>
       <el-form-item
+        label="虚拟倍数"
+        prop="virtualMult"
+      >
+        <el-input-number
+          v-model="sim.virtualMult"
+          :controls="false"
+        ></el-input-number>
+        <span class="unit">倍</span>
+      </el-form-item>
+      <el-form-item
         label="选择叠加套餐"
         prop="increaseComboIds"
       >
@@ -145,6 +155,7 @@ export default {
         onelinkId: "",
         onelinkName: "",
         simType: "A",
+        virtualMult: 1,
         filepath: ""
       },
       increaseComboIds: [],
