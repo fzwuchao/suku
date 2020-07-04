@@ -72,8 +72,8 @@ class ScheduleService extends BaseService {
     const startTime = moment().milliseconds();
     const result = await service.sim.getActivedSim();
     for (let i = 0; i < result.length; i++) {
-      const { simId, simType } = result[i];
-      await service.sim.syncUpdate(simId, simType);
+      const { simId, simType, activeComboId } = result[i];
+      await service.sim.syncUpdate(simId, simType, activeComboId);
     }
     // result.map(sim => {
     //   const { simId, simType } = sim;

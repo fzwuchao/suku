@@ -222,7 +222,7 @@ class SimService extends BaseService {
     return simIdToUserMap;
   }
 
-  async syncUpdate(simId, simType) {
+  async syncUpdate(simId, simType, activeComboId) {
     const ctx = this.ctx;
     const { service, logger } = ctx;
     const startTime = moment().milliseconds();
@@ -254,6 +254,11 @@ class SimService extends BaseService {
     if (activeTime) {
       params.activeTime = activeTime;
       params.isActive = 1;
+      if (simType === 'A') {
+        const combo = service.simCombo.getSimComboById(activeComboId);
+        const newTime = moment(activeTime).add(combo.months, 'M');
+        params.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
+      }
     }
 
     params.cardStatus = cardStatus;

@@ -33,7 +33,7 @@ class JobLogService extends BaseService {
       },
     });
     // await this.ctx.service.schedule.monthCalculate();
-    await this.ctx.service.schedule.syncUpdateBatch();
+    // await this.ctx.service.schedule.syncUpdateBatch();
     return result;
   }
 

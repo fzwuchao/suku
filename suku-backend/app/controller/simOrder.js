@@ -32,7 +32,9 @@ class MessageSendController extends BaseController {
     const order = request.body;
     order.uname = sim.uname;
     order.uid = sim.uid;
-    order.renewIncrAmount = calc(`${order.dealAmount} - ${sim.privateMoney} * ${order.months}`);
+    if (!order.orderType === 2) {
+      order.renewIncrAmount = calc(`${order.dealAmount} - ${sim.privateMoney} * ${order.months}`);
+    }
     const newOrdere = await ctx.service.simOrder.create(order);
     const result = await payApi.getPayParams({
       out_trade_no: newOrdere.orderId,
