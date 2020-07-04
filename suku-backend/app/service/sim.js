@@ -308,7 +308,12 @@ class SimService extends BaseService {
     }
     data.flowServStatus = flowServStatus;
     const operType = flowServStatus === SIM_FLOW_SERV_STATUS.OFF ? SERV_OP_BATCH.OFF : SERV_OP_BATCH.ON;
-    query.flowServStatus = flowServStatus === SIM_FLOW_SERV_STATUS.OFF ? SIM_FLOW_SERV_STATUS.ON : SIM_FLOW_SERV_STATUS.OFF;
+    const queryStatus = flowServStatus === SIM_FLOW_SERV_STATUS.OFF ? SIM_FLOW_SERV_STATUS.ON : SIM_FLOW_SERV_STATUS.OFF;
+    if (typeof query === 'string') {
+      query = query + ' and flow_serv_status = ' + queryStatus;
+    } else {
+      query.flowServStatus = queryStatus;
+    }
     const { oneLinkSimIds } = await this.getOnelinkSimIds(query);
     for (const key in oneLinkSimIds) {
       const simIds = oneLinkSimIds[key];
@@ -341,7 +346,12 @@ class SimService extends BaseService {
     }
     data.voiceServStatus = voiceServStatus;
     const operType = voiceServStatus === SIM_VOICE_SERV_STATUS.OFF ? SERV_OP_BATCH.OFF : SERV_OP_BATCH.ON;
-    query.voiceServStatus = voiceServStatus === SIM_VOICE_SERV_STATUS.OFF ? SIM_VOICE_SERV_STATUS.ON : SIM_VOICE_SERV_STATUS.OFF;
+    const queryStatus = voiceServStatus === SIM_VOICE_SERV_STATUS.OFF ? SIM_VOICE_SERV_STATUS.ON : SIM_VOICE_SERV_STATUS.OFF;
+    if (typeof query === 'string') {
+      query = query + ' and voice_serv_status = ' + queryStatus;
+    } else {
+      query.voiceServStatus = queryStatus;
+    }
     const { oneLinkSimIds } = await this.getOnelinkSimIds(query);
     for (const key in oneLinkSimIds) {
       const simIds = oneLinkSimIds[key];
@@ -391,11 +401,20 @@ class SimService extends BaseService {
     const oneLinkSimIds = {};
     const simIds = [];
     for (let i = 0; i < onelinks.length; i++) {
-      where.onelinkId = onelinks[i].id;
-      const result = await this.app.model.Sim.findAll({
-        attributes: [ 'simId' ],
-        where,
-      });
+      let result;
+      if (typeof where === 'string') {
+        where = where + ' and onelink_id = ' + onelinks[i].id;
+        const sql = 'SELECT `sim_id` AS `simId` FROM `sim` WHERE (`deleted_at` IS NULL AND (' + where + '));';
+        result = await this.app.model.query(sql);
+        result = result[0];
+      } else {
+        where.onelinkId = onelinks[i].id;
+        result = await this.app.model.Sim.findAll({
+          attributes: [ 'simId' ],
+          where,
+        });
+      }
+
       // const result1 = await this.findAndCountAll('Sim', 3, 4, { attributes: [ 'simId' ], where });
       // const result = result1.list;
       const simStrList = [];

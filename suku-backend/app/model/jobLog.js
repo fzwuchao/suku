@@ -66,7 +66,7 @@ module.exports = app => {
 
   JobLog.associate = function() {
     // 与Classes存在多对一关系，所以使用belongsTo()
-    app.model.JobLog.belongsTo(app.model.OnelinkPlatform, { foreignKey: 'onelinkId', targetKey: 'id' });
+    app.model.JobLog.belongsTo(app.model.OnelinkPlatform, { foreignKey: 'onelinkId', targetKey: 'id', as: 'onelink' });
 
   };
 

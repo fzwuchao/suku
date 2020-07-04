@@ -5,6 +5,7 @@
 
 const BaseService = require('../core/baseService');
 const moment = require('moment');
+
 const {
   SIM_CARD_STATUS,
   SIM_FLOW_SERV_STATUS,
@@ -26,24 +27,26 @@ class ScheduleService extends BaseService {
     const startTime = moment().milliseconds();
     // 修改余额，已用流量，已用语音清零，叠加流量清零
     let updateSql = 'update sim set';
-    updateSql += ' shengyu_money = shengyu_money - monthRent,'; // 余额减去月租
+    updateSql += ' shengyu_money = shengyu_money - month_rent,'; // 余额减去月租
     updateSql += ' month_used_flow =0,'; // 已用流量清零
     updateSql += ' month_used_voice_duration=0,'; // 已用语音清零
     updateSql += ' month_overlap_voice_duration=0,'; // 叠加语音清零
-    updateSql += ' month_overlap_flow=0,'; // 叠加流量清零
+    updateSql += ' month_overlap_flow=0'; // 叠加流量清零
     updateSql += ' where shengyu_money > 0';
-    updateSql += '  and isActive = 1';
+    updateSql += '  and is_active = 1';
     await this.app.model.query(updateSql);
 
     // 已过期的被叫卡进行停机处理
     const calledQuery = {
       overdueTime: { [OP.lt]: new Date() },
+      cardStatus: SIM_CARD_STATUS.ACTIVE,
       simType: SIM_TYPE.CALLED,
     };
     await service.sim.updateCardStatusBatch(SIM_CARD_STATUS.STOP, calledQuery);
     // 已过期的主叫卡进行停流量停语音的处理
     const callQuery = {
       overdueTime: { [OP.lt]: new Date() },
+      cardStatus: SIM_CARD_STATUS.ACTIVE,
       simType: SIM_TYPE.CALL,
     };
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, callQuery);
@@ -51,6 +54,7 @@ class ScheduleService extends BaseService {
     // 上月超流量，超语音的卡服务打开处理
     const servQuery = {
       overdueTime: { [OP.gt]: new Date() },
+      cardStatus: SIM_CARD_STATUS.ACTIVE,
     };
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.ON, servQuery);
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.ON, servQuery);
@@ -63,22 +67,22 @@ class ScheduleService extends BaseService {
  */
   async syncUpdateBatch() {
     const { service, logger } = this.ctx;
-    const OP = this.getOp();
+    // const OP = this.getOp();
     logger.info('********************同步卡基本信息*********************');
     const startTime = moment().milliseconds();
     const result = await service.sim.getActivedSim();
-    const promises = result.map(sim => {
-      const { simId, simType } = sim;
-      return service.sim.syncUpdate(simId, simType);
-    });
-    await Promise.all(promises);
+    for (let i = 0; i < result.length; i++) {
+      const { simId, simType } = result[i];
+      await service.sim.syncUpdate(simId, simType);
+    }
+    // result.map(sim => {
+    //   const { simId, simType } = sim;
+    //   return await service.sim.syncUpdate(simId, simType);
+    // });
+    // await Promise.all(promises);
     // 超流量的卡进行停流量，超语音的卡进行停语音处理
-    await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, {
-      monthShengyuFlow: { [OP.lte]: 0 },
-    });
-    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, {
-      monthShengyuVoiceDuration: { [OP.lte]: 0 },
-    });
+    await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
+    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
     const endTime = moment().milliseconds();
     logger.info(`【总同步更新，接口总响应时间：】:${endTime - startTime} ms`);
   }

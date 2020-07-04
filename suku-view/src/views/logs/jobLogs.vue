@@ -21,36 +21,35 @@
         fixed="left"
         label="接口名称"
         min-width="120px"
-        show-overflow-tooltip
       >
         <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
 
-      <el-table-column align="left" min-width="120px" label="参数" show-overflow-tooltip>
+      <el-table-column align="left" min-width="120px" label="参数" >
         <template slot-scope="scope">{{ scope.row.params }}</template>
       </el-table-column>
-      <el-table-column align="left" label="url" show-overflow-tooltip>
+      <el-table-column align="left" label="url" >
         <template slot-scope="scope">
         {{scope.row | getUrl}}
       </template>
       </el-table-column>
-      <el-table-column align="left" min-width="150px" label="JobId" show-overflow-tooltip>
+      <el-table-column align="left" min-width="150px" label="JobId" >
         <template slot-scope="scope">{{ scope.row.jobId}}</template>
       </el-table-column>
-      <el-table-column align="left" min-width="150px" label="JobStatus" show-overflow-tooltip>
+      <el-table-column align="left" min-width="150px" label="JobStatus" >
         <template slot-scope="scope">{{ scope.row.jobStatus}}</template>
       </el-table-column>
-      <el-table-column align="left" min-width="150px" label="接口返回信息" show-overflow-tooltip>
+      <el-table-column align="left" min-width="150px" label="接口返回信息" >
         <template slot-scope="scope">{{ scope.row.result }}</template>
       </el-table-column>
-      <el-table-column align="left" label="平台名称" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.OnelinkPlatform.name}}</template>
+      <el-table-column align="left" label="平台名称" >
+        <template slot-scope="scope">{{ scope.row.onelink.name}}</template>
       </el-table-column>
-      <el-table-column align="left" label="appId" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.OnelinkPlatform.appId}}</template>
+      <el-table-column align="left" label="appId" >
+        <template slot-scope="scope">{{ scope.row.onelink.appId}}</template>
       </el-table-column>
-      <el-table-column align="left" label="secretKey" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.OnelinkPlatform.secretKey}}</template>
+      <el-table-column align="left" label="secretKey" >
+        <template slot-scope="scope">{{ scope.row.onelink.secretKey}}</template>
       </el-table-column>
     </el-table>
     <div class="page">
@@ -86,12 +85,6 @@ export default {
       data: null,
       searchData: [
         {
-          name: "name",
-          title: "SIM卡号",
-          type: "inputText",
-          value: ""
-        },
-        {
           name: "status",
           title: "接口返回状态码",
           type: "inputText",
@@ -105,7 +98,7 @@ export default {
   },
   filters: {
     getUrl(row) {
-      return `${row.OnelinkPlatform.apiHost}${row.OnelinkPlatform.apiVersion}${row.url}`
+      return `${row.onelink.apiHost}${row.onelink.apiVersion}${row.url}`
     }
   },
   methods: {
