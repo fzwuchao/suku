@@ -6,10 +6,10 @@
         size="mini"
         @click="editCombo()"
       >新增</el-button>
-      <el-button
+      <!-- <el-button
         type="primary"
         size="mini"
-      >删除</el-button>
+      >删除</el-button> -->
     </div>
 
     <el-table

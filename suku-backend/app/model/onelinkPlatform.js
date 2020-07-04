@@ -27,6 +27,14 @@ module.exports = app => {
       type: STRING(100), // 'api访问地址',
       field: 'api_host',
     },
+    loginName: {
+      type: STRING(100), // 'api访问地址',
+      field: 'login_name',
+    },
+    loginPws: {
+      type: STRING(100), // 'api访问地址',
+      field: 'login_pws',
+    },
     apiVersion: {
       type: STRING(30), // 'api的版本',
       field: 'api_version',
@@ -59,7 +67,8 @@ module.exports = app => {
     deletedAt: {
       type: DATE,
       get() {
-        return moment(this.getDataValue('deletedAt')).format('YYYY-MM-DD HH:mm:ss');
+        const deletedAt = this.getDataValue('deletedAt');
+        return deletedAt ? moment(deletedAt).format('YYYY-MM-DD HH:mm:ss') : null;
       },
       field: 'deleted_at',
     },

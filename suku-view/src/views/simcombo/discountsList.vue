@@ -3,7 +3,7 @@
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
       <el-button type="primary" size="mini" @click="editCombo()">新增</el-button>
-      <el-button type="primary" size="mini">删除</el-button>
+      <!--<el-button type="primary" size="mini">删除</el-button>-->
     </div>
 
     <el-table

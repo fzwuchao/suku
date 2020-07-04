@@ -15,6 +15,12 @@ const onelinkRule = {
   apiHost: {
     type: 'string?',
   },
+  loginName: {
+    type: 'string?',
+  },
+  loginPws: {
+    type: 'string?',
+  },
   apiVersion: {
     type: 'string?',
   },
