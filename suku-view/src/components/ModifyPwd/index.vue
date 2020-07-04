@@ -80,7 +80,7 @@ export default {
               message: '修改成功',
               type: 'success'
             });
-            this.$emit('close');
+            this.$emit('close', 'submit');
           });
         } else {
           return false;
@@ -88,7 +88,7 @@ export default {
       });
     },
     cancel() {
-      this.$emit('close');
+      this.$emit('close', 'cancel');
     },
     checkPassword() {
       if( this.user.password !== this.user.password2) {

@@ -63,8 +63,9 @@ export default {
     ...mapGetters(["sidebar", "avatar"])
   },
   methods: {
-    close() {
+    close(type) {
       this.dialogVisible = false;
+      if (type === 'cancel') return;
       this.$message({
         showClose: true,
         message: '密码已修改，将自动跳转到登录页',
