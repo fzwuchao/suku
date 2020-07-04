@@ -89,7 +89,7 @@ const ROLE_TYPE = [
   { NAME: 'sysManager', DISPLAYNAME: '系统管理员', CODE: 1, LEVEL: 0 },
   { NAME: 'warehouseManager', DISPLAYNAME: '仓库管理员', CODE: 2, LEVEL: 1 },
   { NAME: 'clerk', DISPLAYNAME: '业务员', CODE: 3, LEVEL: 2 },
-  { NAME: 'operation_service', DISPLAYNAME: '运营客服', CODE: 4, LEVEL: 1 },
+  { NAME: 'operationService', DISPLAYNAME: '运营客服', CODE: 4, LEVEL: 1 },
   { NAME: 'dealer', DISPLAYNAME: '经销商', CODE: 5, LEVEL: 3 },
   { NAME: 'reseller', DISPLAYNAME: '分销商', CODE: 6, LEVEL: 4 },
 ];
