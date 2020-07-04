@@ -66,6 +66,15 @@ class UserController extends BaseController {
     }
   }
 
+  async updatePwd() {
+    const { ctx } = this;
+    const { request, helper } = ctx;
+    const rule = helper.rules.user([ 'id', 'password' ]);
+    ctx.validate(rule, request.body);
+    const user = request.body;
+    const result = await ctx.service.user.update(user);
+    this.success(result, '');
+  }
   async updateOpenmsg() {
     const { ctx } = this;
     const { request } = ctx;
@@ -115,6 +124,18 @@ class UserController extends BaseController {
       this.success({ exit: false }, '用户名可用');
     }
   }
+  async getUserByName() {
+    const { ctx } = this;
+    const { request } = ctx;
+    const { name } = request.query;
+    const result = await ctx.service.user.getUserByName(name);
+    if (result) {
+      this.success({ exit: true }, '昵称已经存在');
+    } else {
+      this.success({ exit: false }, '昵称可用');
+    }
+  }
+
   async getUserById() {
     const { ctx } = this;
     const { request, helper } = ctx;
