@@ -186,9 +186,9 @@ export default {
     },
     changeRoleType(val) {
       const roleType = this.getRoleType(val);
-      this.role.name = roleType ? roleType.name : null;
-      this.role.displayName = roleType ? roleType.displayName : null;
-      this.role.level = roleType ? roleType.level : null;
+      this.role.name = roleType ? roleType.NAME : null;
+      this.role.displayName = roleType ? roleType.DISPLAYNAME : null;
+      this.role.level = roleType ? roleType.LEVEL : null;
     },
     getRoleTypeList() {
       ROLE_TYPE_LIST.then(val => this.roleTypeList = val);
