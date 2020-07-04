@@ -701,7 +701,8 @@ export default {
         method: "get",
         params: {
           simType: this.simType,
-          simId: item.simId
+          simId: item.simId,
+          activeComboId: item.activeComboId
         },
         url: API.SIMLIST.SIM_SYNC_UPDATE
       }).then(r => {

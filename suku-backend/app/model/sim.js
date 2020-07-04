@@ -235,6 +235,9 @@ module.exports = app => {
     privateMoney: {
       type: DECIMAL(10, 3),
       field: 'private_money',
+      get() {
+        return this.getDataValue('privateMoney') || 0;
+      },
       comment: '经销商个人的加价，不参与分成',
     },
     createdAt: {
