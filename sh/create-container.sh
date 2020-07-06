@@ -22,4 +22,4 @@ docker run -p 7001:7001 -d --name suku-backend suku-backend
 
 cd ../frontend
 docker build -t suku-frontend ./
-docker run -p 8080:80 -d --name suku-frontend suku-frontend
+docker run -p 80:80 -d --name suku-frontend suku-frontend
