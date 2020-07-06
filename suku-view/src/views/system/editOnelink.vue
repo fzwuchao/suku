@@ -2,7 +2,7 @@
   <div class="add-person">
     <edit-bar></edit-bar>
     <el-form label-width="130px" :model="onelink" :rules="rules" ref="ruleForm">
-      <el-form-item label="名称" prop="name">
+      <el-form-item label="企业名称" prop="name">
         <el-input v-model="onelink.name" placeholder="请输入平台名称"></el-input>
       </el-form-item>
       <el-form-item label="appId" prop="appId">
@@ -16,6 +16,12 @@
       </el-form-item>
       <el-form-item label="接口版本号" prop="apiVersion">
         <el-input v-model="onelink.apiVersion" placeholder="请输入接口版本号"></el-input>
+      </el-form-item>
+      <el-form-item label="平台账号" prop="loginName">
+        <el-input v-model="onelink.loginName" placeholder="请输入平台账号"></el-input>
+      </el-form-item>
+      <el-form-item label="平台密码" prop="loginPws">
+        <el-input v-model="onelink.loginPws" placeholder="请输入平台密码"></el-input>
       </el-form-item>
       <el-form-item v-if="!onelink.id" label="nameKey" prop="nameKey">
         <el-input v-model="onelink.nameKey" placeholder="请输入redis关键字"></el-input>
@@ -57,6 +63,8 @@ export default {
         appId: "",
         name: "",
         secretKey: "",
+        loginName: "",
+        loginPws: "",
         nameKey: "",
       },
       rules: {
@@ -79,6 +87,12 @@ export default {
         secretKey: [
           { required: true, message: "请输入接口密钥", trigger: "blur" },
           {  max: 100, message: '长度不能大于100个字符', trigger: 'blur' }
+        ],
+        loginName: [
+          {  max: 50, message: '长度不能大于100个字符', trigger: 'blur' }
+        ],
+        loginPws: [
+          {  max: 50, message: '长度不能大于100个字符', trigger: 'blur' }
         ],
         nameKey: [
           { required: true, message: "请输入redis关键字", trigger: "blur" },

@@ -21,7 +21,7 @@
       <el-table-column type="selection" align="center" width="55"></el-table-column>
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
-      <el-table-column align="left" label="名称" show-overflow-tooltip>
+      <el-table-column align="left" label="企业名称" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
       <el-table-column align="left" label="appId" show-overflow-tooltip>
@@ -32,6 +32,12 @@
       </el-table-column>
       <el-table-column align="left" label="接口版本号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.apiVersion }}</template>
+      </el-table-column>
+       <el-table-column align="left" label="平台账号" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.loginName }}</template>
+      </el-table-column>
+       <el-table-column align="left" label="平台密码" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.loginPws }}</template>
       </el-table-column>
       <el-table-column align="left" label="状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.status == 1? '已启用':'已停用'}}</template>
