@@ -5,7 +5,7 @@ const WX_CONFIG = {
   MICHID: '1536554531',
   APPSECRET: '965cc87627449c10ee1436ac5ac26571',
   PARTNERKEY: 'LZM123aabbccEEZLZMlzm83769776123', // partnerKey
-  NOTIFY_URL: 'api.sukudianzi.com', // notify_url
+  NOTIFY_URL: 'http://api.sukudianzi.com/wechat/payBack', // notify_url
 };
 // const WX_CONFIG = {
 //   APPID: 'wxc3a09378c6f6fb74',
