@@ -260,6 +260,8 @@ class SimController extends BaseController {
     };
     ctx.validate(rule, request.query);
     const { simId } = request.query;
+    const openStatus = await service.chinaMobile.queryOnOffStatus(simId);
+    await service.sim.updateBySimId({ openStatus }, simId);
     const result = await service.sim.getSimBySimId(simId);
     this.success(result, '');
   }

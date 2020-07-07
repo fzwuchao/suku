@@ -57,7 +57,12 @@ class ScheduleService extends BaseService {
       cardStatus: SIM_CARD_STATUS.ACTIVE,
     };
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.ON, servQuery);
-    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.ON, servQuery);
+    const voiceServQuery = {
+      overdueTime: { [OP.gt]: new Date() },
+      cardStatus: SIM_CARD_STATUS.ACTIVE,
+      simType: SIM_TYPE.CALL,
+    };
+    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.ON, voiceServQuery);
     const endTime = moment().milliseconds();
     logger.info(`【月结操作，总响应时间：】:${endTime - startTime} ms`);
   }

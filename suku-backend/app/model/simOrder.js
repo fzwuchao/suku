@@ -3,9 +3,27 @@
 
 // sim卡
 const moment = require('moment');
+const hooksName = [
+  'afterBulkCreate',
+  'afterBulkDestroy',
+  'afterBulkUpdate',
+  'afterCreate',
+  'afterDestroy',
+  'afterUpdate',
+  'afterSave',
+];
 module.exports = app => {
   const { STRING, DATE, TINYINT, DECIMAL, BIGINT } = app.Sequelize;
-
+  const delRedisCache = async () => {
+    const ctx = app.createAnonymousContext();
+    await ctx.service.redisCacheService.batchDelKey('SimOrder*');
+  };
+  const hooks = {};
+  hooksName.forEach(name => {
+    hooks[name] = () => {
+      delRedisCache();
+    };
+  });
   const SimOrder = app.model.define('sim_order', {
     id: {
       type: BIGINT(20),
@@ -101,6 +119,7 @@ module.exports = app => {
     updatedAt: 'updatedAt',
     paranoid: true,
     deletedAt: 'deletedAt',
+    hooks,
   });
 
   return SimOrder;

@@ -195,13 +195,13 @@ export default {
           let packs = combo.packs
           for(let j=0;j<packs.length;j++) {
             let pack = packs[j];
-            let packMoney = calcu(`${pack.awardMoney} + ${pack.money}`)
-            let packMonths = calcu(`${packMoney}/${this.sim.monthRent}`);
+            let packMoney = calcu(`${pack.awardMoney?pack.awardMoney:0} + ${pack.money?pack.money:0}`).toFixed(2)
+            let packMonths = calcu(`${packMoney?packMoney:0}/${this.sim.monthRent?this.sim.monthRent:1}`);
             pack.months = packMonths;
-            pack.money = calcu(`${pack.money}+(${this.sim.privateMoney}*${packMonths})`)
+            pack.money = calcu(`${pack.money?pack.money:0}+(${this.sim.privateMoney?this.sim.privateMoney:0}*${packMonths})`).toFixed(2)
             if(pack.comboType == 1 || pack.comboType == 3) {
-              pack.monthFlow =  calcu(`${packMonths} * ${this.sim.monthFlow}`);
-              pack.monthVoice = calcu(`${packMonths} * ${this.sim.monthVoice}`);
+              pack.monthFlow =  calcu(`${packMonths} * ${this.sim.monthFlow?this.sim.monthFlow:0}`).toFixed(2);
+              pack.monthVoice = calcu(`${packMonths} * ${this.sim.monthVoice?this.sim.monthVoice:0}`).toFixed(2);
             }  
           }
         }
@@ -229,11 +229,11 @@ export default {
         pay.months = pack.months;
         pay.orderType = combo.comboType
       } else {
-        pay.dealAmount = calcu(`(${combo.monthRent}+${this.sim.privateMoney}) * ${combo.months}`);
-        pay.flow = calcu(`${combo.monthFlow} * ${combo.months}`);
-        pay.voice = calcu(`${combo.monthVoice} * ${combo.months}`);
+        pay.dealAmount = calcu(`(${combo.monthRent?combo.monthRent:0}+${this.sim.privateMoney?this.sim.privateMoney:0}) * ${combo.months?combo.months:1}`).toFixed(2);
+        pay.flow = calcu(`${combo.monthFlow?combo.monthFlow:0} * ${combo.months?combo.months:1}`).toFixed(2);
+        pay.voice = calcu(`${combo.monthVoice} * ${combo.months?combo.months:1}`).toFixed(2);
         pay.months = combo.months;
-        pay.money = calcu(`(${combo.monthRent}+${this.sim.privateMoney}) * ${combo.months}`);
+        pay.money = calcu(`(${combo.monthRent?combo.monthRent:0}+${this.sim.privateMoney?this.sim.privateMoney:0}) * ${combo.months?combo.months:1}`).toFixed(2);
         pay.orderType = 4;
       }
       this.payInfo = pay;

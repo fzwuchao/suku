@@ -5,7 +5,7 @@
  */
 const BaseService = require('../core/baseService');
 const moment = require('moment');
-const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, SIM_VOICE_SERV_STATUS, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
+const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
 class SimService extends BaseService {
   async update(sim) {
     try {
@@ -242,7 +242,7 @@ class SimService extends BaseService {
     // 流量累计使用量
     promiseList.push(service.chinaMobile.querySimDataUsage(simId));
     // 语音累计使用量
-    if (simType === 'B') {
+    if (simType === SIM_TYPE.CALL) {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId));
     }
     const [ activeTime, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);

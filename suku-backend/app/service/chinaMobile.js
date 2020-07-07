@@ -90,6 +90,7 @@ class ChinaMobileService extends BaseService {
     const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.url}`, {
       data,
       dataType: 'json',
+      timeout: 12000,
       ...options,
     });
     return await this.getResult(res, api, data, id);
@@ -110,10 +111,12 @@ class ChinaMobileService extends BaseService {
       }
       resData.error = true;
       const errorLog = {};
-      errorLog.type = api.type;
+      if (api) {
+        errorLog.type = api.type;
+        errorLog.url = api.url;
+        errorLog.name = api.name;
+      }
       errorLog.onelinkId = onelinkId;
-      errorLog.url = api.url;
-      errorLog.name = api.name;
       errorLog.status = resData.status;
       errorLog.message = resData.message;
       errorLog.source = 1;

@@ -266,7 +266,6 @@
       </el-table-column>
       <el-table-column
         align="left"
-        v-if="simType === 'B'"
         label="短信服务状态"
         min-width="100px"
         show-overflow-tooltip
