@@ -754,7 +754,7 @@ class ChinaMobileService extends BaseService {
    * @param {string} content - 短信内容
    */
   async sendMessage(phone, content) {
-    const xml = `<?xmlversion="1.0" encoding="UTF-8"?>
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
     <svc_init ver="2.0.0">
     <sms ver="2.0.0">
     <client>
@@ -768,8 +768,10 @@ class ChinaMobileService extends BaseService {
     </sms_info>
     </sms>
     </svc_init>`;
+    this.ctx.logger.info('【发送短信xml:】', xml)
     const result = await this.sendXML(xml, 'send');
     if (!result.success) {
+      this.ctx.logger.info('【发送短信，返回结果：】', result);
       return result;
     }
     const { response_info } = result.data.svc_result;
@@ -781,6 +783,8 @@ class ChinaMobileService extends BaseService {
     result.msg = retcodeMap[retcodeValue];
     result.data = { gwid: gwidValue, retmesg: retmesgValue, retcode: retcodeValue };
 
+    this.ctx.logger.info('【发送短信，返回结果：】', result);
+
     return result;
   }
 
@@ -788,12 +792,12 @@ class ChinaMobileService extends BaseService {
    * 上行短信查询接口
    */
   async sendUpgoingMessage() {
-    const xml = `<?xmlversion="1.0" encoding="UTF-8"?>
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
     <svc_initver="2.0.0">
     <sms ver="2.0.0">
     <client>
     <id>${messageParams.id}</id>
-    <pwd>${messageParams.pwd}/pwd>
+    <pwd>${messageParams.pwd}</pwd>
     </client>
     </sms>
     </svc_init>`;

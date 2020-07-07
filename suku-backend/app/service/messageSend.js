@@ -57,8 +57,10 @@ class MessageSendService extends BaseService {
   async create(messageSend) {
     try {
       messageSend.orderNo = MessageSendService.ORDER_NO_PREFIX + this.autoOrder(10);
+      this.ctx.logger.info('【messageSend:】', messageSend);
       await this.app.model.MessageSend.create(messageSend);
     } catch (e) {
+      this.ctx.logger.error(e);
       return false;
     }
     return true;
