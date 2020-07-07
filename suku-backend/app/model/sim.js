@@ -190,7 +190,7 @@ module.exports = app => {
     voiceServStatus: {
       type: TINYINT(1),
       field: 'voice_serv_status',
-      defaultValue: 2,
+      defaultValue: 0,
       comment: '语音服务关停状态: 1-开, 0-关',
     },
     flowServStatus: {
