@@ -18,7 +18,7 @@ cd backend
 # 创建后端image
 docker build -t suku-backend ./
 # 创始后端container,并启动
-docker run -p 7001:7001 -d --name suku-backend suku-backend
+docker run -p 7001:7001 -d -v /home/suku/logs/:/usr/suku-backend/logs --name suku-backend suku-backend
 
 cd ../frontend
 docker build -t suku-frontend ./
