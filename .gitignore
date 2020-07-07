@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-/suku-view/suku-view
+
 
 # local env files
 .env.local

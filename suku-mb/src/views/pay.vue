@@ -61,15 +61,15 @@ export default {
     }
   },
   methods: {
-    onBridgeReady() {
-      // WeixinJSBridge.invoke(
-      //   'getBrandWCPayRequest', json,
-      //    function(res){
-      //      if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-      //        this.$emit("clickLeft")
-      //      }
-      //    }
-      // );
+    onBridgeReady(json) {
+      WeixinJSBridge.invoke(
+        'getBrandWCPayRequest', json,
+         function(res){
+           if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+             this.$emit("clickLeft")
+           }
+         }
+      );
     },
     
     createOrder() {
