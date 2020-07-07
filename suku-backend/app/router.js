@@ -162,6 +162,6 @@ module.exports = app => {
   router.get('/tMsgSendUpgoing', controller.testMsgSend.tMsgSendUpgoing);
 
   router.get('/wechat/getOpenId', controller.wechat.getOpenId);
-  router.get('/wechat/payBack', payApi.middleware('refund'), controller.wechat.payBack);
+  router.post('/wechat/payBack', payApi.middleware('pay'), controller.wechat.payBack);
 
 };
