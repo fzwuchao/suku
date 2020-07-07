@@ -10,6 +10,7 @@ module.exports = (options, app) => {
       '/messageSend/getSendlistBySimId', '/writeList/save',
       '/writeList/getWriteListBySimId',
       '/wechat/getOpenId',
+      '/wechat/payBack', // 微信支付回调接口
       '/testMsgSend', // 模拟短信发送用，之后可删除
       '/testMsgSendUpgoing', // 模拟短信发送用，之后可删除
       '/tMsgSend', // 模拟短信发送用，之后可删除
