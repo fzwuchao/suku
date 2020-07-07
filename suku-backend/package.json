@@ -49,7 +49,7 @@
     "lint": "eslint .",
     "ci": "npm run lint && npm run cov",
     "autod": "autod",
-    "pub": "rm -rf backend.tar.gz && rm -rf backend && tar -zvcf backend.tar.gz --exclude=node_modules --exclude=tmp-file --exclude=logs --exclude=.github --exclude=.vscode --exclude=test --exclude=package-lock.json ./ && mkdir backend && tar -xzvf backend.tar.gz -C ./backend && cp -R backend/. ../sh/backend"
+    "pub": "rm -rf backend.tar.gz && rm -rf backend && tar -zvcf backend.tar.gz --exclude=node_modules --exclude=tmp-file --exclude=logs --exclude=.github --exclude=.vscode --exclude=test --exclude=package-lock.json ./ && mkdir backend && tar -xzvf backend.tar.gz -C ./backend && cp -R backend/. ../sh/backend && rm -rf backend.tar.gz && rm -rf backend"
   },
   "ci": {
     "version": "10"

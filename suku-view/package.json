@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "pub": "rm -rf frontend && npm run build && mkdir frontend && mv admin frontend/ && cp -R frontend/. ../sh/frontend && cp {Dockerfile,nginx.conf,.dockerignore} ../sh/frontend"
+    "pub": "rm -rf frontend && npm run build && mkdir frontend && mv admin frontend/ && cp -R frontend/. ../sh/frontend && cp {Dockerfile,nginx.conf,.dockerignore} ../sh/frontend && rm -rf frontend"
   },
   "dependencies": {
     "axios": "^0.19.2",
