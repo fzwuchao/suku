@@ -35,7 +35,7 @@ class MessageSendController extends BaseController {
     const sender = await ctx.service.sim.getSimBySimId(simId);
     const messageSend = { simId, content };
     // 调用移动端发送短信的接口，在此位置调用
-    const msgResult = await ctx.service.chinaMobile.sendMessage('1', '2', simId, content);
+    const msgResult = await ctx.service.chinaMobile.sendMessage(simId, content);
     if (!msgResult.success) {
       this.fail(null, null, msgResult.msg);
       return;
