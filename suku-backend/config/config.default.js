@@ -138,6 +138,10 @@ module.exports = appInfo => {
     },
   };
 
+  config.logger = {
+    level: 'INFO',
+    dir: 'logs/suku-backend',
+  };
   return {
     ...config,
     ...userConfig,
