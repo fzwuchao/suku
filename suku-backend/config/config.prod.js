@@ -15,7 +15,7 @@ const MYSQL_PARAMS = {
 };
 
 const REDIS_PARAMS = {
-  HOST: '192.168.0.101',
+  HOST: '47.115.75.162',
   PORT: 6379,
   PASSWORD: 'auth',
 };

@@ -18,7 +18,7 @@ class Message extends Subscription {
     logger.info('********************查询上行短信记录*********************');
     const startTime = moment().milliseconds();
     // 获取上行短信
-    const result = await service.chinaMobile.sendUpgoingMessage('1', '2');
+    const result = await service.chinaMobile.sendUpgoingMessage();
     if (result.success) {
       const { messageData } = result.data;
       const simIds = messageData.map(item => item.simId);

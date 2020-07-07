@@ -13,7 +13,11 @@ const retcodeMap = {
   '05': '鉴权ID为空',
   '06': '鉴权失败',
 };
-
+const messageParams = {
+  id: 31, // MAS分配编号
+  pwd: 'JNQov+AilMvpu0jrRLBgDOh2rha1h+PGM075YYycMt88Zbeya8bexQ==', // MAS分配密钥
+  serviceId: '1064899140165',
+}
 
 const BaseService = require('../core/baseService');
 const { getApi } = require('../extend/api')();
@@ -44,7 +48,8 @@ const getTransid = appid => {
 class ChinaMobileService extends BaseService {
   async sendXML(xml, interfaceType) {
     const interfaceTypeMap = {
-      send: 'http://localhost:7001/testMsgSend',
+      // send: 'http://localhost:7001/testMsgSend',
+      send: 'http://117.169.32.136:28181/sjb/HttpSendSMSService',
       delivery: 'http://localhost:7001/testMsgSendUpgoing',
     };
     const url = interfaceTypeMap[interfaceType];
@@ -745,19 +750,17 @@ class ChinaMobileService extends BaseService {
 
   /**
    * 发送短信
-   * @param {string} id - MAS分配编号
-   * @param {string} pwd - MAS分配密钥
    * @param {string} phone - 接收方号码, 多个号码用英文逗号隔开
    * @param {string} content - 短信内容
    */
-  async sendMessage(id, pwd, phone, content) {
+  async sendMessage(phone, content) {
     const xml = `<?xmlversion="1.0" encoding="UTF-8"?>
     <svc_init ver="2.0.0">
     <sms ver="2.0.0">
     <client>
-    <id>${id}</id>
-    <pwd>${pwd}/pwd>
-    <serviceid></serviceid>
+    <id>${messageParams.id}</id>
+    <pwd>${messageParams.pwd}/pwd>
+    <serviceid>${messageParams.serviceId}</serviceid>
     </client>
     <sms_info>
     <phone>${phone}</phone>
@@ -783,16 +786,14 @@ class ChinaMobileService extends BaseService {
 
   /**
    * 上行短信查询接口
-   * @param {string} id - MAS分配编号
-   * @param {string} pwd - MAS分配密钥
    */
-  async sendUpgoingMessage(id, pwd) {
+  async sendUpgoingMessage() {
     const xml = `<?xmlversion="1.0" encoding="UTF-8"?>
     <svc_initver="2.0.0">
     <sms ver="2.0.0">
     <client>
-    <id>${id}</id>
-    <pwd>${pwd}</pwd>
+    <id>${messageParams.id}</id>
+    <pwd>${messageParams.pwd}/pwd>
     </client>
     </sms>
     </svc_init>`;
