@@ -65,7 +65,7 @@ class SimOrderService extends BaseService {
     const newSim = { id: sim.id };
     const pack = this.ctx.service.comboPack.getComboPackById(order.cpid);
     const packMoney = calc(`${pack.awardMoney ? pack.awardMoney : 0} + ${pack.money ? pack.money : 0}`).toFixed(2);
-    const packMonths = calc(`${packMoney ? packMoney : 0}/${this.sim.monthRent ? this.sim.monthRent : 1}`);
+    const packMonths = calc(`${packMoney ? packMoney : 0}/${sim.monthRent ? sim.monthRent : 1}`);
     // pack.months = packMonths;
     // pack.money = calc(`${pack.money ? pack.money : 0}+(${this.sim.privateMoney ? this.sim.privateMoney : 0}*${packMonths})`).toFixed(2);
     switch (order.orderType) {

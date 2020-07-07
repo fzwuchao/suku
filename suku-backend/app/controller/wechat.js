@@ -23,8 +23,8 @@ class WechatController extends BaseController {
       const simId = order.simId;
       const sim = service.sim.getSimBySimId(order.simId);
       const pack = this.ctx.service.comboPack.getComboPackById(order.cpid);
-      await ctx.service.simOrder.changeSim(sim, order);
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 2, wxSerialNum: info.transaction_id });
+      await ctx.service.simOrder.changeSim(sim, order);
       if (order.orderType === 1) {
         await service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
         await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
