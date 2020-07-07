@@ -29,10 +29,10 @@ class WechatController extends BaseController {
         await service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
         await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
       }
-      if (order.orderType === 2 && (pack.flow - 0) > 0 && sim.flowServStatus === SERV_STATUS.OFF) {
+      if (order.orderType === 2 && (pack.monthFlow - 0) > 0 && sim.flowServStatus === SERV_STATUS.OFF) {
         await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
       }
-      if (order.orderType === 2 && (pack.voice - 0) > 0 && sim.voiceServStatus === SERV_STATUS.OFF) {
+      if (order.orderType === 2 && (pack.monthVoice - 0) > 0 && sim.voiceServStatus === SERV_STATUS.OFF) {
         await service.chinaMobile.operateSimCallFunction('0', simId); // 开启语音服务
       }
       await ctx.service.sim.syncUpdate(simId, sim.simType);
