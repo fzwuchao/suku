@@ -77,7 +77,11 @@ export default {
           content: this.msg,
         },
         url: "/messageSend/save"
-      }).then(() => {
+      }).then((r) => {
+        if (!r.success) {
+          Toast(r.msg)
+          return;
+        }
         Toast('发送成功！')
       });
     },
