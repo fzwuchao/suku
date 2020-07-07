@@ -1,5 +1,9 @@
 #!bin/sh
-#创建前端、后端docker容器
+####创建前端、后端docker容器####
+# 清除旧的应用目录
+rm -rf backend
+rm -rf frontend
+
 #解压缩
 tar -xzvf backend.tar.gz -C ./
 tar -xzvf frontend.tar.gz -C ./

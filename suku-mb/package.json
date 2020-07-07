@@ -8,7 +8,7 @@
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "pub": "rm -rf frontend && npm run build && mkdir frontend && mv weixin frontend/ && cp -R frontend/. ../sh/frontend/"
+    "pub": "rm -rf frontend && npm run build && mkdir frontend && mv weixin frontend/ && cp -R frontend/. ../sh/frontend/ && rm -rf frontend"
   },
   "dependencies": {
     "calculatorjs": "^1.1.2",
