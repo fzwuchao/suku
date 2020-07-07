@@ -11,13 +11,13 @@
         label="套餐名称"
         prop="name"
       >
-        <el-input v-model="simCombo.name"></el-input>
+        <el-input v-model="simCombo.name" :disabled="isDisabled"></el-input>
       </el-form-item>
       <el-form-item
         label="适用卡类型"
         prop="belongsToSimType"
       >
-        <el-checkbox-group v-model="belongsToSimType">
+        <el-checkbox-group v-model="belongsToSimType" :disabled="isDisabled">
           <el-checkbox label="A">被叫卡</el-checkbox>
           <el-checkbox label="B">主叫卡</el-checkbox>
         </el-checkbox-group>
@@ -29,6 +29,7 @@
         <el-input-number
           :precision="2"
           :controls="false"
+          :disabled="isDisabled"
           v-model="simCombo.monthFlow"
         ></el-input-number>
         <span class="unit">M</span>
@@ -40,6 +41,7 @@
         <el-input-number
           v-model="simCombo.monthVoice"
           :controls="false"
+          :disabled="isDisabled"
         ></el-input-number>
         <span class="unit">分</span>
       </el-form-item>
@@ -50,6 +52,7 @@
         <el-input-number
           v-model="simCombo.monthRent"
           :controls="false"
+          :disabled="isDisabled"
         ></el-input-number>
         <span class="unit">元</span>
       </el-form-item>
@@ -95,6 +98,7 @@ export default {
   },
   data() {
     return {
+      isDisabled: true,
       simTypes: [],
       belongsToSimType: [],
       simCombo: {

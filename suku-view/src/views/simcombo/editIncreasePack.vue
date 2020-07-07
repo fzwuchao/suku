@@ -147,6 +147,7 @@ export default {
       )[0].belongsToSimType;
       if (belongsToSimType.includes("A")) {
         this.isShow = false;
+        this.simCombo.monthVoice = 0;
       } else {
         this.isShow = true;
       }

@@ -17,7 +17,7 @@
         label="适用卡类型"
         prop="belongsToSimType"
       >
-        <el-checkbox-group v-model="belongsToSimType">
+        <el-checkbox-group v-model="belongsToSimType" :disabled="simTypeIsDisabled">
           <el-checkbox label="A">被叫卡</el-checkbox>
           <el-checkbox label="B">主叫卡</el-checkbox>
         </el-checkbox-group>
@@ -43,6 +43,7 @@ export default {
   },
   data() {
     return {
+      simTypeIsDisabled: false,
       simTypes: [],
       belongsToSimType: [],
       simCombo: {
@@ -54,7 +55,7 @@ export default {
       rules: {
         name: [{ required: true, message: "请输入套餐名称", trigger: "blur" }],
         belongsToSimType: [
-          { required: true, message: "请勾选适用卡类型", trigger: "blur" }
+          { required: true, message: "请勾选适用卡类型", trigger: "change" }
         ],
       }
     };
@@ -113,6 +114,7 @@ export default {
     this.initBelongsToSimType();
     if (this.$route.params.id !== undefined) {
       this.getSimCombo();
+      this.simTypeIsDisabled = true;
     }
   }
 };
