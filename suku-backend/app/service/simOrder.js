@@ -63,7 +63,7 @@ class SimOrderService extends BaseService {
   }
   async changeSim(sim, order) {
     const newSim = { id: sim.id };
-    const pack = this.ctx.service.comboPack.getComboPackById(order.cpid);
+    const pack = await this.ctx.service.comboPack.getComboPackById(order.cpid);
     const packMoney = calc(`${pack.awardMoney ? pack.awardMoney : 0} + ${pack.money ? pack.money : 0}`).toFixed(2);
     const packMonths = calc(`${packMoney ? packMoney : 0}/${sim.monthRent ? sim.monthRent : 1}`);
     // pack.months = packMonths;
@@ -72,8 +72,7 @@ class SimOrderService extends BaseService {
       case 1: 
       case 4:
       case 3:
-        pack.
-          newSim.shengyuMoney = calc(`${sim.shengyuMoney ? sim.shengyuMoney : 0} + ((${sim.monthRent}+${sim.privateMoney}) * ${packMonths})`);
+        newSim.shengyuMoney = calc(`${sim.shengyuMoney ? sim.shengyuMoney : 0} + ((${sim.monthRent}+${sim.privateMoney}) * ${packMonths})`);
         if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
           newSim.shengyuMoney = calc(`${newSim.shengyuMoney} - ${sim.monthRent}`);
           order.months = packMonths - 1; 
@@ -84,8 +83,8 @@ class SimOrderService extends BaseService {
         newSim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         break;
       case 2:
-        newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow} + ${pack.flow ? pack.flow : 0}`);
-        newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration} + ${pack.voice ? pack.voice : 0}`);
+        newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow ? sim.monthOverlapFlow : 0} + ${pack.monthFlow ? pack.monthFlow : 0}`);
+        newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration ? sim.monthOverlapVoiceDuration : 0} + ${pack.monthVoice ? pack.monthVoice : 0}`);
         break;
     }
     if (order.orderType === 1) {
