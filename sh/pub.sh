@@ -22,6 +22,10 @@ cd ${curDir}
 tar -zvcf backend.tar.gz backend
 tar -zvcf frontend.tar.gz frontend
 
+# 清除解压后目录
+rm -rf backend
+rm -rf frontend
+
 # 上传到阿里云服务器上
 host='ecs-hunan'
 proj='/home/suku'
@@ -30,4 +34,6 @@ scp ./frontend.tar.gz ${host}:${proj}/frontend.tar.gz
 scp ./create-container.sh ${host}:${proj}/
 scp ./clear.sh ${host}:${proj}/
 scp ./backup.sh ${host}:${proj}/
+scp ./deploy-backend.sh ${host}:${proj}/
+scp ./deploy-frontend.sh ${host}:${proj}/
 

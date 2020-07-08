@@ -27,3 +27,8 @@ docker run -p 7001:7001 -d -v /home/suku/logs/:/usr/suku-backend/logs --name suk
 cd ../frontend
 docker build -t suku-frontend ./
 docker run -p 80:80 -d --name suku-frontend suku-frontend
+
+cd ../
+rm -rf backend
+rm -rf frontend
+echo '执行完成'
