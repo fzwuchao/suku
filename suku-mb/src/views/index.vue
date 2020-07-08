@@ -34,7 +34,7 @@
 
 <script>
 import { Toast } from "vant";
-import { validateTel } from "../utils/validate"
+// import { validateTel } from "../utils/validate"
 
 export default {
   data() {
@@ -52,10 +52,10 @@ export default {
         Toast("请输入物联卡卡号");
         return;
       }
-      if(!validateTel(this.simId)) {
-        Toast("请输入正确的卡号");
-        return;
-      }
+      // if(!validateTel(this.simId)) {
+      //   Toast("请输入正确的卡号");
+      //   return;
+      // }
       // this.$router.push("/recharge");
       this.axios({
         method: "get",
