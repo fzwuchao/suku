@@ -44,7 +44,7 @@
       >
         <el-input v-model="user.mchId"></el-input>
       </el-form-item>
-      <el-form-item label="权限">
+      <el-form-item v-if="user.id != curUser.id" label="权限">
         <el-select
           v-model="user.roleId"
           clearable
@@ -149,6 +149,7 @@ export default {
     };
     return {
       isSysManager: false,
+      curUser: {},
       user: {
         "id": null,
         "name": "",
@@ -243,8 +244,8 @@ export default {
       });
     },
     getRoleType() {
-      const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-      this.isSysManager = userInfo.roleType === 1;
+      this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager =this.curUser.roleType === 1;
     },
   },
   mounted() {

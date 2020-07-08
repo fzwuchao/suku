@@ -20,8 +20,8 @@ class LoginController extends BaseController {
     const user = await service.user.getLoginUser(username, password);
 
     if (user) {
-      const roleType = await service.role.getRoleTypeById(user.roleId);
-      const loginUserInfo = helper.loginUser.create(user.id, user.username, user.name, user.roleId, roleType);
+      const role = await service.role.getRoleInfo(user.roleId);
+      const loginUserInfo = helper.loginUser.create(user.id, user.username, user.name, user.roleId, role.roleType, role.level);
 
       ctx.cookies.set('loginUserInfo', helper.loginUser.stringfy(loginUserInfo), {
         httpOnly: false,

@@ -20,7 +20,7 @@
             height="40"
           />
           <img v-else src="../../../assets/avatar.png" width="40" height="40" />
-          <span>{{ user.userName || loginUsername}}</span>
+          <span>{{loginUsername}}</span>
           <i class="el-icon-arrow-down"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -58,7 +58,7 @@ export default {
       return JSON.parse(localStorage.getItem('userInfo')).id;
     },
     loginUsername() {
-      return localStorage.getItem("loginUsername");
+      return JSON.parse(localStorage.getItem('userInfo')).name;
     },
     ...mapGetters(["sidebar", "avatar"])
   },

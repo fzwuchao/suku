@@ -156,6 +156,7 @@ export default {
       this.$refs["ruleForm"].validate(valid => {
         if (!valid) return;
         const halfCheckedKeys = this.$refs.tree.getHalfCheckedKeys();
+        debugger
         const data = {
           ...this.role,
           permissions: this.role.permissions.concat(halfCheckedKeys),

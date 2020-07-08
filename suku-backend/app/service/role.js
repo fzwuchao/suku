@@ -25,16 +25,19 @@ class RoleService extends BaseService {
 
   async getRolesPage(level, pageSize, pageNum) {
 
-    const result = await this.findAndCountAll('Role', pageSize, pageNum, { where: { level: {
-      [this.getOp().gte]: level,
-    } } });
+    const result = await this.findAndCountAll('Role', pageSize, pageNum, {
+      where: { level: {
+        [this.getOp().gte]: level,
+      } },
+      order: [[ 'level', 'ASC' ], [ 'roleType', 'ASC' ]],
+    });
     return result;
   }
 
   async getRoles(level) {
     const result = await this.app.model.Role.findAll({ where: { level: {
-      [this.getOp().gte]: level,
-    } } });
+      [this.getOp().gt]: level,
+    } }, order: [[ 'level', 'ASC' ], [ 'roleType', 'ASC' ]] });
     return result;
   }
 

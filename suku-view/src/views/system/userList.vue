@@ -34,7 +34,7 @@
       <el-table-column align="left" label="角色" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.role.displayName}}</template>
       </el-table-column>
-      <el-table-column align="left" label="分成率" show-overflow-tooltip>
+      <el-table-column align="left" v-if="curUser.level == 0" label="分成率" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.rate }}</template>
       </el-table-column>
       <el-table-column align="left" label="商户号" show-overflow-tooltip>
@@ -90,6 +90,7 @@ export default {
       pageSize: 10,
       list: [],
       data: null,
+      cueUser: {},
       multipleSelection: []
     };
   },
@@ -181,6 +182,7 @@ export default {
     }
   },
   mounted() {
+    this.curUser = JSON.parse(localStorage.getItem('userInfo'));
     this.getlist();
   }
 };

@@ -17,16 +17,17 @@ const isJSON = str => {
 };
 
 class LoginUser {
-  constructor(id, username, name, roleId, roleType) {
+  constructor(id, username, name, roleId, roleType, level) {
     this.id = id;
     this.username = username;
     this.name = name;
     this.roleId = roleId;
     this.roleType = roleType;
+    this.roleLevel = level;
   }
 }
 
-const createLoginUser = (id, username, name, roleId, roleType) => { return new LoginUser(id, username, name, roleId, roleType); };
+const createLoginUser = (id, username, name, roleId, roleType, level) => { return new LoginUser(id, username, name, roleId, roleType, level); };
 const parseLoginUser = jsonStr => {
   const decodeStr = decodeURIComponent(jsonStr);
   if (!isJSON(decodeStr)) return null;

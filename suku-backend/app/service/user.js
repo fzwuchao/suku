@@ -117,12 +117,21 @@ class UserService extends BaseService {
     return users;
   }
   async getUsersPage(pid, pageSize, pageNum) {
-    const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'rate', 'createdAt', 'updatedAt' ];
-    const ids = await this.getAllUserIds([ pid ]);
     const Op = this.getOp();
+    const user = this.getCurUser();
+    const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'createdAt', 'updatedAt' ];
+    const where = {};
+    if (user.level === 0) {
+      attributes.push('rate');
+    }
+    const role = await this.ctx.service.role.getRoleInfo(user.roleId);
+    if (role.level !== 1 && role.level !== 0) {
+      const ids = await this.getAllUserIds([ pid ]);
+      where.id = { [Op.in]: ids };
+    }
     const result = await this.findAndCountAll('User', pageSize, pageNum, {
       attributes,
-      where: { id: { [Op.in]: ids } },
+      where,
       include: {
         model: this.app.model.Role,
         attributes: [ 'displayName' ],

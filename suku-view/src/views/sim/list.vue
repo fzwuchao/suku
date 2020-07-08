@@ -3,37 +3,41 @@
     <div class="btn-list">
       <el-button
         type="primary"
+        v-if="isSysManager"
         @click="importDialog = !importDialog"
         size="mini"
       >导入物联卡</el-button>
       <el-button
         type="primary"
         size="mini"
+        v-if="isSysManager"
         @click="handleExport"
       >导出查询结果</el-button>
       <el-button
         type="warning"
         size="mini"
-        v-if="simType === 'A'"
+        v-if="simType === 'A' && isSysManager"
         :disabled="isOneRow"
         @click="activate(false)"
       >停机</el-button>
       <el-button
         type="warning"
         size="mini"
-        v-if="simType === 'A'"
+        v-if="simType === 'A' && isSysManager"
         :disabled="isOneRow"
         @click="activate(true)"
       >复机</el-button>
       <el-button
         type="warning"
         size="mini"
+        v-if="isSysManager"
         :disabled="isOneRow"
         @click="flowServStatus(true)"
       >停数据</el-button>
       <el-button
         type="warning"
         size="mini"
+        v-if="isSysManager"
         :disabled="isOneRow"
         @click="flowServStatus(false)"
       >恢复数据</el-button>
@@ -41,24 +45,27 @@
         type="warning"
         size="mini"
         :disabled="isOneRow"
+        v-if="isSysManager"
         @click="msgServStatus(true)"
       >停短信</el-button>
       <el-button
         type="warning"
         size="mini"
+        v-if="isSysManager"
         :disabled="isOneRow"
         @click="msgServStatus(false)"
       >恢复短信</el-button>
       <el-button
         type="warning"
-        v-if="simType === 'B'"
+        v-if="simType === 'B' && isSysManager"
         size="mini"
+        
         :disabled="isOneRow"
         @click="voiceServStatus(true)"
       >停语音</el-button>
       <el-button
         type="warning"
-        v-if="simType === 'B'"
+        v-if="simType === 'B' && isSysManager"
         size="mini"
         :disabled="isOneRow"
         @click="voiceServStatus(false)"
@@ -66,6 +73,7 @@
       <el-button
         type="primary"
         size="mini"
+        v-if="curUser.roleType !==6"
         @click="changeUser"
       >转让</el-button>
       <el-button
@@ -76,6 +84,7 @@
       <el-button
         type="primary"
         size="mini"
+        v-if="isSysManager"
         @click="handleComboChange"
       >更换套餐</el-button>
     </div>
@@ -367,6 +376,7 @@ export default {
     return {
       multipleSelection: [],
       pageNum: 1,
+      curUser: {},
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
       pageSize: 10,
@@ -375,6 +385,7 @@ export default {
       comboDialog: false,
       priceDialog: false,
       userDialog: false,
+      isSysManager: false,
       tableHeight: null,
       list: [],
       data: null,
@@ -485,6 +496,10 @@ export default {
         return;
       }
       this.userDialog = true;
+    },
+    getRoleType() {
+      this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
     },
     saveUser(user) {
       this.batchUpdate({
@@ -789,6 +804,7 @@ export default {
     }
   },
   mounted() {
+    this.getRoleType();
     this.getlist();
   },
   watch: {

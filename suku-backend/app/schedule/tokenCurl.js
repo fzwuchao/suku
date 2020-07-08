@@ -8,6 +8,7 @@ class TokenCurl extends Subscription {
       interval: '59m', // 59 分钟间隔
       type: 'all', // 指定所有的 worker 都需要执行
       immediate: true,
+      disable: false,
     };
   }
 
