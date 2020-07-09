@@ -18,12 +18,12 @@ fi
 rm -rf frontend
 tar -xzvf frontend.tar.gz -C ./
 
-if [ $type -ne 0 ];then
+if [ $type -eq 0 ];then
   docker cp ./frontend/weixin ${frontendContainer}:${nginxHome}/
   docker cp ./frontend/admin ${frontendContainer}:${nginxHome}/
-elif [ $type -ne 1 ];then
+elif [ $type -eq 1 ];then
   docker cp ./frontend/weixin ${frontendContainer}:${nginxHome}/
-elif [ $type -ne 1 ];then
+elif [ $type -eq 2 ];then
   docker cp ./frontend/admin ${frontendContainer}:${nginxHome}/
 fi
 
