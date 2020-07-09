@@ -37,6 +37,7 @@
       <el-form-item
         label="月通话时长"
         prop="monthVoice"
+        v-if="isShow"
       >
         <el-input-number
           v-model="simCombo.monthVoice"
@@ -98,6 +99,7 @@ export default {
   },
   data() {
     return {
+      isShow: true,
       isDisabled: true,
       simTypes: [],
       belongsToSimType: [],
@@ -165,6 +167,7 @@ export default {
         this.simCombo = r.data;
         this.renewPrice = this.simCombo.renewPrice;
         this.belongsToSimType = this.simCombo.belongsToSimType.split(',');
+        this.isShow = !this.belongsToSimType.includes('A');
       });
     },
     initBelongsToSimType(val) {
