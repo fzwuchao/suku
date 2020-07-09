@@ -202,6 +202,9 @@ export default {
     },
     "sim.onelinkId"(val) {
       this.sim.onelinkName = this.getLabel(this.onelinkList, val);
+    },
+    "type"() {
+      this.init()
     }
   },
   methods: {
@@ -268,30 +271,33 @@ export default {
     getChildUsers() {
       this.axios({
         method: "get",
-        url: API.USERS.GET_CHILD_USERS
+        url: API.USERS.GET_SELECT_USERS
       }).then(r => {
-        this.userList = (r.data || []).map(item => {
-          return { label: item.name, value: item.id };
+        this.userList =  (r.data || []).map(item => {
+          return { label: item.key, value: item.value };
         });
       });
+    },
+    init() {
+      const promiseList = [1, 2, 3].map(comboType =>
+        this.getSimComboByComboType(comboType)
+      );
+      Promise.all(promiseList).then(res => {
+        const simComboList = res.map(simComboRes => {
+          return simComboRes.data.list.map(simCombo => {
+            return { value: simCombo.id, label: simCombo.name };
+          });
+        });
+        this.activeComboList = simComboList[0];
+        this.increaseComboList = simComboList[1];
+        this.discountsComboList = simComboList[2];
+      });
+      this.getOnelink();
+      this.getChildUsers();
     }
   },
   mounted() {
-    const promiseList = [1, 2, 3].map(comboType =>
-      this.getSimComboByComboType(comboType)
-    );
-    Promise.all(promiseList).then(res => {
-      const simComboList = res.map(simComboRes => {
-        return simComboRes.data.list.map(simCombo => {
-          return { value: simCombo.id, label: simCombo.name };
-        });
-      });
-      this.activeComboList = simComboList[0];
-      this.increaseComboList = simComboList[1];
-      this.discountsComboList = simComboList[2];
-    });
-    this.getOnelink();
-    this.getChildUsers();
+    this.init()
   }
 };
 </script>
