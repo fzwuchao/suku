@@ -1,6 +1,7 @@
-FROM nginx
+FROM nginx:1.19.0
 #FROM node:current-slim
 ENV nginx_home /usr/share/nginx/html
+ENV TZ "Asia/Shanghai"
 # 速库源代码目录
 #ENV suku_home /home/app/suku
 

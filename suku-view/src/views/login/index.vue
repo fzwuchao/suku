@@ -65,8 +65,8 @@ export default {
     return {
       // 表单model
       loginForm: {
-        username: "youlan",
-        password: "123456",
+        username: "",
+        password: "",
         captchaCode: ""
       },
       // 表单验证规则

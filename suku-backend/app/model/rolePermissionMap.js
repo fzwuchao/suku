@@ -33,21 +33,11 @@ module.exports = app => {
       field: 'updated_at',
       comment: '更新时间',
     },
-    deletedAt: {
-      type: DATE,
-      get() {
-        const deletedAt = this.getDataValue('deletedAt');
-        return deletedAt ? moment(deletedAt).format('YYYY-MM-DD HH:mm:ss') : null;
-      },
-      field: 'deleted_at',
-    },
   }, {
     timestamps: true,
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     indexes: [{ unique: true, fields: [ 'role_id', 'permission_id' ] }],
-    paranoid: true,
-    deletedAt: 'deletedAt',
   });
 
   RolePermissionMap.associate = () => {

@@ -21,3 +21,4 @@ yarn-error.log*
 *.sw?
 
 sh/*.tar.gz
+sh/*.log
