@@ -121,7 +121,7 @@ class UserService extends BaseService {
     const user = this.getCurUser();
     const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'createdAt', 'updatedAt' ];
     const where = {};
-    if (user.level === 0) {
+    if (user.roleLevel === 0) {
       attributes.push('rate');
     }
     const role = await this.ctx.service.role.getRoleInfo(user.roleId);

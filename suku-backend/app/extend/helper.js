@@ -35,9 +35,9 @@ const parseLoginUser = jsonStr => {
   const tmp = JSON.parse(decodeStr);
   const keys = Object.keys(tmp);
 
-  if (keys.includes('id') && keys.includes('username') && keys.includes('name') && keys.includes('roleId') && keys.includes('roleType')) {
-    const { id, username, name, roleId, roleType } = tmp;
-    return new LoginUser(id, username, name, roleId, roleType);
+  if (keys.includes('id') && keys.includes('username') && keys.includes('name') && keys.includes('roleId') && keys.includes('roleType') && keys.includes('roleLevel')) {
+    const { id, username, name, roleId, roleType, roleLevel } = tmp;
+    return new LoginUser(id, username, name, roleId, roleType, roleLevel);
   }
 
   return null;
