@@ -206,6 +206,7 @@ export default {
             otherComboIds: this.comboIds.join(","),
             overdueTime: this.sim.overdueTime,
             privateMoney: this.sim.privateMoney,
+            virtualMult: this.sim.virtualMult,
             simId: this.simId
           };
           this.axios({

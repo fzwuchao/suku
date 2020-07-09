@@ -29,6 +29,11 @@ class AppBootHook {
       // const ctx = this.app.createAnonymousContext();
       ctx.service.jobLog.dealUnfinishedJobs(job.data, done); // dealOrder是自定义的方法
     });
+    this.app.queue.process('openFlowServ', (job, done) => {
+      // 这里可以调用service里面的方法来消费这些信息
+      // const ctx = this.app.createAnonymousContext();
+      ctx.service.jobLog.openFlowServ(job.data, done); // dealOrder是自定义的方法
+    });
   }
 
 }

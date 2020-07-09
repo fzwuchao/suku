@@ -131,6 +131,7 @@ class SimController extends BaseController {
         onelinkId: params.onelinkId,
         onelinkName: params.onelinkName,
         simType: params.simType,
+        virtualMult: params.virtualMult,
         monthFlow,
         monthVoice,
         renewPrice,
@@ -293,8 +294,8 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simId, otherComboIds, overdueTime, privateMoney } = request.body;
-    await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney }, simId);
+    const { simId, otherComboIds, overdueTime, privateMoney, virtualMult } = request.body;
+    await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney, virtualMult }, simId);
     this.success(null, '更新成功');
   }
 

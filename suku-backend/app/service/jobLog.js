@@ -37,7 +37,7 @@ class JobLogService extends BaseService {
     return result;
   }
 
-  async dealUnfinishedJobs(jobLog) {
+  async dealUnfinishedJobs(jobLog, done) {
     const { ctx } = this;
     const { service, logger } = ctx;
     logger.info(`【开始执行队列：】:${jobLog.name} ms`);
@@ -54,9 +54,14 @@ class JobLogService extends BaseService {
       }
       await service.sim.batchUpdateBySimIds(data, res.sucessIds);
     }
-    return true;
+    done();
+    // return true;
   }
 
+  async openFlowServ(data, done) {
+    await this.ctx.service.chinaMobile.operateSimApnFunction('0', data.simId);
+    done();
+  }
   async create(jobLog) {
     try {
       await this.app.model.JobLog.create(jobLog);
