@@ -197,7 +197,7 @@ class ChinaMobileService extends BaseService {
     const url = getApi(1).url;
 
     for (let i = 0; i < results.length; i++) {
-      const { nameKey, apiHost, appId, apiVersion, secretKey } = results[i];
+      const { nameKey, apiHost, appId, apiVersion, secretKey, id } = results[i];
       const res = await this.ctx.curl(`${apiHost}${apiVersion}${url}`, {
         data: {
           appid: appId,
@@ -206,7 +206,12 @@ class ChinaMobileService extends BaseService {
         },
         dataType: 'json',
       });
-      const result = await this.getResult(res);
+      const api = getApi(1);
+      const result = await this.getResult(res, api, {
+        appid: appId,
+        password: secretKey,
+        transid: getTransid(appId),
+      }, id);
       let token = null;
       if (result.length > 0) {
         token = result[0].token;
