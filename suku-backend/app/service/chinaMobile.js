@@ -17,7 +17,7 @@ const messageParams = {
   id: 31, // MAS分配编号
   pwd: 'JNQov+AilMvpu0jrRLBgDOh2rha1h+PGM075YYycMt88Zbeya8bexQ==', // MAS分配密钥
   serviceId: '1064899140165',
-}
+};
 
 const BaseService = require('../core/baseService');
 const { getApi } = require('../extend/api')();
@@ -211,7 +211,7 @@ class ChinaMobileService extends BaseService {
       if (result.length > 0) {
         token = result[0].token;
       }
-      console.log(`#####${token}#####`);
+      this.ctx.logger.info(`#####${token}#####`);
       await this.app.redis.set(`${nameKey}_token`, token);
     }
   }
@@ -768,7 +768,7 @@ class ChinaMobileService extends BaseService {
     </sms_info>
     </sms>
     </svc_init>`;
-    this.ctx.logger.info('【发送短信xml:】', xml)
+    this.ctx.logger.info('【发送短信xml;:】', xml);
     const result = await this.sendXML(xml, 'send');
     if (!result.success) {
       this.ctx.logger.info('【发送短信，返回结果：】', result);
