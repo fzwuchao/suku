@@ -66,7 +66,7 @@ class UserService extends BaseService {
     return user;
   }
 
-  async getAllUserIds(pids, ids) {
+  async getAllUserIdsByPid(pids, ids) {
     const attributes = [ 'id' ];
     const Op = this.getOp();
     if (typeof pids === 'number') {
@@ -87,12 +87,21 @@ class UserService extends BaseService {
         ids.push(users[i].id);
         newPids.push(users[i].id);
       }
-      await this.getAllUserIds(newPids, ids);
+      await this.getAllUserIdsByPid(newPids, ids);
     }
     return ids;
   }
 
-  async getAllUsers(pids, users) {
+  async getAllUserIds() {
+    const attributes = [ 'id' ];
+
+    let ids = await this.app.model.User.findAll({ attributes,
+    });
+    ids = ids.map(item => { return item.id; });
+    return ids;
+  }
+
+  async getAllUsersByPid(pids, users) {
     const attributes = [[ 'id', 'value' ], [ 'name', 'key' ]];
     if (typeof pids === 'number') {
       pids = [ pids ];
@@ -112,10 +121,17 @@ class UserService extends BaseService {
         newPids.push(curUsers[i].dataValues.value);
       }
       Array.prototype.push.apply(users, curUsers);
-      await this.getAllUsers(newPids, users);
+      await this.getAllUsersByPid(newPids, users);
     }
     return users;
   }
+
+  async getAllUsers() {
+    const attributes = [[ 'id', 'value' ], [ 'name', 'key' ]];
+    const users = await this.app.model.User.findAll({ attributes });
+    return users;
+  }
+
   async getUsersPage(pid, pageSize, pageNum) {
     const Op = this.getOp();
     const user = this.getCurUser();
@@ -124,17 +140,23 @@ class UserService extends BaseService {
     if (user.roleLevel === 0) {
       attributes.push('rate');
     }
-    const role = await this.ctx.service.role.getRoleInfo(user.roleId);
-    if (role.level !== 1 && role.level !== 0) {
-      const ids = await this.getAllUserIds([ pid ]);
-      where.id = { [Op.in]: ids };
+    let ids = [];
+    if (user.roleLevel <= 1) {
+      ids = await this.ctx.service.user.getAllUserIds();
+    } else {
+      ids = await this.ctx.service.user.getAllUserIdsByPid([ user.id ]);
     }
+    where.id = { [Op.in]: ids };
+
     const result = await this.findAndCountAll('User', pageSize, pageNum, {
       attributes,
       where,
       include: {
         model: this.app.model.Role,
         attributes: [ 'displayName' ],
+        where: {
+          level: { [Op.gte ]: user.roleLevel },
+        },
       },
     });
     return result;

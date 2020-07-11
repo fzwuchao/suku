@@ -28,8 +28,14 @@ class UserController extends BaseController {
   async getSelectUsers() {
     const { ctx } = this;
     const user = this.getCurUser();
-    const result = await ctx.service.user.getAllUsers(user.id);
-    result.push({ value: user.id, key: user.name });
+    let result = [];
+    if (user.roleLevel <= 1) {
+      result = await ctx.service.user.getAllUsers(user.id);
+    } else {
+      result = await ctx.service.user.getAllUsersByPid(user.id);
+      result.push({ value: user.id, key: user.name });
+    }
+
     this.success(result, '');
   }
 

@@ -23,7 +23,12 @@ class MessageUpgoingService extends BaseService {
       where.uid = uid;
     } else {
       const curUser = this.getCurUser();
-      const ids = await this.ctx.service.user.getAllUserIds([ curUser.id ]);
+      let ids = [];
+      if (curUser.roleLevel <= 1) {
+        ids = await this.ctx.service.user.getAllUserIds();
+      } else {
+        ids = await this.ctx.service.user.getAllUserIdsByPid([ curUser.id ]);
+      }
       where.uid = {
         [Op.in]: ids,
       };
