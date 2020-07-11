@@ -76,6 +76,9 @@ class SimComboService extends BaseService {
         const id = params.id;
         delete params.id;
         await this.app.model.SimCombo.update(params, { where: { id } });
+        // if (params.months) {
+
+        // }
       } else {
         await this.app.model.SimCombo.create(params);
       }

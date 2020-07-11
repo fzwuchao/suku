@@ -255,8 +255,8 @@ class SimService extends BaseService {
       params.activeTime = activeTime;
       params.isActive = 1;
       if (simType === 'A') {
-        const combo = service.simCombo.getSimComboById(activeComboId);
-        const newTime = moment(activeTime).add(combo.months, 'M');
+        const combo = await service.simCombo.getSimComboById(activeComboId);
+        const newTime = moment(activeTime).add((combo.months - 1), 'M');
         params.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
       }
     }
