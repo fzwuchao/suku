@@ -28,7 +28,7 @@ class WechatController extends BaseController {
       if (order.orderType === 1) {
         await service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
         // await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
-        this.app.queue.create('openFlowServ', { simId }).delay(3000) // 延时多少毫秒
+        this.app.queue.create('openFlowServ', { simId }).delay(10000) // 延时多少毫秒
           .save();
       }
       if (order.orderType === 2 && (pack.monthFlow - 0) > 0 && sim.flowServStatus === SERV_STATUS.OFF) {
