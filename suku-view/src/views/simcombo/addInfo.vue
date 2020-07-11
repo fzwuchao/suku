@@ -171,10 +171,15 @@ export default {
     }
   },
   computed: {
-    renewPrice() {
+    renewPrice:{
+      get() {
       const { monthRent, months } = this.simCombo;
       return monthRent * months;
-    }
+      },
+      set(val) {
+        this.value = val;
+      }
+    } 
   },
   mounted() {
     this.initBelongsToSimType();

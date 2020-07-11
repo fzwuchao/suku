@@ -215,6 +215,7 @@
         align="left"
         v-if="simType === 'B'"
         label="余额(元)"
+        min-width="100px"
         show-overflow-tooltip
       >
         <template slot-scope="scope">{{ `${scope.row.shengyuMoney ? scope.row.shengyuMoney : 0}` }}</template>
