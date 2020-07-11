@@ -775,7 +775,7 @@ class ChinaMobileService extends BaseService {
     </svc_init>`;
     this.ctx.logger.info('【发送短信xml;:】', xml);
     const result = await this.sendXML(xml, 'send');
-    this.ctx.logger.info('【发送短信，移动接口返回结果：】', result);
+    this.ctx.logger.info('【发送短信，移动接口返回结果：】', JSON.stringify(result));
     if (!result.success) {
       return result;
     }
@@ -808,7 +808,7 @@ class ChinaMobileService extends BaseService {
     </svc_init>`;
     this.ctx.logger.info('【上行短信xml;:】', xml);
     const result = await this.sendXML(xml, 'delivery');
-    this.ctx.logger.info('【上行短信查询，移动接口返回结果：】', result);
+    this.ctx.logger.info('【上行短信查询，移动接口返回结果：】', JSON.stringify(result));
     if (!result.success) {
       return result;
     }
