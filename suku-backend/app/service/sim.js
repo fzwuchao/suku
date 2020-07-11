@@ -64,13 +64,13 @@ class SimService extends BaseService {
    * @return {{count, rows}} - 总条数，一页的数据
    */
   async getSimPageData({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
-    const result = this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName });
+    const result = await this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
 
     return simData;
   }
 
-  getWhereCondition({ simId, simIdRange, uname, cardStatus, isActive, simType, activeComboName }) {
+  async getWhereCondition({ simId, simIdRange, uname, cardStatus, isActive, simType, activeComboName }) {
     const Op = this.getOp();
     const condition = {};
     const queryKey = {};
@@ -134,6 +134,17 @@ class SimService extends BaseService {
       queryKey['activeComboName'] = activeComboName;
     }
 
+    const curUser = this.getCurUser();
+    let ids = [];
+    if (curUser.roleLevel <= 1) {
+      ids = await this.ctx.service.user.getAllUserIds();
+    } else {
+      ids = await this.ctx.service.user.getAllUserIdsByPid([ curUser.id ]);
+    }
+    condition['uid'] = {
+      [Op.in]: ids,
+    };
+    queryKey['uid'] = JSON.stringify(ids);
     const whereCondition = {};
 
     if (Object.keys(condition).length > 0) whereCondition.where = condition;
@@ -144,7 +155,7 @@ class SimService extends BaseService {
   }
 
   async getSimDataForExcel({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName }, simTypeIsB) {
-    const whereCondition = this.getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName });
+    const whereCondition = await this.getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName });
     const commonAttrs = [
       [ 'sim_id', 'Sim卡号' ],
       // [ 'net_status', '状态' ],
