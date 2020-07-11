@@ -764,7 +764,7 @@ class ChinaMobileService extends BaseService {
     <sms ver="2.0.0">
     <client>
     <id>${messageParams.id}</id>
-    <pwd>${messageParams.pwd}/pwd>
+    <pwd>${messageParams.pwd}</pwd>
     <serviceid>${messageParams.serviceId}</serviceid>
     </client>
     <sms_info>
@@ -775,8 +775,8 @@ class ChinaMobileService extends BaseService {
     </svc_init>`;
     this.ctx.logger.info('【发送短信xml;:】', xml);
     const result = await this.sendXML(xml, 'send');
+    this.ctx.logger.info('【发送短信，移动接口返回结果：】', result);
     if (!result.success) {
-      this.ctx.logger.info('【发送短信，返回结果：】', result);
       return result;
     }
     const { response_info } = result.data.svc_result;
@@ -788,7 +788,7 @@ class ChinaMobileService extends BaseService {
     result.msg = retcodeMap[retcodeValue];
     result.data = { gwid: gwidValue, retmesg: retmesgValue, retcode: retcodeValue };
 
-    this.ctx.logger.info('【发送短信，返回结果：】', result);
+    this.ctx.logger.info('【发送短信，解析后结果：】', result);
 
     return result;
   }
@@ -798,7 +798,7 @@ class ChinaMobileService extends BaseService {
    */
   async sendUpgoingMessage() {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-    <svc_initver="2.0.0">
+    <svc_init ver="2.0.0">
     <sms ver="2.0.0">
     <client>
     <id>${messageParams.id}</id>
@@ -806,7 +806,9 @@ class ChinaMobileService extends BaseService {
     </client>
     </sms>
     </svc_init>`;
+    this.ctx.logger.info('【上行短信xml;:】', xml);
     const result = await this.sendXML(xml, 'delivery');
+    this.ctx.logger.info('【上行短信查询，移动接口返回结果：】', result);
     if (!result.success) {
       return result;
     }
@@ -827,7 +829,7 @@ class ChinaMobileService extends BaseService {
       });
     }
     result.data = { messageData, retmesg: retmesgValue, retcode: retcodeValue };
-
+    this.ctx.logger.info('【上行短信查询，解析后的结果：】', result);
     return result;
   }
 }
