@@ -175,7 +175,13 @@ export default {
         ],
         email:[
           {validator: checkEmail, trigger: 'blur'}
-        ]
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: "blur" }
+        ],
+        password2: [
+          { required: true, message: '请输入确认密码', trigger: "blur" }
+        ],
       },
       roleList:[]
     };
