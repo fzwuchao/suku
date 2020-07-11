@@ -246,12 +246,12 @@ class ChinaMobileService extends BaseService {
    */
   async querySimBasicInfo(msisdn) {
     const result = await this.handleBy(2, msisdn, { msisdn });
-    const { activeDate } = result[0] || {};
+    const { activeDate, iccid } = result[0] || {};
     let activeDt = null;
     if (activeDate !== ' ' && !_.isNil(activeDate)) {
       activeDt = moment(activeDate).toDate();
     }
-    return activeDt;
+    return { activeDt, iccid };
   }
 
   /**

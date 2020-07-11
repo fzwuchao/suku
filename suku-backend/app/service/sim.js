@@ -245,15 +245,17 @@ class SimService extends BaseService {
     if (simType === SIM_TYPE.CALL) {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId));
     }
-    const [ activeTime, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
+    const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
 
     if (voiceAmount) {
       params.voiceAmount = voiceAmount;
     }
 
-    if (activeTime) {
+    if (baseInfo.activeDt) {
+      const activeTime = baseInfo.activeDt;
       params.activeTime = activeTime;
       params.isActive = 1;
+      params.iccid = baseInfo.iccid;
       if (simType === 'A') {
         const combo = await service.simCombo.getSimComboById(activeComboId);
         const newTime = moment(activeTime).add((combo.months - 1), 'M');
