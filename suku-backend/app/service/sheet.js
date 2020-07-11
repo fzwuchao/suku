@@ -77,9 +77,17 @@ class SheetService extends Service {
     const workbook = XLSX.readFile(filepath);
     const { Sheets } = workbook;
 
-    for (const key in Sheets) {
-      if (Sheets.hasOwnProperty(key)) {
-        sheetData = XLSX.utils.sheet_to_json(Sheets[key]);
+    // for (const key in Sheets) {
+    //   if (Sheets.hasOwnProperty(key)) {
+    //     sheetData = XLSX.utils.sheet_to_json(Sheets[key]);
+    //     return;
+    //   }
+    // }
+    const keys = Object.keys(Sheets);
+    // excel中有多个sheet，只取第一个
+    if (keys && keys.length > 0) {
+      if (Sheets.hasOwnProperty(keys[0])) {
+        sheetData = XLSX.utils.sheet_to_json(Sheets[keys[0]]);
       }
     }
 

@@ -99,6 +99,7 @@ module.exports = appInfo => {
     fileExtensions: [
       '.csv',
       '.xlsx',
+      '.xls',
     ],
   };
 
