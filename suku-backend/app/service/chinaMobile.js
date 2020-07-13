@@ -15,7 +15,7 @@ const retcodeMap = {
 };
 const messageParams = {
   id: 31, // MAS分配编号
-  pwd: 'JNQov+AilMvpu0jrRLBgDOh2rha1h+PGM075YYycMt88Zbeya8bexQ==', // MAS分配密钥
+  pwd: '17AhjPzRA4my8fC9Nv4z9A5LbplVV/K+UhyrVghlRg08Zbeya8bexQ==', // MAS分配密钥
   serviceId: '1064899140165',
 };
 
@@ -50,7 +50,8 @@ class ChinaMobileService extends BaseService {
     const interfaceTypeMap = {
       // send: 'http://localhost:7001/testMsgSend',
       send: 'http://117.169.32.136:28181/sjb/HttpSendSMSService',
-      delivery: 'http://localhost:7001/testMsgSendUpgoing',
+      // delivery: 'http://localhost:7001/testMsgSendUpgoing',
+      delivery: 'http://117.169.32.136:28181/sjb/HttpDeliverySMSService',
     };
     const url = interfaceTypeMap[interfaceType];
     const resState = { success: false, msg: '', data: null };
