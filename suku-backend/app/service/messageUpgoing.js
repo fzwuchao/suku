@@ -53,18 +53,20 @@ class MessageUpgoingService extends BaseService {
   }
 
   async batchSave(msgUpgoingList) {
-    const t = await this.getTransaction();
-    const transaction = { transaction: t };
+    // const t = await this.getTransaction();
+    // const transaction = { transaction: t };
     try {
-      await this.app.model.MessageUpgoing.destroy({
-        truncate: true,
-        ...transaction,
-      });
-      await this.app.model.MessageUpgoing.bulkCreate(msgUpgoingList, { ...transaction });
-      await t.commit();
+      // await this.app.model.MessageUpgoing.destroy({
+      //   truncate: true,
+      //   force: true,
+      //   ...transaction,
+      // });
+      // await this.app.model.MessageUpgoing.bulkCreate(msgUpgoingList, { ...transaction });
+      // await t.commit();
+      await this.app.model.MessageUpgoing.bulkCreate(msgUpgoingList);
     } catch (e) {
       this.ctx.logger.error(e);
-      await t.rollback();
+      // await t.rollback();
       return false;
     }
     return true;

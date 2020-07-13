@@ -882,8 +882,9 @@ class ChinaMobileService extends BaseService {
     result.msg = retcodeMap[retcodeValue];
 
     const messageData = [];
+    this.ctx.logger.info('---------- itemlist:', itemlist);
     if (itemlist.length > 0) {
-      itemlist[0].item.forEach(m => {
+      (itemlist[0].item || []).forEach(m => {
         messageData.push({
           content: m.content[0],
           simId: m.phone[0],

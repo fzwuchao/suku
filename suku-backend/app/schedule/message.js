@@ -5,10 +5,10 @@ class Message extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      interval: '59m', // 59 分钟间隔
+      interval: '3m', // 59 分钟间隔
       type: 'all', // 指定所有的 worker 都需要执行
       immediate: true,
-      disable: true,
+      disable: false,
     };
   }
 
@@ -30,6 +30,7 @@ class Message extends Subscription {
           ...user,
         };
       });
+      this.ctx.logger.info('----------- msgUpgoingList:', msgUpgoingList);
       await service.messageUpgoing.batchSave(msgUpgoingList);
     }
     const endTime = moment().milliseconds();
