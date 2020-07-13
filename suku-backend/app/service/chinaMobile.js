@@ -417,6 +417,38 @@ class ChinaMobileService extends BaseService {
   }
 
   /**
+   * CMIOT_API23E02-成员归属群组查询
+   * 查询物联卡归属的群组信息
+   * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
+   * @return {array} [{
+   *  groupList: [
+   *    {groupId, offeringId, offeringName}
+   *  ]
+   * }]
+   */
+  async queryGroupByMemberFlow(msisdn) {
+    const { nameKey, status } = await this.getOnelink(msisdn);
+    if (status === 0) {
+      return null;
+    }
+    let groupId = await this.app.redis.get(`${nameKey}_flow_groupId`);
+    let offerId = await this.app.redis.get(`${nameKey}_flow_offerId`);
+    if (groupId) {
+      return { groupId, offerId };
+    }
+
+    const result = await this.handleBy(9, msisdn, { msisdn });
+    if (result.length > 0) {
+      groupId = result[0].groupList[2].groupId;
+      offerId = result[0].groupList[2].offeringId;
+    }
+    await this.app.redis.set(`${nameKey}_flow_groupId`, groupId);
+    await this.app.redis.set(`${nameKey}_flow_offerId`, offerId);
+
+    return { groupId, offerId };
+  }
+
+  /**
    * CMIOT_API23M16-成员语音白名单配置
    * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）实现集团旗下单个群组成员的语音白名单配置
    * @param {string} operType - 语音白名单配置类型：1：新增 4：删除
@@ -447,6 +479,36 @@ class ChinaMobileService extends BaseService {
     };
 
     const result = await this.handleBy(18, msisdn, data);
+    return result;
+  }
+
+
+  /**
+   * CMIOT_API23E04-群组成员流量限额设置
+   * 集团客户可以通过卡号（msisdn\iccid\imsi 三选一，单卡）实现集团旗下单个群组成员的语音白名单配置
+   * @param {string} operType - 限额设置类型：1：新增 2：删除， 3: 变更
+   * @param {number} limitValue - 限额值 单位 mb
+   * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
+   * @return {array} []
+   */
+  async configLimtValue(operType, limitValue, msisdn) {
+    // 当 operType=1 新增时，whiteNumber只能传 1 个值。
+    // 当 operType=4 删除时，whiteNumber可传 2 个值，2 个号码用下划线分隔，例如：xxxx_xxxx
+    const { groupId, offerId } = await this.queryGroupByMemberFlow(msisdn);
+    // offerId = 'IO111000000009';
+    const apnName = 'CMIOT';
+    const actionRule = 1;
+    limitValue = limitValue - 0;
+    const data = {
+      groupId,
+      offerId,
+      apnName,
+      actionRule,
+      limitValue,
+      operType,
+      msisdn,
+    };
+    const result = await this.handleBy(24, msisdn, data);
     return result;
   }
 

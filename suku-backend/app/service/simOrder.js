@@ -6,12 +6,13 @@
 const BaseService = require('../core/baseService');
 const moment = require('moment');
 const calc = require('calculatorjs');
+// const { orderType } = require('../extend/rules/simOrder');
 // 导出文件所在路径
 // const FILE_PATH_PREFIX = '/var/tmp/';
 
 // user表名
 // const TABLE_USER = 'user';
-
+const { LIMT_OPTY } = require('../extend/constant')();
 class SimOrderService extends BaseService {
 
 
@@ -71,6 +72,8 @@ class SimOrderService extends BaseService {
     const pack = await this.ctx.service.comboPack.getComboPackById(order.cpid);
     const packMoney = calc(`${pack.awardMoney ? pack.awardMoney : 0} + ${pack.money ? pack.money : 0}`).toFixed(2);
     const packMonths = calc(`${packMoney ? packMoney : 0}/${sim.monthRent ? sim.monthRent : 1}`);
+    const operType = LIMT_OPTY.UPDATE;
+    let limtValue = 0;
     // pack.months = packMonths;
     // pack.money = calc(`${pack.money ? pack.money : 0}+(${this.sim.privateMoney ? this.sim.privateMoney : 0}*${packMonths})`).toFixed(2);
     switch (order.orderType) {
@@ -84,7 +87,6 @@ class SimOrderService extends BaseService {
         } else {
           order.months = packMonths;
         }
-        
         newSim.overdueTime = sim.overdueTime ? sim.overdueTime : new Date();
         const newTime = moment(newSim.overdueTime).add(order.months, 'M');
         newSim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
@@ -92,12 +94,19 @@ class SimOrderService extends BaseService {
       case 2:
         newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow ? sim.monthOverlapFlow : 0} + ${pack.monthFlow ? pack.monthFlow : 0}`);
         newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration ? sim.monthOverlapVoiceDuration : 0} + ${pack.monthVoice ? pack.monthVoice : 0}`);
+        limtValue = calc(`(${sim.monthFlow}+${newSim.monthOverlapFlow})/${sim.virtualMult}`).toFixed(3); 
+        await this.ctx.service.chinaMobile.configLimtValue(operType, limtValue, sim.simId);
         break;
     }
     if (order.orderType === 1) {
       newSim.isActive = 1;
+      // operType = LIMT_OPTY.ADD;
+      // limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
+      // await this.ctx.service.chinaMobile.configLimtValue(operType, limtValue, sim.simId);
     }
     await this.ctx.service.sim.update(newSim);
+
+    
   }
   async update(order) {
     try {

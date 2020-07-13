@@ -4,7 +4,8 @@
 const _ = require('lodash');
 
 const BaseController = require('../core/baseController');
-const { SERV_STATUS, SERV_OP_SINGLE } = require('../extend/constant')();
+const { SERV_STATUS, SERV_OP_SINGLE, LIMT_OPTY } = require('../extend/constant')();
+const calc = require('calculatorjs');
 class SimController extends BaseController {
   // 查询
   async search() {
@@ -141,6 +142,12 @@ class SimController extends BaseController {
 
     try {
       await service.sim.bulkCreate(simList);
+      for (let i = 0; i < simList.length; i++) {
+        const item = simList[i];
+        const operType = LIMT_OPTY.ADD;
+        const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
+        await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
+      }
       // 在表中生成数据后，删除tmp-file/下对应的文件
       await service.sheet.removeFile(params.filepath);
 

@@ -115,6 +115,16 @@ const API_CONFIG = {
     name: 'CMIOT_API23M07-单卡数据功能开停',
     type: 4,
   },
+  24: {
+    url: '/ec/limit/group-member-data-usage',
+    name: 'CMIOT_API23E04-群组成员流量限额设置',
+    type: 5,
+  },
+  25: {
+    url: '/ec/query/ordered-offerings',
+    name: 'CMIOT_API23R00-资费订购实时查询',
+    type: 1,
+  },
 };
 function getApi(key) {
   return API_CONFIG[key];

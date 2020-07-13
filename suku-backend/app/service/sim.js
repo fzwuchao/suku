@@ -5,7 +5,8 @@
  */
 const BaseService = require('../core/baseService');
 const moment = require('moment');
-const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
+const calc = require('calculatorjs');
+const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, LIMT_OPTY, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
 class SimService extends BaseService {
   async update(sim) {
     try {
@@ -393,7 +394,29 @@ class SimService extends BaseService {
     return true;
   }
 
-
+  /**
+ * 修改流量阀值
+ */
+  async configLimtValue() {
+    const ctx = this.ctx;
+    const { service } = ctx;
+    const Op = this.getOp();
+    const where = {
+      monthOverlapFlow: { [Op.gt]: 0 },
+      cardStatus: SIM_CARD_STATUS.ACTIVE,
+      overdueTime: { [Op.lt]: new Date() },
+    };
+    const simList = await this.app.model.Sim.findAll({
+      where,
+    });
+    for (let i = 0; i < simList.length; i++) {
+      const item = simList[i];
+      const operType = LIMT_OPTY.UPDATE;
+      const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
+      await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
+    }
+    return true;
+  }
   /**
    * 单卡状态修改
    */

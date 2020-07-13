@@ -163,5 +163,6 @@ module.exports = app => {
 
   router.get('/wechat/getOpenId', controller.wechat.getOpenId);
   router.post('/wechat/payBack', payApi.middleware('pay'), controller.wechat.payBack);
+  // router.post('/wechat/payBack', controller.wechat.payBack);
 
 };

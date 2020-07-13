@@ -84,6 +84,12 @@ const SERVICE_TYPE = {
   MSG: '08',
 };
 
+const LIMT_OPTY = {
+  ADD: 1,
+  DEL: 2,
+  UPDATE: 3,
+};
+
 // 角色类型:1-系统管理员, 2-仓库管理员, 3-业务员, 4-运营客服, 5-经销商, 6-分销商
 const ROLE_TYPE = [
   { NAME: 'sysManager', DISPLAYNAME: '系统管理员', CODE: 1, LEVEL: 0 },
@@ -115,5 +121,6 @@ module.exports = () => {
     ORDER_TYPE,
     SERVICE_TYPE,
     ROLE_TYPE,
+    LIMT_OPTY,
   };
 };

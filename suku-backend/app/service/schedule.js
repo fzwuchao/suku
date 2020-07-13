@@ -25,6 +25,7 @@ class ScheduleService extends BaseService {
     const { service, logger } = ctx;
     logger.info('********************月结处理*********************');
     const startTime = moment().milliseconds();
+    await service.sim.configLimtValue();
     // 修改余额，已用流量，已用语音清零，叠加流量清零
     let updateSql = 'update sim set';
     updateSql += ' shengyu_money = shengyu_money - month_rent,'; // 余额减去月租

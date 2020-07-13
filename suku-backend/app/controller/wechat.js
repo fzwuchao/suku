@@ -18,6 +18,11 @@ class WechatController extends BaseController {
     const { ctx } = this;
     const { request, service } = ctx;
     const info = request.weixin;
+    // const info = {
+    //   return_code: 'SUCCESS',
+    //   out_trade_no: 'PRE14809331354T183658R4796',
+    //   transaction_id: '4200000602202007123750226959',
+    // };
     if (info.return_code === 'SUCCESS') {
       const order = await service.simOrder.getOrderByOrderId(info.out_trade_no);
       const simId = order.simId;
@@ -42,7 +47,7 @@ class WechatController extends BaseController {
     } else {
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 0 });
     }
-    ctx.reply();
+    // ctx.reply();
   }
 
 }
