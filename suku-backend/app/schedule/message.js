@@ -23,15 +23,20 @@ class Message extends Subscription {
       const { messageData } = result.data;
       const simIds = messageData.map(item => item.simId);
       const simIdToUserMap = await service.sim.getSimIdToUserMapBySimIds(simIds);
-      const msgUpgoingList = messageData.map(data => {
-        const user = simIdToUserMap[data.simId];
-        return {
-          ...data,
-          ...user,
-        };
-      });
+      const msgUpgoingList = [];
+      for (let i = 0; i < messageData.length; i++) {
+        const user = simIdToUserMap[messageData[i].simId];
+        if (user) {
+          msgUpgoingList.push({
+            ...messageData[i],
+            ...user,
+          });
+        }
+      }
       this.ctx.logger.info('----------- msgUpgoingList:', msgUpgoingList);
-      await service.messageUpgoing.batchSave(msgUpgoingList);
+      if (msgUpgoingList.length > 0) {
+        await service.messageUpgoing.batchSave(msgUpgoingList);
+      }
     }
     const endTime = moment().milliseconds();
     logger.info(`【查询上短信记录，并入库总时间：】:${endTime - startTime} ms`);

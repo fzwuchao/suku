@@ -42,4 +42,9 @@ module.exports = {
     enable: true,
     package: 'egg-delayed-queue',
   },
+  // 日志切割
+  logrotator: {
+    enable: true,
+    package: 'egg-logrotator',
+  },
 };
