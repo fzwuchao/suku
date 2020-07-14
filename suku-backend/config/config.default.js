@@ -142,7 +142,7 @@ module.exports = appInfo => {
   config.logger = {
     level: 'INFO',
     // dir: 'logs/suku-backend',
-    dir: path.join(appInfo.root, 'logs', appInfo.name),
+    dir: path.join(__dirname, '../logs', appInfo.name),
   };
   return {
     ...config,
