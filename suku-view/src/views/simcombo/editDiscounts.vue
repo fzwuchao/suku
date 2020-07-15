@@ -5,6 +5,9 @@
       <el-form-item label="套餐名称" prop="name">
         <el-input v-model="simCombo.name"></el-input>
       </el-form-item>
+      <el-form-item label="套餐别名" prop="displayName">
+        <el-input v-model="simCombo.displayName"></el-input>
+      </el-form-item>
       <el-form-item label="适用卡类型" prop="belongsToSimType">
         <el-checkbox-group v-model="belongsToSimType">
           <el-checkbox label="B">主叫卡</el-checkbox>
@@ -32,6 +35,7 @@ export default {
       simCombo: {
         id: null,
         name: "",
+        displayName: "",
         belongsToSimType: "",
         comboType: 3
       },

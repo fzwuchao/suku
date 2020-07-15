@@ -74,7 +74,7 @@
     </div>
     <div class="combos">
       <van-tabs v-model="active" :animated="true" scrollspy sticky>
-        <van-tab v-for="(combo,index) in comboList" :title="combo.name" :key="index">
+        <van-tab v-for="(combo,index) in comboList" :title="combo.displayName" :key="index">
           <div  class="combo-packs" >
             <div  class="combo-pack" v-for="(pack,pindex) in combo.packs" @click="showPay(combo,pack)" :key="index+'_'+pindex">
               <div class="combo-pack-top">

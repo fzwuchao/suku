@@ -14,6 +14,12 @@
         <el-input v-model="simCombo.name"></el-input>
       </el-form-item>
       <el-form-item
+        label="套餐别名"
+        prop="displayName"
+      >
+        <el-input v-model="simCombo.displayName"></el-input>
+      </el-form-item>
+      <el-form-item
         label="适用卡类型"
         prop="belongsToSimType"
       >
@@ -103,6 +109,7 @@ export default {
         name: "",
         belongsToSimType: '',
         monthFlow: 0,
+        displayName: '',
         monthVoice: 0,
         monthRent: 0,
         months: 1,

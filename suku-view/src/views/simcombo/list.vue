@@ -28,7 +28,15 @@
       >
         <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
-
+      <el-table-column
+        align="left"
+        fixed="left"
+        label="套餐别名"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.displayName}}</template>
+      </el-table-column>
       <el-table-column align="left" min-width="120px" label="适用卡类型" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.belongsToSimType | simType }}</template>
       </el-table-column>

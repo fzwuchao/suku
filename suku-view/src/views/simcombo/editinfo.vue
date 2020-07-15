@@ -14,6 +14,12 @@
         <el-input v-model="simCombo.name" :disabled="isDisabled"></el-input>
       </el-form-item>
       <el-form-item
+        label="套餐名称"
+        prop="displayName"
+      >
+        <el-input v-model="simCombo.displayName" ></el-input>
+      </el-form-item>
+      <el-form-item
         label="适用卡类型"
         prop="belongsToSimType"
       >
@@ -106,6 +112,7 @@ export default {
       simCombo: {
         id: '',
         name: "",
+        displayName: "",
         belongsToSimType: "",
         monthFlow: 0,
         monthVoice: 0,

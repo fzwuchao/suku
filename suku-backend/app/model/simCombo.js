@@ -16,6 +16,14 @@ module.exports = app => {
       type: STRING(30),
       comment: '套餐名称',
     },
+    displayName: {
+      type: STRING(30),
+      field: 'display_name',
+      get() {
+        return this.getDataValue('displayName') ? this.getDataValue('displayName') : this.getDataValue('name');
+      },
+      comment: '套餐微信端显示名',
+    },
     comboType: {
       type: TINYINT(2),
       field: 'combo_type',
