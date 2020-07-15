@@ -5,10 +5,10 @@ class Message extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      interval: '59m', // 59 分钟间隔
+      interval: '3m', // 59 分钟间隔
       type: 'all', // 指定所有的 worker 都需要执行
       immediate: true,
-      disable: true,
+      disable: false,
     };
   }
 
@@ -23,14 +23,20 @@ class Message extends Subscription {
       const { messageData } = result.data;
       const simIds = messageData.map(item => item.simId);
       const simIdToUserMap = await service.sim.getSimIdToUserMapBySimIds(simIds);
-      const msgUpgoingList = messageData.map(data => {
-        const user = simIdToUserMap[data.simId];
-        return {
-          ...data,
-          ...user,
-        };
-      });
-      await service.messageUpgoing.batchSave(msgUpgoingList);
+      const msgUpgoingList = [];
+      for (let i = 0; i < messageData.length; i++) {
+        const user = simIdToUserMap[messageData[i].simId];
+        if (user) {
+          msgUpgoingList.push({
+            ...messageData[i],
+            ...user,
+          });
+        }
+      }
+      this.ctx.logger.info('----------- msgUpgoingList:', msgUpgoingList);
+      if (msgUpgoingList.length > 0) {
+        await service.messageUpgoing.batchSave(msgUpgoingList);
+      }
     }
     const endTime = moment().milliseconds();
     logger.info(`【查询上短信记录，并入库总时间：】:${endTime - startTime} ms`);
