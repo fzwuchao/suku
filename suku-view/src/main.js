@@ -10,6 +10,7 @@ import App from './App'
 import router from './router'
 import store from './store'
 import axios from './utils/axiosPlugin'
+import echarts from 'echarts'
 
 // import './mock' // 该项目所有请求使用mockjs模拟
 
@@ -24,6 +25,7 @@ import '@/permission' // permission control
 Vue.component('SvgIcon', SvgIcon);
 // console.log(router)
 Vue.config.productionTip = false
+Vue.prototype.$echarts = echarts
 new Vue({
     router,
     store,
