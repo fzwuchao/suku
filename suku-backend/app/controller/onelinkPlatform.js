@@ -26,7 +26,7 @@ class OnelinkPlatformController extends BaseController {
 
   async getAllOnelink() {
     const { ctx } = this;
-    const result = await ctx.service.onelinkPlatform.getAllOnelink();
+    const result = await ctx.service.onelinkPlatform.getAllOnelinkHasStop();
 
     this.success(result, '');
   }
