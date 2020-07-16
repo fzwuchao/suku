@@ -2,6 +2,7 @@
 
 
 const _ = require('lodash');
+const moment = require('moment');
 
 const BaseController = require('../core/baseController');
 const { SERV_STATUS, SERV_OP_SINGLE, LIMT_OPTY } = require('../extend/constant')();
@@ -59,7 +60,7 @@ class SimController extends BaseController {
 
   /**
    * 导入excel文件
-   * 头字段包括: MSISDN，ICCID
+   * 头字段包括: 'sim_id', 'iccid', 'overdue_time', 'private_money', 'month_overlap_flow'
    */
   async importSimsWithHeadField() {
     const { ctx } = this;
@@ -77,7 +78,7 @@ class SimController extends BaseController {
     const params = { ...request.body };
     ctx.validate(rule, params);
 
-    const simExcelHeadField = [ 'MSISDN', 'ICCID' ];
+    const simExcelHeadField = [ 'sim_id', 'iccid', 'overdue_time', 'private_money', 'month_overlap_flow' ];
     const result = await service.sheet.parseFileWithHeadField(params.filepath);
 
     if (!result.parseSuccess) {
@@ -98,8 +99,8 @@ class SimController extends BaseController {
     });
     const repeatSimIdsInFile = Object.keys(mapSimIdToCount).filter(simId => mapSimIdToCount[simId] > 1);
     if (repeatSimIdsInFile.length > 0) {
-      ctx.logger.error(`【表中，sim卡号存在重复的】: ${repeatSimIdsInFile}`);
-      this.fail(null, repeatSimIdsInFile, '表中，sim卡号存在重复的');
+      ctx.logger.error(`【导入的表中，sim卡号存在重复的】: ${repeatSimIdsInFile}`);
+      this.fail(null, repeatSimIdsInFile, '导入的表中，sim卡号存在重复的');
       return;
     }
 
@@ -121,6 +122,9 @@ class SimController extends BaseController {
     const simList = sheetData.map(item => {
       const simId = item[simExcelHeadField[0]];
       const iccid = item[simExcelHeadField[1]];
+      const overdueTime = item[simExcelHeadField[2]] ? new Date(item[simExcelHeadField[2]]) : null;
+      const privateMoney = item[simExcelHeadField[3]] ? item[simExcelHeadField[3]] : null;
+      const monthOverlapFlow = item[simExcelHeadField[4]] ? item[simExcelHeadField[4]] : 0;
       return {
         simId,
         iccid,
@@ -137,6 +141,9 @@ class SimController extends BaseController {
         monthVoice,
         renewPrice,
         monthRent,
+        overdueTime,
+        privateMoney,
+        monthOverlapFlow,
       };
     });
 
@@ -160,6 +167,7 @@ class SimController extends BaseController {
       this.success('', '导入成功');
 
     } catch (error) {
+      this.ctx.logger.error(error);
       this.fail('', '', error.message);
     }
   }

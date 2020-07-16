@@ -121,7 +121,7 @@
           <div
             slot="tip"
             class="el-upload__tip"
-          >只能上传execl/cvs文件</div>
+          >只能上传excel/csv文件</div>
         </el-upload>
       </el-form-item>
 
@@ -175,9 +175,9 @@ export default {
         ],
         filepath: [{ required: true, message: "请上传文件", trigger: "blur" }],
         increaseComboIds: [
-          // { required: true, message: "请选择叠加套餐", trigger: "blur" }
           {
-            trigger: "blur",
+            required: true,
+            trigger: "change",
             validator: (rule, value, callback) => {
               if (this.increaseComboIds.length === 0) {
                 callback('请选择叠加套餐');
