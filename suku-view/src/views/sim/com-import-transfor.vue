@@ -6,24 +6,7 @@
       :rules="rules"
       ref="ruleForm"
     >
-      <el-form-item
-        label="选择激活套餐"
-        prop="activeComboId"
-      >
-        <el-select
-          v-model="sim.activeComboId"
-          clearable
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="activeMenu in activeComboList"
-            :key="activeMenu.value"
-            :label="activeMenu.label"
-            :value="activeMenu.value"
-          ></el-option>
-
-        </el-select>
-      </el-form-item>
+      
       <el-form-item
         label="虚拟倍数"
         prop="virtualMult"
@@ -34,57 +17,7 @@
         ></el-input-number>
         <span class="unit">倍</span>
       </el-form-item>
-      <el-form-item
-        label="选择叠加套餐"
-        prop="increaseComboIds"
-      >
-        <el-select
-          v-model="increaseComboIds"
-          multiple
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="increaseCombo in increaseComboList"
-            :key="increaseCombo.value"
-            :label="increaseCombo.label"
-            :value="increaseCombo.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        v-if="type === 'B'"
-        label="选择特惠套餐"
-      >
-        <el-select
-          v-model="discountsComboIds"
-          multiple
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="discountsCombo in discountsComboList"
-            :key="discountsCombo.value"
-            :label="discountsCombo.label"
-            :value="discountsCombo.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item
-        label="选择用户"
-        prop="uid"
-      >
-        <el-select
-          v-model="sim.uid"
-          clearable
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="user in userList"
-            :key="user.value"
-            :label="user.label"
-            :value="user.value"
-          ></el-option>
-        </el-select>
-      </el-form-item>
+      
       <el-form-item
         label="选择onelink平台"
         prop="onelinkId"
@@ -147,46 +80,18 @@ export default {
         "x-csrf-token": getToken()
       },
       sim: {
-        uname: "",
-        uid: "",
-        activeComboId: "",
-        activeComboName: "",
-        otherComboIds: "",
         onelinkId: "",
         onelinkName: "",
         simType: "A",
         virtualMult: 1,
         filepath: ""
       },
-      increaseComboIds: [],
-      discountsComboIds: [],
-      activeComboList: [],
-      increaseComboList: [],
-      discountsComboList: [],
-      userList: [],
       onelinkList: [],
       rules: {
-        uid: [{ required: true, message: "请选择用户", trigger: "blur" }],
-        activeComboId: [
-          { required: true, message: "请选择激活套餐", trigger: "blur" }
-        ],
         onelinkId: [
           { required: true, message: "请选择onelink", trigger: "blur" }
         ],
         filepath: [{ required: true, message: "请上传文件", trigger: "blur" }],
-        increaseComboIds: [
-          {
-            required: true,
-            trigger: "change",
-            validator: (rule, value, callback) => {
-              if (this.increaseComboIds.length === 0) {
-                callback('请选择叠加套餐');
-              } else {
-                callback();
-              }
-            }
-          }
-        ]
       }
     };
   },
@@ -194,12 +99,6 @@ export default {
     type: String
   },
   watch: {
-    "sim.activeComboId"(val) {
-      this.sim.activeComboName = this.getLabel(this.activeComboList, val);
-    },
-    "sim.uid"(val) {
-      this.sim.uname = this.getLabel(this.userList, val);
-    },
     "sim.onelinkId"(val) {
       this.sim.onelinkName = this.getLabel(this.onelinkList, val);
     },
@@ -221,15 +120,12 @@ export default {
     submit() {
       this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          this.sim.otherComboIds = this.increaseComboIds
-            .concat(this.discountsComboIds)
-            .join(",");
           this.sim.simType = this.type;
           let data = this.sim;
           this.axios({
             method: "post",
             data: data,
-            url: API.SIMLIST.SIM_IMPORT_SIMS
+            url: API.SIMLIST.SIM_TRANSFOR
           }).then(r => {
             if (r.success) {
               this.$refs["ruleForm"].resetFields();
@@ -246,18 +142,6 @@ export default {
         }
       });
     },
-    getSimComboByComboType(comboType) {
-      return this.axios({
-        method: "get",
-        params: {
-          pageNum: 1,
-          pageSize: 9999,
-          comboType,
-          belongsToSimType: this.type
-        },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
-      });
-    },
     getOnelink() {
       this.axios({
         method: "get",
@@ -268,30 +152,7 @@ export default {
         });
       });
     },
-    getChildUsers() {
-      this.axios({
-        method: "get",
-        url: API.USERS.GET_SELECT_USERS
-      }).then(r => {
-        this.userList =  (r.data || []).map(item => {
-          return { label: item.key, value: item.value };
-        });
-      });
-    },
     init() {
-      const promiseList = [1, 2, 3].map(comboType =>
-        this.getSimComboByComboType(comboType)
-      );
-      Promise.all(promiseList).then(res => {
-        const simComboList = res.map(simComboRes => {
-          return simComboRes.data.list.map(simCombo => {
-            return { value: simCombo.id, label: simCombo.name };
-          });
-        });
-        this.activeComboList = simComboList[0];
-        this.increaseComboList = simComboList[1];
-        this.discountsComboList = simComboList[2];
-      });
       this.getOnelink();
       this.getChildUsers();
     }

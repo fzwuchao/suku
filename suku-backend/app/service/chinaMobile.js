@@ -430,7 +430,7 @@ class ChinaMobileService extends BaseService {
   async queryGroupByMemberFlow(msisdn) {
     const { nameKey, status } = await this.getOnelink(msisdn);
     if (status === 0) {
-      return null;
+      return {};
     }
     let groupId = await this.app.redis.get(`${nameKey}_flow_groupId`);
     let offerId = await this.app.redis.get(`${nameKey}_flow_offerId`);
