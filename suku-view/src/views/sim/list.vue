@@ -9,6 +9,12 @@
       >导入物联卡</el-button>
       <el-button
         type="primary"
+        v-if="isSysManager"
+        @click="importDialogForTransfor = !importDialogForTransfor"
+        size="mini"
+      >导入物联卡(迁移)</el-button>
+      <el-button
+        type="primary"
         size="mini"
         v-if="isSysManager"
         @click="handleExport"
@@ -338,6 +344,15 @@
       ></com-import>
     </el-dialog>
     <el-dialog
+      :title="'导入'+ (simType === 'B' ? '主叫卡': '被叫卡')"
+      :visible.sync="importDialogForTransfor"
+    >
+      <com-import-transfor
+        :type="simType"
+        @close="closeTransfor"
+      ></com-import-transfor>
+    </el-dialog>
+    <el-dialog
       title="更换套餐"
       :visible.sync="comboDialog"
     >
@@ -368,6 +383,7 @@
 import API from "@/api";
 import searchBar from "@/components/SearchBar";
 import comImport from "./com-import";
+import comImportTransfor from "./com-import-transfor";
 import comboChange from "./combo-change";
 import userPrice from "./user-price";
 import userList from "./user-list";
@@ -383,6 +399,7 @@ export default {
       pageSize: 10,
       isOneRow: false,
       importDialog: false,
+      importDialogForTransfor: false,
       comboDialog: false,
       priceDialog: false,
       userDialog: false,
@@ -481,6 +498,7 @@ export default {
   components: {
     searchBar,
     comImport,
+    comImportTransfor,
     comboChange,
     userPrice,
     userList
@@ -746,6 +764,10 @@ export default {
     },
     close() {
       this.importDialog = false;
+      this.getlist();
+    },
+    closeTransfor() {
+      this.importDialogForTransfor = false;
       this.getlist();
     },
     closeComboChange() {
