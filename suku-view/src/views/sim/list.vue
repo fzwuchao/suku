@@ -9,7 +9,7 @@
       >导入物联卡</el-button>
       <el-button
         type="primary"
-        v-if="isSysManager"
+        v-if="isSysManager && isShowTransforBtn"
         @click="importDialogForTransfor = !importDialogForTransfor"
         size="mini"
       >导入物联卡(迁移)</el-button>
@@ -404,6 +404,7 @@ export default {
       priceDialog: false,
       userDialog: false,
       isSysManager: false,
+      isShowTransforBtn: false,
       tableHeight: null,
       list: [],
       data: null,
@@ -519,6 +520,7 @@ export default {
     getRoleType() {
       this.curUser = JSON.parse(localStorage.getItem('userInfo'));
       this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
+      this.isShowTransforBtn = this.curUser.username === 'youlan';
     },
     saveUser(user) {
       this.batchUpdate({
