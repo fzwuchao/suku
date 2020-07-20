@@ -9,21 +9,25 @@ const calc = require('calculatorjs');
 const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, LIMT_OPTY, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
 class SimService extends BaseService {
   async update(sim) {
+    let result = null;
+    const ctx = this.ctx;
     try {
-      await this.app.model.Sim.update(sim, { where: { id: sim.id } });
+      result = await this.app.model.Sim.update(sim, { where: { id: sim.id } });
     } catch (e) {
-      return false;
+      ctx.logger.info(e);
     }
-    return true;
+    return result;
   }
 
   async updateBySimId(sim, simId) {
+    let result = null;
+    const ctx = this.ctx;
     try {
-      await this.app.model.Sim.update(sim, { where: { simId } });
+      result = await this.app.model.Sim.update(sim, { where: { simId } });
     } catch (e) {
-      return false;
+      ctx.logger.info(e);
     }
-    return true;
+    return result;
   }
 
   async batchUpdateBySimIds(data, simIds) {
@@ -234,7 +238,30 @@ class SimService extends BaseService {
     return simIdToUserMap;
   }
 
-  async syncUpdate(simId, simType, activeComboId) {
+  async migrationSyncUpdate(simType) {
+    const { service, logger } = this.ctx;
+    // const OP = this.getOp();
+    logger.info('********************同步卡基本信息*********************');
+    const startTime = moment().milliseconds();
+    const result = await this.app.model.Sim.findAll({
+      where: {
+        simType,
+      },
+    });
+    const isMigrat = true;
+    for (let i = 0; i < result.length; i++) {
+      const { simId, simType, activeComboId } = result[i];
+      await this.syncUpdate(simId, simType, activeComboId, isMigrat);
+      const operType = LIMT_OPTY.ADD;
+      const limtValue = calc(`${result[i].monthFlow}/${result[i].virtualMult}`).toFixed(3);
+      await service.chinaMobile.configLimtValue(operType, limtValue, result[i].simId);
+    }
+    const endTime = moment().milliseconds();
+    logger.info(`【总同步更新，接口总响应时间：】:${endTime - startTime} ms`);
+  }
+
+
+  async syncUpdate(simId, simType, activeComboId, isMigrat) {
     const ctx = this.ctx;
     const { service, logger } = ctx;
     const startTime = moment().milliseconds();
@@ -275,7 +302,11 @@ class SimService extends BaseService {
         if (!sim.overdueTime) {
           params.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         }
-
+        if (isMigrat) {
+          const overdueTime = params.overdueTime || sim.overdueTime;
+          const remainMonths = moment(overdueTime).month() - moment(new Date()).month();
+          params.shengyuMoney = calc(`${remainMonths}*${sim.monthRent}`);
+        }
       }
     }
 
@@ -290,6 +321,7 @@ class SimService extends BaseService {
     logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
     await service.sim.updateBySimId(params, simId);
   }
+
   /**
    * 批量设置卡的状态
    * @param {*} cardStatus 需要设置卡的状态
@@ -469,12 +501,12 @@ class SimService extends BaseService {
       for (let j = 0; j < result.length; j++) { // result.length
         osimIds.push(result[j].simId);
         simIds.push(result[j].simId);
-        if ((j + 1) % 2 === 0) {
+        if ((j + 1) % 99 === 0) {
           simStrList.push(osimIds.join('_'));
           // simArrayList.push()
           osimIds = [];
         }
-        if ((result.length % 2) !== 0 && j === (result.length - 1)) {
+        if ((result.length % 99) !== 0 && j === (result.length - 1)) {
           simStrList.push(osimIds.join('_'));
         }
 

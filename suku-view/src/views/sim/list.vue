@@ -15,6 +15,12 @@
       >导入物联卡(迁移)</el-button>
       <el-button
         type="primary"
+        v-if="isSysManager && isShowTransforBtn"
+        @click="migrationSyncUpdate"
+        size="mini"
+      >同步更新(迁移)</el-button>
+      <el-button
+        type="primary"
         size="mini"
         v-if="isSysManager"
         @click="handleExport"
@@ -749,6 +755,20 @@ export default {
           message: "同步更新失败",
           type: "error"
         });
+      });
+    },
+    migrationSyncUpdate() {
+      this.axios({
+        method: "get",
+        params: {
+          simType: this.simType
+        },
+        url: API.SIMLIST.SIM_MIGRAT_SYNC_UPDATE
+      }).then(r => {
+        if (r.success) {
+          this.getlist();
+          return;
+        }
       });
     },
     handleExport() {

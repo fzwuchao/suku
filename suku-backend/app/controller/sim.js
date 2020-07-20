@@ -512,6 +512,25 @@ class SimController extends BaseController {
     this.success('', '同步更新完成');
   }
 
+  /**
+   * 迁移同步
+   * 都需要同步的字段有：状态信息、开关机状态、通信功能开通、流量累计使用量
+   * 主叫卡还需要同步的字段：语音累计使用量
+   */
+  async migrationSyncUpdate() {
+    const ctx = this.ctx;
+    const { request, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim([ 'simType' ]),
+    };
+    ctx.validate(rule, request.query);
+    const { simType } = request.query;
+
+    await ctx.service.sim.migrationSyncUpdate(simType);
+    this.success('', '同步更新完成');
+  }
+
   async update() {
     const ctx = this.ctx;
     const { request, service, helper } = ctx;
@@ -521,7 +540,10 @@ class SimController extends BaseController {
     };
     ctx.validate(rule, request.body);
     const { simId, otherComboIds, overdueTime, privateMoney, virtualMult } = request.body;
-    await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney, virtualMult }, simId);
+    const result = await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney, virtualMult }, simId);
+    const operType = LIMT_OPTY.UPADTE;
+    const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
+    await service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
     this.success(null, '更新成功');
   }
 
