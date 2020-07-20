@@ -15,7 +15,7 @@ import { urlPrefix } from '@/utils'
 
 const Axios = axios.create({
     baseURL: '/', // 因为我本地做了反向代理
-    timeout: 10000,
+    timeout: 3 * 60 * 1000,
     responseType: 'json',
     withCredentials: true, // 是否允许带cookie这些
     headers: {

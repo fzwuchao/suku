@@ -102,6 +102,7 @@ module.exports = appInfo => {
       '.xlsx',
       '.xls',
     ],
+    fileSize: '50mb',
   };
 
   config.validate = {

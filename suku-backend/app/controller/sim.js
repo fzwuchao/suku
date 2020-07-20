@@ -329,7 +329,7 @@ class SimController extends BaseController {
       const simId = item[simExcelHeadField[0]];
       const iccid = item[simExcelHeadField[1]];
       const overdueTime = item[simExcelHeadField[2]] ? new Date(item[simExcelHeadField[2]]) : null;
-      const privateMoney = item[simExcelHeadField[3]] ? item[simExcelHeadField[3]] : null;
+      const privateMoney = item[simExcelHeadField[3]] ? item[simExcelHeadField[3]] : 0;
       const monthOverlapFlow = item[simExcelHeadField[4]] ? item[simExcelHeadField[4]] : 0;
       const uname = item[simExcelHeadField[5]];
       const user = userMap[uname];
