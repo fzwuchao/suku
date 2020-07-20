@@ -32,7 +32,6 @@
       </el-table-column>
       <el-table-column
         align="left"
-        fixed="left"
         label="套餐别名"
         min-width="120px"
         show-overflow-tooltip
