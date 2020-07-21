@@ -75,22 +75,22 @@ class ScheduleService extends BaseService {
     const { service, logger } = this.ctx;
     // const OP = this.getOp();
     logger.info('********************同步卡基本信息*********************');
+
     const startTime = moment().milliseconds();
-    const result = await service.sim.getActivedSim();
-    for (let i = 0; i < result.length; i++) {
-      const { simId, simType, activeComboId } = result[i];
-      await service.sim.syncUpdate(simId, simType, activeComboId);
+    const isMigrat = true;
+
+    const { oneLinkSims } = await this.getOnelinkSimIds({
+      cardStatus: 2,
+    });
+    for (const key in oneLinkSims) {
+      const simsList = oneLinkSims[key];
+      for (let i = 0; i < simsList.length; i++) {
+        this.app.queue.create('BatchSyncUpdate', { sims: simsList[i], isMigrat }).delay(100) // 延时多少毫秒
+          .save();
+      }
     }
-    // result.map(sim => {
-    //   const { simId, simType } = sim;
-    //   return await service.sim.syncUpdate(simId, simType);
-    // });
-    // await Promise.all(promises);
-    // 超流量的卡进行停流量，超语音的卡进行停语音处理
-    await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
-    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
     const endTime = moment().milliseconds();
-    logger.info(`【总同步更新，接口总响应时间：】:${endTime - startTime} ms`);
+    logger.info(`【同步卡基本信息(迁移)，接口总响应时间：】:${endTime - startTime} ms`);
   }
   /**
  * 删除已经处理过的日志

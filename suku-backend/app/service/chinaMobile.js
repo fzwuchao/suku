@@ -91,12 +91,16 @@ class ChinaMobileService extends BaseService {
     }
     // const params = JSON.parse(JSON.stringify(data));
     data.token = await this.getToken(simId);
+    if (!data.token) {
+      await this.app.runSchedule('tokenCurl');
+      data.token = await this.getToken(simId);
+    }
     data.transid = getTransid(appId);
     const api = getApi(apiKey);
     const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.url}`, {
       data,
       dataType: 'json',
-      timeout: 12000,
+      timeout: 1000 * 60 * 3,
       ...options,
     });
     return await this.getResult(res, api, data, id);
@@ -434,14 +438,14 @@ class ChinaMobileService extends BaseService {
     }
     let groupId = await this.app.redis.get(`${nameKey}_flow_groupId`);
     let offerId = await this.app.redis.get(`${nameKey}_flow_offerId`);
-    if (groupId) {
-      return { groupId, offerId };
-    }
+    // if (groupId) {
+    //   return { groupId, offerId };
+    // }
 
     const result = await this.handleBy(9, msisdn, { msisdn });
     if (result.length > 0) {
-      groupId = result[0].groupList[2].groupId;
-      offerId = result[0].groupList[2].offeringId;
+      groupId = result[0].groupList[1].groupId;
+      offerId = result[0].groupList[1].offeringId;
     }
     await this.app.redis.set(`${nameKey}_flow_groupId`, groupId);
     await this.app.redis.set(`${nameKey}_flow_offerId`, offerId);

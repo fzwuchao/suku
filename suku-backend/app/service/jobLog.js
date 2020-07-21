@@ -10,7 +10,8 @@ const BaseService = require('../core/baseService');
 
 // user表名
 // const TABLE_USER = 'user';
-
+const { LIMT_OPTY, SIM_FLOW_SERV_STATUS,SIM_VOICE_SERV_STATUS} = require('../extend/constant')();
+const calc = require('calculatorjs');
 class JobLogService extends BaseService {
 
 
@@ -62,9 +63,48 @@ class JobLogService extends BaseService {
     const { service, logger } = this.ctx;
     logger.info(`【开始执行队列：】:${data.simId} ms`);
     await service.chinaMobile.operateSimApnFunction('0', data.simId);
-    await service.sim.syncUpdate(data.simId, 'B');
+    const sim = service.sim.getSimBySimId(data.simId);
+    await service.sim.syncUpdate(sim);
     done();
   }
+
+  async MigratBatchSyncUpdate(data, done) {
+    const results = data.sims;
+    const ctx = this.ctx;
+    const { service, logger } = ctx;
+    logger.info('【同步更开始500条】');
+    const promises = results.map(result => {
+      const operType = LIMT_OPTY.ADD;
+      const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
+      service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
+      return service.sim.syncUpdate(result, data.isMigrat);
+    });
+    await Promise.all(promises);
+    logger.info('【同步更新完成500条】');
+    done();
+  }
+
+  async BatchSyncUpdate(data, done) {
+    const results = data.sims;
+    const ctx = this.ctx;
+    const { service, logger } = ctx;
+    logger.info('【同步更开始500条】');
+
+    const promises = results.map(result => {
+      const operType = LIMT_OPTY.ADD;
+      const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
+      service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
+      return service.sim.syncUpdate(result, data.isMigrat);
+    });
+    await Promise.all(promises);
+    // 超流量的卡进行停流量，超语音的卡进行停语音处理
+    await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
+    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
+    logger.info('【同步更新完成500条】');
+    done();
+  }
+
+
   async create(jobLog) {
     try {
       await this.app.model.JobLog.create(jobLog);
