@@ -31,18 +31,18 @@ module.exports = appInfo => {
   const config = exports = {};
 
   // use for cookie sign key, should change to your own and keep security
-  config.keys = appInfo.name + '_1589425408323_5421';
+  // config.keys = appInfo.name + '_1589425408323_5421';
   // add your middleware config here
   // 所有请求都会走checkToken（middleware/checkToken.js)
-  config.middleware = ['checkToken'];
-  config.jwt = {
-    secret: '123456', // 自定义 token 的加密条件字符串
-  };
+  // config.middleware = ['checkToken'];
+  // config.jwt = {
+  //   secret: '123456', // 自定义 token 的加密条件字符串
+  // };
 
-  config.cors = {
-    origin: '*',
-    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
-  };
+  // config.cors = {
+  //   origin: '*',
+  //   allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+  // };
 
   // config.mysql = {
   //   // 单数据库信息配置
@@ -64,23 +64,23 @@ module.exports = appInfo => {
   //   agent: false,
   // };
 
-  config.sequelize = {
-    dialect: 'mysql',
-    // host
-    host: MYSQL_PARAMS.HOST,
-    // 端口号
-    port: MYSQL_PARAMS.PORT,
-    // 用户名
-    username: MYSQL_PARAMS.USER,
-    // 密码
-    password: MYSQL_PARAMS.PASSWORD,
-    // 数据库名
-    database: MYSQL_PARAMS.DATABASE,
-    timezone: '+08:00',
-    define: {
-      freezeTableName: true, // 强制model名与table名保持一致
-    },
-  };
+  // config.sequelize = {
+  //   dialect: 'mysql',
+  //   // host
+  //   host: MYSQL_PARAMS.HOST,
+  //   // 端口号
+  //   port: MYSQL_PARAMS.PORT,
+  //   // 用户名
+  //   username: MYSQL_PARAMS.USER,
+  //   // 密码
+  //   password: MYSQL_PARAMS.PASSWORD,
+  //   // 数据库名
+  //   database: MYSQL_PARAMS.DATABASE,
+  //   timezone: '+08:00',
+  //   define: {
+  //     freezeTableName: true, // 强制model名与table名保持一致
+  //   },
+  // };
 
   config.redis = {
     client: {
@@ -92,36 +92,36 @@ module.exports = appInfo => {
   };
 
   // egg-multipart的参数配置
-  config.multipart = {
-    mode: 'file',
-    // 存放上传文件的目录
-    tmpdir: path.resolve(__dirname, '../tmp-file'),
-    fileExtensions: [
-      '.csv',
-      '.xlsx',
-      '.xls',
-    ],
-    fileSize: '50mb',
-  };
+  // config.multipart = {
+  //   mode: 'file',
+  //   // 存放上传文件的目录
+  //   tmpdir: path.resolve(__dirname, '../tmp-file'),
+  //   fileExtensions: [
+  //     '.csv',
+  //     '.xlsx',
+  //     '.xls',
+  //   ],
+  //   fileSize: '50mb',
+  // };
 
-  config.validate = {
-    convert: true, // 入参的数据类型自动转换
-    widelyUndefined: true, // 值为空字符串、NaN、Null转换成undefined
-  };
-  config.queue = {
-    client: {
-      queuePrefix: 'q',
-      redis: {
-        port: REDIS_PARAMS.PORT,
-        host: REDIS_PARAMS.HOST,
-        // auth: 'auth',
-        password: REDIS_PARAMS.PASSWORD,
-        db: 3,
-        options: {
-        },
-      },
-    },
-  };
+  // config.validate = {
+  //   convert: true, // 入参的数据类型自动转换
+  //   widelyUndefined: true, // 值为空字符串、NaN、Null转换成undefined
+  // };
+  // config.queue = {
+  //   client: {
+  //     queuePrefix: 'q',
+  //     redis: {
+  //       port: REDIS_PARAMS.PORT,
+  //       host: REDIS_PARAMS.HOST,
+  //       // auth: 'auth',
+  //       password: REDIS_PARAMS.PASSWORD,
+  //       db: 3,
+  //       options: {
+  //       },
+  //     },
+  //   },
+  // };
 
   // add your user config here
   const userConfig = {
