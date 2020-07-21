@@ -540,7 +540,8 @@ class SimController extends BaseController {
     };
     ctx.validate(rule, request.body);
     const { simId, otherComboIds, overdueTime, privateMoney, virtualMult } = request.body;
-    const result = await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney, virtualMult }, simId);
+    await service.sim.updateBySimId({ otherComboIds, overdueTime, privateMoney, virtualMult }, simId);
+    const result = await service.sim.getSimBySimId(simId);
     const operType = LIMT_OPTY.UPADTE;
     const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
     await service.chinaMobile.configLimtValue(operType, limtValue, result.simId);

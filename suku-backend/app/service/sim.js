@@ -27,7 +27,7 @@ class SimService extends BaseService {
     } catch (e) {
       ctx.logger.info(e);
     }
-    return result;
+    return result[0];
   }
 
   async batchUpdateBySimIds(data, simIds) {
@@ -239,32 +239,32 @@ class SimService extends BaseService {
   }
 
   async migrationSyncUpdate(simType) {
-    const { service, logger } = this.ctx;
+    const { logger } = this.ctx;
     // const OP = this.getOp();
-    logger.info('********************同步卡基本信息*********************');
+    logger.info('********************同步卡基本信息(迁移)*********************');
     const startTime = moment().milliseconds();
-    const result = await this.app.model.Sim.findAll({
-      where: {
-        simType,
-      },
-    });
     const isMigrat = true;
-    for (let i = 0; i < result.length; i++) {
-      const { simId, simType, activeComboId } = result[i];
-      await this.syncUpdate(simId, simType, activeComboId, isMigrat);
-      const operType = LIMT_OPTY.ADD;
-      const limtValue = calc(`${result[i].monthFlow}/${result[i].virtualMult}`).toFixed(3);
-      await service.chinaMobile.configLimtValue(operType, limtValue, result[i].simId);
+
+    const { oneLinkSims } = await this.getOnelinkSimIds({
+      simType,
+    });
+    for (const key in oneLinkSims) {
+      const simsList = oneLinkSims[key];
+      for (let i = 0; i < simsList.length; i++) {
+        this.app.queue.create('MigratBatchSyncUpdate', { sims: simsList[i], isMigrat }).delay(100) // 延时多少毫秒
+          .save();
+      }
     }
     const endTime = moment().milliseconds();
-    logger.info(`【总同步更新，接口总响应时间：】:${endTime - startTime} ms`);
+    logger.info(`【同步卡基本信息(迁移)，接口总响应时间：】:${endTime - startTime} ms`);
   }
 
 
-  async syncUpdate(simId, simType, activeComboId, isMigrat) {
+  async syncUpdate(sim , isMigrat) {
     const ctx = this.ctx;
     const { service, logger } = ctx;
     const startTime = moment().milliseconds();
+    const { simId, simType, activeComboId } = sim;
     const params = {};
     // 被叫卡有激活时间，主叫卡有语音使用量
     const promiseList = [];
@@ -298,7 +298,6 @@ class SimService extends BaseService {
       if (simType === SIM_TYPE.CALLED) {
         const combo = await service.simCombo.getSimComboById(activeComboId);
         const newTime = moment(activeTime).add((combo.months - 1), 'M');
-        const sim = await service.sim.getSimBySimId(simId);
         if (!sim.overdueTime) {
           params.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         }
@@ -476,18 +475,18 @@ class SimService extends BaseService {
     const { service } = ctx;
     const onelinks = await service.onelinkPlatform.getAllOnelinkDesc();
     const oneLinkSimIds = {};
+    const oneLinkSims = {};
     const simIds = [];
     for (let i = 0; i < onelinks.length; i++) {
       let result;
       if (typeof where === 'string') {
         where = where + ' and onelink_id = ' + onelinks[i].id;
-        const sql = 'SELECT `sim_id` AS `simId` FROM `sim` WHERE (`deleted_at` IS NULL AND (' + where + '));';
+        const sql = 'SELECT * AS `simId` FROM `sim` WHERE (`deleted_at` IS NULL AND (' + where + '));';
         result = await this.app.model.query(sql);
         result = result[0];
       } else {
         where.onelinkId = onelinks[i].id;
         result = await this.app.model.Sim.findAll({
-          attributes: [ 'simId' ],
           where,
         });
       }
@@ -495,25 +494,32 @@ class SimService extends BaseService {
       // const result1 = await this.findAndCountAll('Sim', 3, 4, { attributes: [ 'simId' ], where });
       // const result = result1.list;
       const simStrList = [];
+      const simList = [];
       // const simArrayList = [];
       let osimIds = [];
+      let sims = [];
 
       for (let j = 0; j < result.length; j++) { // result.length
         osimIds.push(result[j].simId);
         simIds.push(result[j].simId);
-        if ((j + 1) % 99 === 0) {
+        sims.push(result[j]);
+        if ((j + 1) % 500 === 0) {
           simStrList.push(osimIds.join('_'));
+          simList.push(sims);
           // simArrayList.push()
           osimIds = [];
+          sims = [];
         }
-        if ((result.length % 99) !== 0 && j === (result.length - 1)) {
+        if ((result.length % 500) !== 0 && j === (result.length - 1)) {
           simStrList.push(osimIds.join('_'));
+          simList.push(sims);
         }
 
       }
       oneLinkSimIds[onelinks[i].id] = simStrList;
+      oneLinkSims[onelinks[i].id] = simList;
     }
-    return { oneLinkSimIds, simIds };
+    return { oneLinkSimIds, simIds, oneLinkSims };
   }
 
 
