@@ -72,7 +72,7 @@ class JobLogService extends BaseService {
     const results = data.sims;
     const ctx = this.ctx;
     const { service, logger } = ctx;
-    logger.info('【同步更开始500条】');
+    logger.warn('【同步更开始900条】');
     const promises = results.map(result => {
       const operType = LIMT_OPTY.ADD;
       const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
@@ -80,7 +80,7 @@ class JobLogService extends BaseService {
       return service.sim.syncUpdate(result, data.isMigrat);
     });
     await Promise.all(promises);
-    logger.info('【同步更新完成500条】');
+    logger.warn('【同步更新完成900条】');
     done();
   }
 
@@ -88,7 +88,7 @@ class JobLogService extends BaseService {
     const results = data.sims;
     const ctx = this.ctx;
     const { service, logger } = ctx;
-    logger.info('【同步更开始500条】');
+    logger.warn('【同步更开始2500条】');
 
     const promises = results.map(result => {
       const operType = LIMT_OPTY.ADD;
@@ -100,7 +100,7 @@ class JobLogService extends BaseService {
     // 超流量的卡进行停流量，超语音的卡进行停语音处理
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
-    logger.info('【同步更新完成500条】');
+    logger.warn('【同步更新完成2500条】');
     done();
   }
 

@@ -79,21 +79,24 @@ class ChinaMobileService extends BaseService {
     return resState;
   }
 
-  async getOnelink(simId) {
-    const { onelinkId } = await this.ctx.service.sim.getSimBySimId(simId);
+  async getOnelink(simId, onelinkId) {
+    if(!onelinkId){
+      const sim = await this.ctx.service.sim.getSimBySimId(simId);
+      onelinkId = sim.onelinkId
+    }
     const oneLink = await this.ctx.service.onelinkPlatform.getOnelinkById(onelinkId);
     return oneLink;
   }
-  async fetchData(apiKey, data, simId, options) {
-    const { appId, apiHost, apiVersion, status, id } = await this.getOnelink(simId);
+  async fetchData(apiKey, data, simId, onelinkId, options) {
+    const { appId, apiHost, apiVersion, status, id } = await this.getOnelink(simId, onelinkId);
     if (status === 0) {
       return null;
     }
     // const params = JSON.parse(JSON.stringify(data));
-    data.token = await this.getToken(simId);
+    data.token = await this.getToken(simId, onelinkId);
     if (!data.token) {
       await this.app.runSchedule('tokenCurl');
-      data.token = await this.getToken(simId);
+      data.token = await this.getToken(simId, onelinkId);
     }
     data.transid = getTransid(appId);
     const api = getApi(apiKey);
@@ -183,9 +186,9 @@ class ChinaMobileService extends BaseService {
    * token 过期时间为 1 小时
    * @param {string} simId - token的key名
    */
-  async getToken(simId) {
+  async getToken(simId, onelinkId) {
     // 设置超时时间为50分钟，避免产生时间差
-    const { nameKey, status } = await this.getOnelink(simId);
+    const { nameKey, status } = await this.getOnelink(simId, onelinkId);
     if (status === 0) {
       return null;
     }
@@ -232,14 +235,14 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号
    * @param {object} data - 请求数据
    */
-  async handleBy(url, msisdn, data) {
+  async handleBy(url, msisdn, data, onelinkId) {
     if (_.isNil(msisdn)) {
       return [];
     }
     if (msisdn.length > 13) {
       msisdn = _.split(msisdn, '_')[0];
     }
-    const result = await this.fetchData(url, data, msisdn);
+    const result = await this.fetchData(url, data, msisdn, onelinkId);
     return result;
   }
 
@@ -249,8 +252,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码
    * @return {datetime} activeDate - 激活日期（首次）
    */
-  async querySimBasicInfo(msisdn) {
-    const result = await this.handleBy(2, msisdn, { msisdn });
+  async querySimBasicInfo(msisdn, onelinkId) {
+    const result = await this.handleBy(2, msisdn, { msisdn }, onelinkId);
     const { activeDate, iccid } = result[0] || {};
     let activeDt = null;
     if (activeDate !== ' ' && !_.isNil(activeDate)) {
@@ -314,8 +317,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {string} cardStatus - 物联卡状态
    */
-  async querySimStatus(msisdn) {
-    const result = await this.handleBy(3, msisdn, { msisdn });
+  async querySimStatus(msisdn, onelinkId) {
+    const result = await this.handleBy(3, msisdn, { msisdn }, onelinkId);
     const { cardStatus } = result[0] || {};
     return cardStatus;
   }
@@ -326,8 +329,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {number} usedFlow - 已用流量(M)
    */
-  async querySimDataUsage(msisdn) {
-    const result = await this.handleBy(4, msisdn, { msisdn });
+  async querySimDataUsage(msisdn, onelinkId) {
+    const result = await this.handleBy(4, msisdn, { msisdn }, onelinkId);
     const { dataAmount } = result[0] || {};
     // 单位：M
     let usedFlow = 0;
@@ -344,8 +347,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} [{imei}] - IMEI 号码
    */
-  async querySimImei(msisdn) {
-    const result = await this.handleBy(5, msisdn, { msisdn });
+  async querySimImei(msisdn, onelinkId) {
+    const result = await this.handleBy(5, msisdn, { msisdn }, onelinkId);
     return result;
   }
 
@@ -357,8 +360,8 @@ class ChinaMobileService extends BaseService {
    *  simSessionList: [{apnId, status, ip, createDate, rat}]
    * }]
    */
-  async querySimSession(msisdn) {
-    const result = await this.handleBy(6, msisdn, { msisdn });
+  async querySimSession(msisdn, onelinkId) {
+    const result = await this.handleBy(6, msisdn, { msisdn }, onelinkId);
     return result;
   }
 
@@ -368,8 +371,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {string} status - 终端的开关机状态, 0:关机 1:开机
    */
-  async queryOnOffStatus(msisdn) {
-    const result = await this.handleBy(7, msisdn, { msisdn });
+  async queryOnOffStatus(msisdn, onelinkId) {
+    const result = await this.handleBy(7, msisdn, { msisdn }, onelinkId);
     const { status } = result[0] || {};
     return status;
   }
@@ -444,8 +447,8 @@ class ChinaMobileService extends BaseService {
 
     const result = await this.handleBy(9, msisdn, { msisdn });
     if (result.length > 0) {
-      groupId = result[0].groupList[1].groupId;
-      offerId = result[0].groupList[1].offeringId;
+      groupId = result[0].groupList[2].groupId;
+      offerId = result[0].groupList[2].offeringId;
     }
     await this.app.redis.set(`${nameKey}_flow_groupId`, groupId);
     await this.app.redis.set(`${nameKey}_flow_offerId`, offerId);
@@ -559,8 +562,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {object} {voiceServStatus, msgServStatus, flowServStatus}
    */
-  async querySimCommunicationFunctionStatus(msisdn) {
-    const result = await this.handleBy(10, msisdn, { msisdn });
+  async querySimCommunicationFunctionStatus(msisdn, onelinkId) {
+    const result = await this.handleBy(10, msisdn, { msisdn }, onelinkId);
     const { serviceTypeList = [] } = result[0] || {};
     const servStatus = {};
     const serviceType = {
@@ -582,8 +585,8 @@ class ChinaMobileService extends BaseService {
    *  accmMarginList: [{offeringId, offeringName, apnName, totalAmount, useAmount, remainAmount, pccCode}]
    * }]
    */
-  async querySimDataMargin(msisdn) {
-    const result = await this.handleBy(11, msisdn, { msisdn });
+  async querySimDataMargin(msisdn, onelinkId) {
+    const result = await this.handleBy(11, msisdn, { msisdn }, onelinkId);
     return result;
   }
 
@@ -635,8 +638,8 @@ class ChinaMobileService extends BaseService {
    *  accmMarginList: [{offeringId, offeringName, totalAmount, useAmount, remainAmount}]
    * }]
    */
-  async querySimVoiceMargin(msisdn) {
-    const result = await this.handleBy(12, msisdn, { msisdn });
+  async querySimVoiceMargin(msisdn, onelinkId) {
+    const result = await this.handleBy(12, msisdn, { msisdn }, onelinkId);
     return result;
   }
 
@@ -646,8 +649,8 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {number} voiceAmount - 语音累积量值，单位：分钟
    */
-  async querySimVoiceUsage(msisdn) {
-    const result = await this.handleBy(13, msisdn, { msisdn });
+  async querySimVoiceUsage(msisdn, onelinkId) {
+    const result = await this.handleBy(13, msisdn, { msisdn }, onelinkId);
     const va = (result[0] || {}).voiceAmount;
     let voiceAmount = 0;
     // 返回" "时,表示卡未产生用量或者未订购套餐

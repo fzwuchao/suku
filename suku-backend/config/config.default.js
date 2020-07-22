@@ -15,8 +15,8 @@ const MYSQL_PARAMS = {
 };
 
 const REDIS_PARAMS = {
-  HOST: '127.0.0.1',
-  // HOST: '47.115.75.162',
+  // HOST: '127.0.0.1',
+  HOST: '47.115.75.162',
   PORT: 6379,
   PASSWORD: 'auth',
 };
@@ -81,6 +81,12 @@ module.exports = appInfo => {
     define: {
       freezeTableName: true, // 强制model名与table名保持一致
     },
+    pool: {
+      max: 200,
+      min: 0,
+      // @note https://github.com/sequelize/sequelize/issues/8133#issuecomment-359993057
+      acquire: 100*1000,
+    },
   };
 
   config.redis = {
@@ -141,7 +147,8 @@ module.exports = appInfo => {
   };
 
   config.logger = {
-    level: 'INFO',
+    level: 'WARN',
+    consoleLevel: 'WARN',
     // dir: 'logs/suku-backend',
     dir: path.join(__dirname, '../logs', appInfo.name),
   };

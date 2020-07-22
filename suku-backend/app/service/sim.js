@@ -247,7 +247,7 @@ class SimService extends BaseService {
 
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
-    });
+    }, 1500);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       for (let i = 0; i < simsList.length; i++) {
@@ -264,25 +264,26 @@ class SimService extends BaseService {
     const ctx = this.ctx;
     const { service, logger } = ctx;
     const startTime = moment().milliseconds();
-    const { simId, simType, activeComboId } = sim;
+    const { simId, simType, activeComboId, onelinkId } = sim;
     const params = {};
     // 被叫卡有激活时间，主叫卡有语音使用量
     const promiseList = [];
+    // await service.chinaMobile.querySimBasicInfo(simId, onelinkId)
     // 激活时间
-    promiseList.push(service.chinaMobile.querySimBasicInfo(simId));
+    promiseList.push(service.chinaMobile.querySimBasicInfo(simId, onelinkId));
     // 状态信息
-    promiseList.push(service.chinaMobile.querySimStatus(simId));
+    promiseList.push(service.chinaMobile.querySimStatus(simId, onelinkId));
     // imei
     // promiseList.push(service.chinaMobile.querySimImei(simId));
     // 开关机状态
-    promiseList.push(service.chinaMobile.queryOnOffStatus(simId));
+    promiseList.push(service.chinaMobile.queryOnOffStatus(simId, onelinkId));
     // 通信功能开通
-    promiseList.push(service.chinaMobile.querySimCommunicationFunctionStatus(simId));
+    promiseList.push(service.chinaMobile.querySimCommunicationFunctionStatus(simId, onelinkId));
     // 流量累计使用量
-    promiseList.push(service.chinaMobile.querySimDataUsage(simId));
+    promiseList.push(service.chinaMobile.querySimDataUsage(simId, onelinkId));
     // 语音累计使用量
     if (simType === SIM_TYPE.CALL) {
-      promiseList.push(service.chinaMobile.querySimVoiceUsage(simId));
+      promiseList.push(service.chinaMobile.querySimVoiceUsage(simId, onelinkId));
     }
     const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
 
@@ -470,13 +471,16 @@ class SimService extends BaseService {
     });
     return result;
   }
-  async getOnelinkSimIds(where) {
+  async getOnelinkSimIds(where, limit) {
     const ctx = this.ctx;
     const { service } = ctx;
     const onelinks = await service.onelinkPlatform.getAllOnelinkDesc();
     const oneLinkSimIds = {};
     const oneLinkSims = {};
     const simIds = [];
+    if(!limit) {
+      limit = 100;
+    }
     for (let i = 0; i < onelinks.length; i++) {
       let result;
       if (typeof where === 'string') {
@@ -503,14 +507,14 @@ class SimService extends BaseService {
         osimIds.push(result[j].simId);
         simIds.push(result[j].simId);
         sims.push(result[j]);
-        if ((j + 1) % 500 === 0) {
+        if ((j + 1) % limit === 0) {
           simStrList.push(osimIds.join('_'));
           simList.push(sims);
           // simArrayList.push()
           osimIds = [];
           sims = [];
         }
-        if ((result.length % 500) !== 0 && j === (result.length - 1)) {
+        if ((result.length % limit) !== 0 && j === (result.length - 1)) {
           simStrList.push(osimIds.join('_'));
           simList.push(sims);
         }
