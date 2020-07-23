@@ -197,9 +197,9 @@ class SimController extends BaseController {
       await service.sim.bulkCreate(simList);
       for (let i = 0; i < simList.length; i++) {
         const item = simList[i];
-        const operType = LIMT_OPTY.ADD;
-        const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
-        await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
+        // const operType = LIMT_OPTY.ADD;
+        // const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
+        // await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
       }
       // 在表中生成数据后，删除tmp-file/下对应的文件
       await service.sheet.removeFile(params.filepath);

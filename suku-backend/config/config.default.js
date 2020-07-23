@@ -82,7 +82,7 @@ module.exports = appInfo => {
       freezeTableName: true, // 强制model名与table名保持一致
     },
     pool: {
-      max: 200,
+      max: 100,
       min: 0,
       // @note https://github.com/sequelize/sequelize/issues/8133#issuecomment-359993057
       acquire: 100*1000,
@@ -147,8 +147,8 @@ module.exports = appInfo => {
   };
 
   config.logger = {
-    level: 'WARN',
-    consoleLevel: 'WARN',
+    level: 'INFO',
+    consoleLevel: 'INFO',
     // dir: 'logs/suku-backend',
     dir: path.join(__dirname, '../logs', appInfo.name),
   };

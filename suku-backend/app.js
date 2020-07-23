@@ -41,7 +41,7 @@ class AppBootHook {
       ctx.service.jobLog.BatchSyncUpdate(job.data, done); // dealOrder是自定义的方法
     });
 
-    this.app.queue.process('MigratBatchSyncUpdate', (job, done) => {
+    this.app.queue.process('MigratBatchSyncUpdate', 6,(job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
       ctx.service.jobLog.MigratBatchSyncUpdate(job.data, done); // dealOrder是自定义的方法

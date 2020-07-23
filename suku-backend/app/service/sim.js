@@ -247,7 +247,7 @@ class SimService extends BaseService {
 
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
-    }, 1500);
+    }, 2000);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       for (let i = 0; i < simsList.length; i++) {
