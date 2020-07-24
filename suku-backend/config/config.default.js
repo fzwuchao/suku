@@ -18,7 +18,7 @@ const REDIS_PARAMS = {
   // HOST: '127.0.0.1',
   HOST: '47.115.75.162',
   PORT: 6379,
-  PASSWORD: 'auth',
+  PASSWORD: 'ABYujk876kil',
 };
 
 /**
@@ -121,8 +121,8 @@ module.exports = appInfo => {
       redis: {
         port: REDIS_PARAMS.PORT,
         host: REDIS_PARAMS.HOST,
-        // auth: REDIS_PARAMS.PASSWORD,
-        password: REDIS_PARAMS.PASSWORD,
+        auth: REDIS_PARAMS.PASSWORD,
+        // password: REDIS_PARAMS.PASSWORD,
         db: 3,
         options: {
         },
