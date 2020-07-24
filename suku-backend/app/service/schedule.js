@@ -81,7 +81,7 @@ class ScheduleService extends BaseService {
 
     const { oneLinkSims } = await service.sim.getOnelinkSimIds({
       cardStatus: 2,
-    }, 1500);
+    }, 1000);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       for (let i = 0; i < simsList.length; i++) {

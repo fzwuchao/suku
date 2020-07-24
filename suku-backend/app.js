@@ -36,13 +36,13 @@ class AppBootHook {
         done();
       });
     });
-    this.app.queue.process('openFlowServ', (job, done) => {
+    this.app.queue.process('openFlowServ', 12, (job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
       ctx.service.jobLog.openFlowServ(job.data, done); // dealOrder是自定义的方法
     });
 
-    this.app.queue.process('BatchSyncUpdate', (job, done) => {
+    this.app.queue.process('BatchSyncUpdate', 12, (job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
       var domain = require('domain').create();
@@ -55,7 +55,7 @@ class AppBootHook {
       });
     });
 
-    this.app.queue.process('MigratBatchSyncUpdate', 8,(job, done) => {
+    this.app.queue.process('MigratBatchSyncUpdate', 12,(job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
       var domain = require('domain').create();
@@ -69,7 +69,7 @@ class AppBootHook {
       
     });
 
-    this.app.queue.process('configLimtValue', 8,(job, done) => {
+    this.app.queue.process('configLimtValue', 12,(job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
       var domain = require('domain').create();
