@@ -195,12 +195,12 @@ class SimController extends BaseController {
 
     try {
       await service.sim.bulkCreate(simList);
-      for (let i = 0; i < simList.length; i++) {
-        const item = simList[i];
+      // for (let i = 0; i < simList.length; i++) {
+        // const item = simList[i];
         // const operType = LIMT_OPTY.ADD;
         // const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
         // await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
-      }
+      // }
       // 在表中生成数据后，删除tmp-file/下对应的文件
       await service.sheet.removeFile(params.filepath);
 
@@ -361,12 +361,12 @@ class SimController extends BaseController {
 
     try {
       await service.sim.bulkCreate(simList);
-      for (let i = 0; i < simList.length; i++) {
-        const item = simList[i];
-        const operType = LIMT_OPTY.ADD;
-        const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
-        await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
-      }
+      // for (let i = 0; i < simList.length; i++) {
+      //   const item = simList[i];
+      //   const operType = LIMT_OPTY.ADD;
+      //   const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
+      //   await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
+      // }
       // 在表中生成数据后，删除tmp-file/下对应的文件
       await service.sheet.removeFile(params.filepath);
 
@@ -528,6 +528,23 @@ class SimController extends BaseController {
     const { simType } = request.query;
 
     await ctx.service.sim.migrationSyncUpdate(simType);
+    this.success('', '同步更新完成');
+  }
+
+  /**
+   * 一键设置卡阀值
+   */
+  async configLimtValue() {
+    const ctx = this.ctx;
+    const { request, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim([ 'simType' ]),
+    };
+    ctx.validate(rule, request.query);
+    const { simType } = request.query;
+
+    await ctx.service.sim.configLimtValue(simType);
     this.success('', '同步更新完成');
   }
 

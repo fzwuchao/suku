@@ -25,7 +25,7 @@ class ScheduleService extends BaseService {
     const { service, logger } = ctx;
     logger.info('********************月结处理*********************');
     const startTime = moment().milliseconds();
-    await service.sim.configLimtValue();
+    // await service.sim.configLimtValue();
     // 修改余额，已用流量，已用语音清零，叠加流量清零
     let updateSql = 'update sim set';
     updateSql += ' shengyu_money = shengyu_money - month_rent,'; // 余额减去月租
@@ -85,7 +85,7 @@ class ScheduleService extends BaseService {
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       for (let i = 0; i < simsList.length; i++) {
-        this.app.queue.create('BatchSyncUpdate', { sims: simsList[i], isMigrat }).delay(100) // 延时多少毫秒
+        this.app.queue.create('BatchSyncUpdate', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
           .save();
       }
     }

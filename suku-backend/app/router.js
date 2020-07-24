@@ -59,7 +59,9 @@ module.exports = app => {
   router.post('/sim/transfer', controller.sim.importSimsWithHeadFieldForTransfer);
   // 迁移同步
   router.get('/sim/migrationSyncUpdate', controller.sim.migrationSyncUpdate);
-
+  // 手动触发设置阀值
+  router.get('/sim/configLimtValue', controller.sim.configLimtValue);
+  
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);
   // 通过id,查询套餐

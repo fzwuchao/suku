@@ -91,12 +91,6 @@ class JobLogService extends BaseService {
       // service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
       return service.sim.syncUpdate(result, data.isMigrat);
     });
-    setTimeout(function(){
-      if(!isDone) {
-        isDone = true;
-        done();
-      }
-    }, 2.4*60*1000)
     Promise.all(promises).then(()=>{
       logger.warn('【同步更新完成1000条】');
       if(!isDone) {
@@ -104,8 +98,27 @@ class JobLogService extends BaseService {
         done();
       }
     });
-    
-    
+  }
+
+  async configLimtValue(data, done) {
+    const results = data.sims;
+    const ctx = this.ctx;
+    let isDone = false;
+    const { service, logger } = ctx;
+    logger.warn('【设置阀值1000条】');
+    const promises = results.map(result => {
+      const operType = LIMT_OPTY.ADD;
+      const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
+      return service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
+      // return service.sim.syncUpdate(result, data.isMigrat);
+    });
+    Promise.all(promises).then(()=>{
+      logger.warn('【设置阀值完成1000条】');
+      if(!isDone) {
+        isDone = true;
+        done();
+      }
+    });
   }
 
   async BatchSyncUpdate(data, done) {
@@ -124,12 +137,7 @@ class JobLogService extends BaseService {
     // 超流量的卡进行停流量，超语音的卡进行停语音处理
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
-    setTimeout(function(){
-      if(!isDone) {
-        isDone = true;
-        done();
-      }
-    }, 2.4*60*1000)
+    
     Promise.all(promises).then(()=>{
       logger.warn('【同步更新完成1000条】');
       if(!isDone) {

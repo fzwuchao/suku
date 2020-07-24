@@ -27,7 +27,14 @@ class AppBootHook {
     this.app.queue.process('jobLog', (job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
-      ctx.service.jobLog.dealUnfinishedJobs(job.data, done); // dealOrder是自定义的方法
+      var domain = require('domain').create();
+      domain.on('error', function(err){
+        done(err);
+      });
+      domain.run(function(){ // your process functio
+        ctx.service.jobLog.dealUnfinishedJobs(job.data, done); // dealOrder是自定义的方法
+        done();
+      });
     });
     this.app.queue.process('openFlowServ', (job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
@@ -38,13 +45,42 @@ class AppBootHook {
     this.app.queue.process('BatchSyncUpdate', (job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
-      ctx.service.jobLog.BatchSyncUpdate(job.data, done); // dealOrder是自定义的方法
+      var domain = require('domain').create();
+      domain.on('error', function(err){
+        done(err);
+      });
+      domain.run(function(){ // your process functio
+        ctx.service.jobLog.BatchSyncUpdate(job.data, done); // dealOrder是自定义的方法
+        done();
+      });
     });
 
-    this.app.queue.process('MigratBatchSyncUpdate', 6,(job, done) => {
+    this.app.queue.process('MigratBatchSyncUpdate', 8,(job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
-      ctx.service.jobLog.MigratBatchSyncUpdate(job.data, done); // dealOrder是自定义的方法
+      var domain = require('domain').create();
+      domain.on('error', function(err){
+        done(err);
+      });
+      domain.run(function(){ // your process functio
+        ctx.service.jobLog.MigratBatchSyncUpdate(job.data, done); // dealOrder是自定义的方法
+        done();
+      });
+      
+    });
+
+    this.app.queue.process('configLimtValue', 8,(job, done) => {
+      // 这里可以调用service里面的方法来消费这些信息
+      // const ctx = this.app.createAnonymousContext();
+      var domain = require('domain').create();
+      domain.on('error', function(err){
+        done(err);
+      });
+      domain.run(function(){ // your process functio
+        ctx.service.jobLog.configLimtValue(job.data, done); // dealOrder是自定义的方法
+        done();
+      });
+      
     });
   }
 

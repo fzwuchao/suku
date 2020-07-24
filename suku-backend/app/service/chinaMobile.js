@@ -84,12 +84,12 @@ class ChinaMobileService extends BaseService {
       const sim = await this.ctx.service.sim.getSimBySimId(simId);
       onelinkId = sim.onelinkId
     }
-    // let oneLink = await this.app.redis.get(`${simId}_onelink`);
-    // if(oneLink) {
-    //   return oneLink;
-    // }
-    const oneLink = await this.ctx.service.onelinkPlatform.getOnelinkById(onelinkId);
-    // await this.app.redis.set(`${simId}_onelink`, JSON.stringify(oneLink));
+    let oneLink = await this.app.redis.get(`suku_onelink_info_${onelinkId}`);
+    if(oneLink) {
+      return oneLink;
+    }
+    oneLink = await this.ctx.service.onelinkPlatform.getOnelinkById(onelinkId);
+    await this.app.redis.set(`suku_onelink_info_${onelinkId}`, JSON.stringify(oneLink));
     return oneLink;
   }
   async fetchData(apiKey, data, simId, onelinkId, options) {

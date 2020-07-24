@@ -19,6 +19,14 @@
         @click="migrationSyncUpdate"
         size="mini"
       >同步更新(迁移)</el-button>
+
+      <el-button
+        type="primary"
+        v-if="isSysManager && isShowTransforBtn"
+        @click="configLimtValue"
+        size="mini"
+      >设置阀值</el-button>
+
       <el-button
         type="primary"
         size="mini"
@@ -755,6 +763,16 @@ export default {
           message: "同步更新失败",
           type: "error"
         });
+      });
+    },
+    configLimtValue() {
+      this.axios({
+        method: "get",
+        params: {
+          simType: this.simType
+        },
+        url: API.SIMLIST.SIM_CONFIG_LIMT_VALUE
+      }).then(() => {
       });
     },
     migrationSyncUpdate() {

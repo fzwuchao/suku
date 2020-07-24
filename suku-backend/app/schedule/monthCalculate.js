@@ -6,7 +6,7 @@ class MonthCalculate extends Subscription {
     return {
       cron: '0 0 4 1 * *', // 每月1号凌晨4点执行
       type: 'all', // 指定所有的 worker 都需要执行
-      disable: false,
+      disable: true,
     };
   }
 

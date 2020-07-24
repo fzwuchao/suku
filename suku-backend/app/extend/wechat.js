@@ -7,12 +7,14 @@ const WX_CONFIG = {
   PARTNERKEY: 'LZM123aabbccEEZLZMlzm83769776123', // partnerKey
   NOTIFY_URL: 'http://api.sukudianzi.com/api/wechat/payBack', // notify_url
 };
+
+
 // const WX_CONFIG = {
 //   APPID: 'wxc3a09378c6f6fb74',
 //   MICHID: '1551436281',
 //   APPSECRET: 'b3096dee738880e68418657367e9dd60',
 //   PARTNERKEY: 'BaVOdsHox5IZ9I1TcAAONXpFlYEIjUg5', // partnerKey
-//   NOTIFY_URL: 'http://www.sukudianzi.com/', // notify_url
+//   NOTIFY_URL: 'http://api.sukudianzi.com/api/wechat/payBack', // notify_url
 // };
 const payConfig = {
   appid: WX_CONFIG.APPID,

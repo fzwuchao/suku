@@ -6,7 +6,7 @@ class SyncSimInfo extends Subscription {
     return {
       interval: '40m', // 60 分钟间隔
       type: 'all', // 指定所有的 worker 都需要执行
-      disable: false,
+      disable: true,
     };
   }
 

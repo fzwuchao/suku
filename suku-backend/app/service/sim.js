@@ -247,16 +247,37 @@ class SimService extends BaseService {
 
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
-    }, 2000);
+    }, 1500);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       for (let i = 0; i < simsList.length; i++) {
-        this.app.queue.create('MigratBatchSyncUpdate', { sims: simsList[i], isMigrat }).delay(100) // 延时多少毫秒
+        this.app.queue.create('MigratBatchSyncUpdate', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
           .save();
       }
     }
     const endTime = moment().milliseconds();
     logger.info(`【同步卡基本信息(迁移)，接口总响应时间：】:${endTime - startTime} ms`);
+  }
+
+  async configLimtValue(simType) {
+    const { logger } = this.ctx;
+    // const OP = this.getOp();
+    logger.info('********************【手动设置阀值】*********************');
+    const startTime = moment().milliseconds();
+    const isMigrat = true;
+
+    const { oneLinkSims } = await this.getOnelinkSimIds({
+      simType,
+    }, 1500);
+    for (const key in oneLinkSims) {
+      const simsList = oneLinkSims[key];
+      for (let i = 0; i < simsList.length; i++) {
+        this.app.queue.create('configLimtValue', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
+          .save();
+      }
+    }
+    const endTime = moment().milliseconds();
+    logger.info(`【手动设置阀值，接口总响应时间：】:${endTime - startTime} ms`);
   }
 
 

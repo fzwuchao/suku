@@ -9,6 +9,7 @@ module.exports = {
     outputDir: "admin",
     publicPath: '/admin/',
     devServer: {
+        disableHostCheck: true,
         proxy: {
             "/api": {
                 // 开发环境
