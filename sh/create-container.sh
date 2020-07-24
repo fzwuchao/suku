@@ -7,6 +7,7 @@ rm -rf frontend
 #解压缩
 tar -xzvf backend.tar.gz -C ./
 tar -xzvf frontend.tar.gz -C ./
+tar -xzvf prerequisites.tar.gz -C ./
 
 #停止容器
 docker stop suku-backend
@@ -18,7 +19,11 @@ docker rm suku-frontend
 docker rmi suku-backend
 docker rmi suku-frontend
 
-cd backend
+# 创建mysql、redis
+cd prerequisites
+sh init.sh
+
+cd ../backend
 # 创建后端image
 docker build -t suku-backend ./
 # 创始后端container,并启动

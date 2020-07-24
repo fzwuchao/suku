@@ -4,6 +4,8 @@ rm -rf backend
 rm -rf frontend
 rm -rf backend.tar.gz
 rm -rf frontend.tar.gz
+rm -rf prerequisites.tar.gz
+tar -zvcf prerequisites.tar.gz prerequisites
 
 curDir=`pwd`
 weixinDir=${curDir}/../suku-mb
@@ -36,4 +38,8 @@ scp ./clear.sh ${host}:${proj}/
 scp ./backup.sh ${host}:${proj}/
 scp ./deploy-backend.sh ${host}:${proj}/
 scp ./deploy-frontend.sh ${host}:${proj}/
+scp ./prerequisites.tar.gz ${host}:${proj}/
 
+rm -rf backend.tar.gz
+rm -rf frontend.tar.gz
+rm -rf prerequisites.tar.gz
