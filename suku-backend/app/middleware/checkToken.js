@@ -15,6 +15,9 @@ module.exports = (options, app) => {
       '/testMsgSendUpgoing', // 模拟短信发送用，之后可删除
       '/tMsgSend', // 模拟短信发送用，之后可删除
       '/tMsgSendUpgoing', // 模拟短信发送用，之后可删除
+      '/mq/sendMQMsg', // 发送mq消息
+      '/mq/receiveMQMsg',
+      '/mq/close',
     ];
     const testUrl = url.split('?')[0];
     // 除登录接口外，其它接口需要验证token有效性

@@ -169,4 +169,7 @@ module.exports = app => {
   router.post('/wechat/payBack', payApi.middleware('pay'), controller.wechat.payBack);
   // router.post('/wechat/payBack', controller.wechat.payBack);
 
+  router.get('/mq/sendMQMsg', controller.testMQ.sendMQMsg);
+  router.get('/mq/receiveMQMsg', controller.testMQ.receiveMQMsg);
+  router.get('/mq/close', controller.testMQ.close);
 };
