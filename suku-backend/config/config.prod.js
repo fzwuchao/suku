@@ -14,11 +14,11 @@ const MYSQL_PARAMS = {
   DATABASE: 'suku', // 'youlan_db',
 };
 
-// const REDIS_PARAMS = {
-//   HOST: '47.115.75.162',
-//   PORT: 6379,
-//   PASSWORD: 'auth',
-// };
+const REDIS_PARAMS = {
+  HOST: '47.115.75.162',
+  PORT: 6379,
+  PASSWORD: 'ABYujk876kil',
+};
 
 /**
  * @param {Egg.EggAppInfo} appInfo app info
@@ -64,38 +64,38 @@ module.exports = appInfo => {
   //   agent: false,
   // };
 
-  // config.sequelize = {
-  //   dialect: 'mysql',
-  //   // host
-  //   host: MYSQL_PARAMS.HOST,
-  //   // 端口号
-  //   port: MYSQL_PARAMS.PORT,
-  //   // 用户名
-  //   username: MYSQL_PARAMS.USER,
-  //   // 密码
-  //   password: MYSQL_PARAMS.PASSWORD,
-  //   // 数据库名
-  //   database: MYSQL_PARAMS.DATABASE,
-  //   timezone: '+08:00',
-  //   define: {
-  //     freezeTableName: true, // 强制model名与table名保持一致
-  //   },
-  //   pool: {
-  //     max: 200,
-  //     min: 0,
-  //     // @note https://github.com/sequelize/sequelize/issues/8133#issuecomment-359993057
-  //     acquire: 100*1000,
-  //   },
-  // };
+  config.sequelize = {
+    dialect: 'mysql',
+    // host
+    host: MYSQL_PARAMS.HOST,
+    // 端口号
+    port: MYSQL_PARAMS.PORT,
+    // 用户名
+    username: MYSQL_PARAMS.USER,
+    // 密码
+    password: MYSQL_PARAMS.PASSWORD,
+    // 数据库名
+    database: MYSQL_PARAMS.DATABASE,
+    timezone: '+08:00',
+    define: {
+      freezeTableName: true, // 强制model名与table名保持一致
+    },
+    pool: {
+      max: 100,
+      min: 0,
+      // @note https://github.com/sequelize/sequelize/issues/8133#issuecomment-359993057
+      acquire: 100*1000,
+    },
+  };
 
-  // config.redis = {
-  //   client: {
-  //     port: REDIS_PARAMS.PORT, // Redis port
-  //     host: REDIS_PARAMS.HOST, // Redis host
-  //     password: REDIS_PARAMS.PASSWORD,
-  //     db: 0,
-  //   },
-  // };
+  config.redis = {
+    client: {
+      port: REDIS_PARAMS.PORT, // Redis port
+      host: REDIS_PARAMS.HOST, // Redis host
+      password: REDIS_PARAMS.PASSWORD,
+      db: 0,
+    },
+  };
 
   // egg-multipart的参数配置
   // config.multipart = {
@@ -114,20 +114,19 @@ module.exports = appInfo => {
   //   convert: true, // 入参的数据类型自动转换
   //   widelyUndefined: true, // 值为空字符串、NaN、Null转换成undefined
   // };
-  // config.queue = {
-  //   client: {
-  //     queuePrefix: 'q',
-  //     redis: {
-  //       port: REDIS_PARAMS.PORT,
-  //       host: REDIS_PARAMS.HOST,
-  //       // auth: 'auth',
-  //       password: REDIS_PARAMS.PASSWORD,
-  //       db: 3,
-  //       options: {
-  //       },
-  //     },
-  //   },
-  // };
+  config.queue = {
+    client: {
+      queuePrefix: 'q',
+      redis: {
+        port: REDIS_PARAMS.PORT,
+        host: REDIS_PARAMS.HOST,
+        auth: REDIS_PARAMS.PASSWORD,
+        db: 3,
+        options: {
+        },
+      },
+    },
+  };
 
   // add your user config here
   const userConfig = {
