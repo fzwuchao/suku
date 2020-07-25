@@ -6,13 +6,13 @@
 
 // const path = require('path');
 
-// const MYSQL_PARAMS = {
-//   HOST: '47.115.75.162', // 'localhost',
-//   PORT: 3306,
-//   USER: 'suku', // 'root',
-//   PASSWORD: 'ZY1305@OULAN', // 'root1234',
-//   DATABASE: 'suku', // 'youlan_db',
-// };
+const MYSQL_PARAMS = {
+  HOST: '47.115.75.162', // 'localhost',
+  PORT: 3306,
+  USER: 'suku', // 'root',
+  PASSWORD: 'ZY1305@OULAN', // 'root1234',
+  DATABASE: 'suku', // 'youlan_db',
+};
 
 // const REDIS_PARAMS = {
 //   HOST: '47.115.75.162',

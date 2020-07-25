@@ -200,6 +200,19 @@ class SimService extends BaseService {
     return sims.length === simList.length;
   }
 
+  async bulkUpdate(simList) {
+    const { Sim } = this.app.model;
+    const sims = await Sim.bulkCreate(simList, {
+      updateOnDuplicate: ['id', 'overdueTime', 'shengyuMoney', 
+      'activeTime', 'isActive', 'voiceAmount', 'iccid', 
+      'cardStatus', 'openStatus', 'voiceServStatus', 'msgServStatus', 'flowServStatus', 'monthUsedFlow']
+    });
+    // await this.app.redis.del('Sim:{"simType":"B"}:10:1');
+    return sims.length === simList.length;
+  }
+
+  
+
   // 获取表中存在的simId
   async getRepeatSimIds(ids) {
     const { Sim } = this.app.model;
@@ -247,7 +260,7 @@ class SimService extends BaseService {
 
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
-    }, 1000);
+    }, 10);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       for (let i = 0; i < simsList.length; i++) {
@@ -281,12 +294,13 @@ class SimService extends BaseService {
   }
 
 
-  async syncUpdate(sim , isMigrat) {
+  async syncUpdate(sim , isMigrat, isBatch) {
     const ctx = this.ctx;
     const { service, logger } = ctx;
     const startTime = moment().milliseconds();
     const { simId, simType, activeComboId, onelinkId } = sim;
-    const params = {};
+    const params = {id: sim.id};
+    
     // 被叫卡有激活时间，主叫卡有语音使用量
     const promiseList = [];
     // await service.chinaMobile.querySimBasicInfo(simId, onelinkId)
@@ -307,39 +321,58 @@ class SimService extends BaseService {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId, onelinkId));
     }
     const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
-
+    params.overdueTime = sim.overdueTime;
+    params.shengyuMoney = sim.shengyuMoney;
+    params.activeTime = sim.activeTime;
+    params.isActive = sim.isActive;
+    params.voiceAmount = sim.voiceAmount;
+    params.iccid = sim.iccid;
+    params.cardStatus = sim.cardStatus;
+    params.openStatus = sim.openStatus;
+    params.voiceServStatus = sim.voiceServStatus;
+    params.msgServStatus = sim.msgServStatus;
+    params.flowServStatus = sim.flowServStatus;
+    params.monthUsedFlow = sim.monthUsedFlow;
     if (voiceAmount) {
       params.voiceAmount = voiceAmount;
     }
-
+    
     if (baseInfo.activeDt) {
       const activeTime = baseInfo.activeDt;
       params.activeTime = activeTime;
       params.isActive = 1;
-      params.iccid = baseInfo.iccid;
       if (simType === SIM_TYPE.CALLED) {
         const combo = await service.simCombo.getSimComboById(activeComboId);
         const newTime = moment(activeTime).add((combo.months - 1), 'M');
         if (!sim.overdueTime) {
           params.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         }
-        if (isMigrat) {
-          const overdueTime = params.overdueTime || sim.overdueTime;
-          const remainMonths = moment(overdueTime).month() - moment(new Date()).month();
-          params.shengyuMoney = calc(`${remainMonths}*${sim.monthRent}`);
-        }
       }
+    }
+    // 如果是迁移，则更据过期时间计算余额
+    if (isMigrat && params.overdueTime) {
+      const overdueTime = params.overdueTime;
+      const remainMonths = moment(overdueTime).month() - moment(new Date()).month();
+      params.shengyuMoney = calc(`${remainMonths}*${sim.monthRent}`);
+    }
+
+    if(baseInfo.iccid) {
+      params.iccid = baseInfo.iccid;
     }
 
     params.cardStatus = cardStatus;
     // params.imei = imei;
     params.openStatus = openStatus;
+    
     for (const key in servStatus) {
       params[key] = servStatus[key];
     }
     params.monthUsedFlow = monthUsedFlow;
     const endTime = moment().milliseconds();
     logger.info(`【同步更新，接口总响应时间：】:${endTime - startTime} ms`);
+    if(isBatch) { //如果是批量更新，则返回需要更新的信息，不直接更新
+      return params;
+    }
     await service.sim.updateBySimId(params, simId);
   }
 

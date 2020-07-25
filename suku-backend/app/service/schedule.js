@@ -77,7 +77,7 @@ class ScheduleService extends BaseService {
     logger.info('********************同步卡基本信息*********************');
 
     const startTime = moment().milliseconds();
-    const isMigrat = true;
+    const isMigrat = fasle;
 
     const { oneLinkSims } = await service.sim.getOnelinkSimIds({
       cardStatus: 2,

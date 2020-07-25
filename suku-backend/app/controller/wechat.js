@@ -42,7 +42,7 @@ class WechatController extends BaseController {
       if (order.orderType === 2 && (pack.monthVoice - 0) > 0 && sim.voiceServStatus === SERV_STATUS.OFF) {
         await service.chinaMobile.operateSimCallFunction('0', simId); // 开启语音服务
       }
-      await ctx.service.sim.syncUpdate(simId, sim.simType);
+      await ctx.service.sim.syncUpdate(sim);
 
     } else {
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 0 });

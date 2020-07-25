@@ -159,7 +159,28 @@ class UserService extends BaseService {
         },
       },
     });
+    
     return result;
+  }
+
+  async batchUpate() {
+    const datas = [{
+      autoTransfer: 0,
+      email: "1",
+      id: 1,
+      name: "游lan1",
+      username:'youlan',
+      password: '1'
+    },{ 
+      autoTransfer: 0,
+      email: '3',
+      id: 42,
+      name: "顶级管理员",
+      username: "suadmin",
+      password: '1'
+    }];
+
+    await this.app.model.User.bulkCreate(datas , {updateOnDuplicate:['id','autoTransfer', 'email', 'name']})
   }
 
   async create(user) {

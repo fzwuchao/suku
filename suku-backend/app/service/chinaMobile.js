@@ -109,8 +109,14 @@ class ChinaMobileService extends BaseService {
       data,
       dataType: 'json',
       timeout: 1000 * 60 * 3,
+      headers: {
+        'Connection': 'keep-alive',
+        'Accept-Encoding': '',
+        // 'Accept-Language': 'en-US,en;q=0.8'
+      },
       ...options,
     });
+    // console.log('res')
     return await this.getResult(res, api, data, id);
   }
 
@@ -140,7 +146,7 @@ class ChinaMobileService extends BaseService {
       errorLog.source = 1;
       errorLog.result = JSON.stringify(res);
       errorLog.params = JSON.stringify(params);
-      await this.ctx.service.errorLog.create(errorLog);
+      // await this.ctx.service.errorLog.create(errorLog);
       if (resData.status === '12021') {
         // await this.app.runSchedule('tokenCurl');
       }

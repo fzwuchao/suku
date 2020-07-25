@@ -76,7 +76,7 @@ class OnelinkPlatformController extends BaseController {
 
   async getToken() {
     await this.ctx.service.chinaMobile.getTokenCurl();
-    this.success(result, '');
+    this.success(true, '');
   }
 
   async getOnelinkByNameKey() {

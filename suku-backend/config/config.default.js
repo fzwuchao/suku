@@ -9,16 +9,17 @@ const path = require('path');
 const MYSQL_PARAMS = {
   HOST: '47.115.75.162', // 'localhost',
   PORT: 3306,
-  USER: 'suku', // 'root',
-  PASSWORD: 'ZY1305@OULAN', // 'root1234',
-  DATABASE: 'suku', // 'youlan_db',
+  USER: 'suku-test', // 'root',
+  PASSWORD: 'ZY1305-test@OULAN', // 'root1234',
+  DATABASE: 'suku-test', // 'youlan_db',
 };
 
 const REDIS_PARAMS = {
-  // HOST: '127.0.0.1',
-  HOST: '47.115.75.162',
+  HOST: '127.0.0.1',
+  // HOST: '47.115.75.162',
   PORT: 6379,
-  PASSWORD: 'ABYujk876kil',
+  PASSWORD: 'auth'
+  // PASSWORD: 'ABYujk876kil',
 };
 
 /**

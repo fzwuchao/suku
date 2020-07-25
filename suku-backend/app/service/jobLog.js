@@ -86,38 +86,33 @@ class JobLogService extends BaseService {
     const { service, logger } = ctx;
     logger.warn('【同步更开始1000条】');
     const promises = results.map(result => {
-      // const operType = LIMT_OPTY.ADD;
-      // const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
-      // service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
-      return service.sim.syncUpdate(result, data.isMigrat);
+      return service.sim.syncUpdate(result, data.isMigrat, true);
     });
-    Promise.all(promises).then(()=>{
-      logger.warn('【同步更新完成1000条】');
-      if(!isDone) {
-        isDone = true;
-        done();
-      }
-    });
+    // const promises = [];
+    // for(let i=0;i<4;i++){
+    //   promises.push(service.sim.syncUpdate(results[i], data.isMigrat, true));
+    // }
+    const datas = await Promise.all(promises);
+    logger.info(datas)
+    await service.sim.bulkUpdate(datas);
+    logger.warn('【同步更新完成1000条】');
+    done();
+    
   }
 
   async configLimtValue(data, done) {
     const results = data.sims;
     const ctx = this.ctx;
-    let isDone = false;
     const { service, logger } = ctx;
     logger.warn('【设置阀值1000条】');
     const promises = results.map(result => {
       const operType = LIMT_OPTY.ADD;
       const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
       return service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
-      // return service.sim.syncUpdate(result, data.isMigrat);
     });
     Promise.all(promises).then(()=>{
       logger.warn('【设置阀值完成1000条】');
-      if(!isDone) {
-        isDone = true;
-        done();
-      }
+      done();
     });
   }
 
@@ -126,25 +121,18 @@ class JobLogService extends BaseService {
     const ctx = this.ctx;
     const { service, logger } = ctx;
     logger.warn('【同步更开始1500条】');
-    let isDone = false;
     const promises = results.map(result => {
       const operType = LIMT_OPTY.ADD;
       const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
       service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
-      return service.sim.syncUpdate(result, data.isMigrat);
+      return service.sim.syncUpdate(result, data.isMigrat, true);
     });
-    await Promise.all(promises);
+    const datas = await Promise.all(promises);
+    await service.sim.bulkUpdate(datas);
     // 超流量的卡进行停流量，超语音的卡进行停语音处理
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
     
-    Promise.all(promises).then(()=>{
-      logger.warn('【同步更新完成1000条】');
-      if(!isDone) {
-        isDone = true;
-        done();
-      }
-    });
   }
 
 
