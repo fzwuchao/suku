@@ -6,7 +6,7 @@ class TokenCurl extends Subscription {
   static get schedule() {
     return {
       interval: '59m', // 59 分钟间隔
-      type: 'all', // 指定所有的 worker 都需要执行
+      type: 'worker', // 指定所有的 worker 都需要执行
       immediate: true,
       disable: false,
       env: [ 'prod' ], // 定时任务，只在生产环境才执行
