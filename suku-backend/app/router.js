@@ -115,6 +115,8 @@ module.exports = app => {
   router.post('/onelink/updateStatus', controller.onelinkPlatform.updateStatus);
   // 获取所有开启的onelink配置
   router.get('/onelink/getAllOnelink', controller.onelinkPlatform.getAllOnelink);
+  // 获取所有开启onelink的token
+  router.get('/onelink/getToken', controller.onelinkPlatform.getToken);
 
 
   // 获取sim流水

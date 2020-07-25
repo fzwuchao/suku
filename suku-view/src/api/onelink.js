@@ -10,5 +10,7 @@ export default {
   // 批量开启/关闭平台
   UPDATE_STATUS: '/onelink/updateStatus',
   // 获取所有开启的onelink
-  GET_ALL_ONELINK: '/onelink/getAllOnelink'
+  GET_ALL_ONELINK: '/onelink/getAllOnelink',
+  // 获取所有开启的onelink
+  GET_ONELINK_TOKEN: '/onelink/getToken'
 }

@@ -84,7 +84,7 @@ class ChinaMobileService extends BaseService {
       const sim = await this.ctx.service.sim.getSimBySimId(simId);
       onelinkId = sim.onelinkId
     }
-    let oneLink = await this.app.redis.get(`suku_onelink_info_${onelinkId}`);
+    let oneLink = JSON.parse(await this.app.redis.get(`suku_onelink_info_${onelinkId}`));
     if(oneLink) {
       return oneLink;
     }
@@ -99,10 +99,10 @@ class ChinaMobileService extends BaseService {
     }
     // const params = JSON.parse(JSON.stringify(data));
     data.token = await this.getToken(simId, onelinkId);
-    if (!data.token) {
-      await this.app.runSchedule('tokenCurl');
-      data.token = await this.getToken(simId, onelinkId);
-    }
+    // if (!data.token) {
+    //   // await this.app.runSchedule('tokenCurl');
+    //   data.token = await this.getToken(simId, onelinkId);
+    // }
     data.transid = getTransid(appId);
     const api = getApi(apiKey);
     const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.url}`, {
@@ -142,7 +142,7 @@ class ChinaMobileService extends BaseService {
       errorLog.params = JSON.stringify(params);
       await this.ctx.service.errorLog.create(errorLog);
       if (resData.status === '12021') {
-        await this.app.runSchedule('tokenCurl');
+        // await this.app.runSchedule('tokenCurl');
       }
       resData.errorCode = resData.status;
       resData.errorInfo = resData.message;

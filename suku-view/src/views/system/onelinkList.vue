@@ -5,6 +5,7 @@
       <el-button type="primary" size="mini" @click="addOnelink">增加</el-button>
       <el-button type="primary" size="mini" @click="openStatus(1)">启用</el-button>
       <el-button type="primary" size="mini" @click="openStatus(0)">停用</el-button>
+      <el-button type="primary" size="mini" @click="getToken">手动获取token</el-button>
     </div>
 
     <el-table
@@ -116,6 +117,13 @@ export default {
         this.data = r.data;
         this.list = this.data.list;
         this.pageTotal = this.data.totalRecords;
+      });
+    },
+    getToken() {
+      this.axios({
+        method: "get",
+        url: API.ONELINK.GET_ONELINK_TOKEN
+      }).then(() => {
       });
     },
     handleSelectionChange(val) {
