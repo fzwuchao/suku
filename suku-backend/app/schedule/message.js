@@ -6,7 +6,7 @@ class Message extends Subscription {
   static get schedule() {
     return {
       interval: '3m', // 59 分钟间隔
-      type: 'all', // 指定所有的 worker 都需要执行
+      type: 'worker', // 让一个worker执行
       immediate: true,
       disable: true,
     };
