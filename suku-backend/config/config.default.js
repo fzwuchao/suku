@@ -128,7 +128,7 @@ module.exports = appInfo => {
         port: REDIS_PARAMS.PORT,
         host: REDIS_PARAMS.HOST,
         // auth: REDIS_PARAMS.PASSWORD,
-        password: REDIS_PARAMS.PASSWORD,
+        auth: REDIS_PARAMS.PASSWORD,
         db: 3,
         options: {
         },
