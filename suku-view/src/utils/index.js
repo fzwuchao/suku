@@ -1,7 +1,7 @@
 /**
  * Created by jiachenpan on 16/11/18.
  */
-
+import calc from  'calculatorjs'
 export function parseTime(time, cFormat) {
     if (arguments.length === 0) {
         return null
@@ -38,6 +38,16 @@ export function getTableHeight() {
     // console.log(winHeight);
     return winHeight - 148 - 50;
 }
+
+export function formatDisplayFlow(monthFlow) {
+  if(monthFlow >= 1024) {
+    monthFlow = ((calc(`${monthFlow}/1024`))-0).toFixed(3) + 'G'
+  } else {
+      monthFlow = monthFlow + 'M'
+  }
+return monthFlow;
+}
+
 export function formatTime(time, option) {
     time = +time * 1000
     const d = new Date(time)

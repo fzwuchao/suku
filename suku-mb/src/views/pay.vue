@@ -7,7 +7,7 @@
         <p class="sim-number">{{payInfo.dealAmount}}</p>
       </div>
       <div class="combo-desc">
-        <p class="combo-desc-item">套餐包含: {{payInfo.flow? payInfo.flow: '--'}}M {{payInfo.voice?payInfo.voice:'--'}}分钟</p>
+        <p class="combo-desc-item">套餐包含: {{payInfo.flow | DisplayFlow}} {{payInfo.voice?payInfo.voice:'--'}}分钟</p>
         <p class="combo-desc-item">有效期: {{payInfo.months? `${payInfo.months}个月`: '当月'}}</p>
       </div>
     </div>
@@ -47,6 +47,7 @@
 
 <script>
 import { Toast } from "vant";
+import { formatDisplayFlow } from  '../utils';
 export default {
   data() {
     return {
@@ -60,8 +61,15 @@ export default {
       type: Object
     }
   },
+  filters: {
+    DisplayFlow(val) {
+      const str = formatDisplayFlow(val ? val : 0);
+      return str;
+    },
+  },
   methods: {
     onBridgeReady(json) {
+      // eslint-disable-next-line no-undef
       WeixinJSBridge.invoke(
         'getBrandWCPayRequest', json,
          function(res){

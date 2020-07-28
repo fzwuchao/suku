@@ -1,5 +1,8 @@
 import { Toast } from 'vant';
+
 import axios from 'axios';
+
+import calc from 'calculatorjs';
 export function getOpenId() {
   // sessionStorage.setItem('openId', 'on2l30nibxGCb_u4wb3T2Fs02MM8');
   // 清除开发阶段存入的测试openId odrqo082xuKdbE_c5ceeRxGINCqc
@@ -35,4 +38,13 @@ export function getOpenId() {
        }
     });
   });
+}
+
+export function formatDisplayFlow(monthFlow) {
+  if(monthFlow >= 1024) {
+    monthFlow = ((calc(`${monthFlow}/1024`))-0).toFixed(3) + ' G'
+  } else {
+      monthFlow = monthFlow + ' M'
+  }
+return monthFlow;
 }

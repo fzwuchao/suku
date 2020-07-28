@@ -40,7 +40,7 @@
         <template slot-scope="scope">{{ scope.row.belongsToSimType | simType }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="套餐月流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthFlow ? scope.row.monthFlow : 0} M`}}</template>
+        <template slot-scope="scope">{{ scope.row.monthFlow | DisplayFlow}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="月通话时长" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.monthVoice ? scope.row.monthVoice : 0} 分`}}</template>
@@ -79,7 +79,7 @@
 <script>
 import API from "@/api";
 import searchBar from "@/components/SearchBar";
-import { getTableHeight } from "@/utils";
+import { getTableHeight, formatDisplayFlow } from "@/utils";
 export default {
   data() {
     return {
@@ -147,7 +147,11 @@ export default {
         }
       }
       return returnStr;
-    }
+    },
+    DisplayFlow(val) {
+      const str = formatDisplayFlow(val ? val : 0);
+      return str;
+    },
   },
   methods: {
     pageChange(page) {

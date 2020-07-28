@@ -56,7 +56,7 @@
         label="流量"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthFlow ? scope.row.monthFlow : 0} M`}}</template>
+        <template slot-scope="scope">{{ scope.row.monthFlow | DisplayFlow}}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -118,7 +118,7 @@
 <script>
 import API from "@/api";
 import searchBar from "@/components/SearchBar";
-import { getTableHeight } from "@/utils";
+import { getTableHeight, formatDisplayFlow } from "@/utils";
 export default {
   data() {
     return {
@@ -146,7 +146,12 @@ export default {
   components: {
     searchBar
   },
-
+  filters: {
+    DisplayFlow(val) {
+      const str = formatDisplayFlow(val ? val : 0);
+      return str;
+    },
+  },
   methods: {
     pageChange(page) {
       this.pageNum = page;

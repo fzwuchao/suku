@@ -197,7 +197,7 @@
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthFlow ? scope.row.monthFlow : 0}` }}</template>
+        <template slot-scope="scope">{{ scope.row.monthFlow | DisplayFlow }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -205,7 +205,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthOverlapFlow ? scope.row.monthOverlapFlow : 0}` }}</template>
+        <template slot-scope="scope">{{ scope.row.monthOverlapFlow  | DisplayFlow }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -213,7 +213,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthUsedFlow ? scope.row.monthUsedFlow : 0}` }}</template>
+        <template slot-scope="scope">{{ scope.row.monthUsedFlow  | DisplayFlow }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -229,7 +229,7 @@
         min-width="100px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ `${scope.row.monthShengyuFlow}` }}</template>
+        <template slot-scope="scope">{{ scope.row.monthShengyuFlow | DisplayFlow }}</template>
       </el-table-column>
       <el-table-column
         align="left"
@@ -401,7 +401,7 @@ import comImportTransfor from "./com-import-transfor";
 import comboChange from "./combo-change";
 import userPrice from "./user-price";
 import userList from "./user-list";
-import { getTableHeight } from "@/utils";
+import { getTableHeight, formatDisplayFlow } from "@/utils";
 export default {
   data() {
     return {
@@ -501,6 +501,10 @@ export default {
         "22": "欠费"
       };
       return status[val];
+    },
+    DisplayFlow(val) {
+      const str = formatDisplayFlow(val ? val : 0);
+      return str;
     },
     serveStatus(val) {
       const serveStatus = {
