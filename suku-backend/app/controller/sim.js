@@ -68,13 +68,13 @@ class SimController extends BaseController {
       ...pageRules,
     };
 
-    const params = Object.keys(rule).reduce((acc, cur) => {
-      if (cur in request.query || cur in request.queries) {
-        acc[cur] = rule[cur].type.includes('array') ? request.queries[`${cur}`] : request.query[cur];
-      }
-      return acc;
-    }, {});
-
+    // const params = Object.keys(rule).reduce((acc, cur) => {
+    //   if (cur in request.query || cur in request.queries) {
+    //     acc[cur] = rule[cur].type.includes('array') ? request.queries[`${cur}`] : request.query[cur];
+    //   }
+    //   return acc;
+    // }, {});
+    const params = request.body;
     ctx.validate(rule, params);
     const pageData = await service.sim.getSimPageData(params);
     this.success(pageData, '');
@@ -89,13 +89,13 @@ class SimController extends BaseController {
       ...sim(),
     };
 
-    const params = Object.keys(rule).reduce((acc, cur) => {
-      if (cur in request.query || cur in request.queries) {
-        acc[cur] = rule[cur].type.includes('array') ? request.queries[`${cur}`] : request.query[cur];
-      }
-      return acc;
-    }, {});
-
+    // const params = Object.keys(rule).reduce((acc, cur) => {
+    //   if (cur in request.query || cur in request.queries) {
+    //     acc[cur] = rule[cur].type.includes('array') ? request.queries[`${cur}`] : request.query[cur];
+    //   }
+    //   return acc;
+    // }, {});
+    const params = request.body;
     ctx.validate(rule, params);
     const excelSimData = await service.sim.getSimDataForExcel(params, params.simType === 'B');
     const jsonExcel = JSON.parse(JSON.stringify(excelSimData, null, 2));
