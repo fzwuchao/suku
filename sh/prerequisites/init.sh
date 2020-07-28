@@ -8,7 +8,7 @@ confDir=${curDir}/mysql/config
 backupDir=${curDir}/mysql/backup
 mkdir ${dataDir}
 mkdir ${backupDir}
-docker run --name suku-mysql -v ${curDir}/mysql/backup:/home/suku/backup -v ${confDir}:/etc/mysql/conf.d -v ${dataDir}:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=ZY1305@OULAN -e TZ=Asia/Shanghai -p 3306:3306 -d mysql:8.0.21
+docker run --name suku-mysql -v ${backupDir}:/home/suku/backup -v ${confDir}:/etc/mysql/conf.d -v ${dataDir}:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=ZY1305@OULAN -e TZ=Asia/Shanghai -p 3306:3306 -d mysql:8.0.21
 
 # 创建redis
 # 进入容器：docker exec -it suku-redis /bin/bash
