@@ -541,7 +541,8 @@ class ChinaMobileService extends BaseService {
       msisdn,
     };
     const result = await this.handleBy(24, msisdn, data);
-    return result;
+    const simIdR = (result[0] || {}).msisdn;
+    return simIdR;
   }
 
   /**

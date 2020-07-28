@@ -297,6 +297,12 @@ class SimService extends BaseService {
     logger.info(`【手动设置阀值，接口总响应时间：】:${endTime - startTime} ms`);
   }
 
+  async configLimtValueBySim(sim) {
+    const limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
+    await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.DEL, limtValue, sim.simId);
+    await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId);
+    return true;
+  }
 
   async syncUpdate(sim , isMigrat, isBatch) {
     const ctx = this.ctx;

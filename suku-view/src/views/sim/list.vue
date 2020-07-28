@@ -315,7 +315,7 @@
       <el-table-column
         fixed="right"
         label="操作"
-        width="150"
+        width="190"
       >
         <template slot-scope="scope">
           <el-button
@@ -328,6 +328,11 @@
             @click="syncOnelink(scope.row)"
             size="small"
           >同步更新</el-button>
+          <el-button
+            type="text"
+            @click="configLimtValueBySimId(scope.row)"
+            size="small"
+          >设置阀值</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -766,6 +771,20 @@ export default {
         this.$message({
           message: "同步更新失败",
           type: "error"
+        });
+      });
+    },
+    configLimtValueBySimId(item) {
+      this.axios({
+        method: "get",
+        params: {
+          simId: item.simId
+        },
+        url: API.SIMLIST.SIM_CONFIG_LIMT_VALUE_BY_SIMID
+      }).then(()=> {
+        this.$message({
+          message: "设置完成",
+          type: "success"
         });
       });
     },
