@@ -61,7 +61,10 @@ module.exports = app => {
   router.get('/sim/migrationSyncUpdate', controller.sim.migrationSyncUpdate);
   // 手动触发设置阀值
   router.get('/sim/configLimtValue', controller.sim.configLimtValue);
+  // 手动触发单卡设置阀值
+  router.get('/sim/configLimtValueBySimId', controller.sim.configLimtValueBySimId);
   
+
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);
   // 通过id,查询套餐

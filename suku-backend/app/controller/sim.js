@@ -551,6 +551,23 @@ class SimController extends BaseController {
     this.success('', '同步更新完成');
   }
 
+  /**
+   * 单卡设置阀值
+   */
+  async configLimtValueBySimId() {
+    const ctx = this.ctx;
+    const { request, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim([ 'simId' ]),
+    };
+    ctx.validate(rule, request.query);
+    const { simId } = request.query;
+    const simO = await ctx.service.sim.getSimBySimId(simId)
+    await ctx.service.sim.configLimtValueBySim(simO);
+    this.success('', '设置完成');
+  }
+
   async update() {
     const ctx = this.ctx;
     const { request, service, helper } = ctx;

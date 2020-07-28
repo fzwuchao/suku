@@ -106,9 +106,7 @@ class JobLogService extends BaseService {
     const { service, logger } = ctx;
     logger.warn('【设置阀值1000条】');
     const promises = results.map(result => {
-      const operType = LIMT_OPTY.ADD;
-      const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
-      return service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
+      return service.sim.configLimtValueBySim(result);
     });
     Promise.all(promises).then(()=>{
       logger.warn('【设置阀值完成1000条】');

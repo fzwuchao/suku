@@ -10,5 +10,6 @@ export default {
     SIM_TRANSFOR: "/sim/transfer",
     SIM_MIGRAT_SYNC_UPDATE: "/sim/migrationSyncUpdate",
     SIM_CONFIG_LIMT_VALUE: "/sim/configLimtValue",
+    SIM_CONFIG_LIMT_VALUE_BY_SIMID: "/sim/configLimtValueBySimId",
     
 }
