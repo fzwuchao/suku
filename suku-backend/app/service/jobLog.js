@@ -93,7 +93,7 @@ class JobLogService extends BaseService {
     //   promises.push(service.sim.syncUpdate(results[i], data.isMigrat, true));
     // }
     const datas = await Promise.all(promises);
-    logger.info(datas)
+    // logger.info(datas)
     await service.sim.bulkUpdate(datas);
     logger.warn('【同步更新完成1000条】');
     done();

@@ -829,14 +829,16 @@ export default {
       this.$router.push(`/sim/editinfo/${this.simType}/${row.simId}`);
     },
     getlist(val) {
+      let pageNum = this.pageNum;
       if (val) {
         this.searchParams = val;
+        pageNum = 1;
       }
       this.axios({
         method: "get",
         params: {
           simType: this.simType,
-          pageNum: this.pageNum,
+          pageNum: pageNum,
           pageSize: this.pageSize,
           ...this.searchParams
         },

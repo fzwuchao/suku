@@ -61,6 +61,7 @@ export default {
       tableHeight: null,
       list: [],
       data: null,
+      searchParams: {},
       searchData: [
         {
           name: "simId",
@@ -82,15 +83,19 @@ export default {
       this.pageNum = page;
       this.getlist();
     },
-    getlist(params) {
-      if(!params) {
-        params = {};
+    getlist(val) {
+     let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
       }
-      params.pageSize = this.pageSize;
-      params.pageNum = this.pageNum;
       this.axios({
         method: "get",
-        params,
+        params: {
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams,
+        },
         url: API.SIMLIST.WRITE_LIST
       }).then(r => {
         this.data = r.data;

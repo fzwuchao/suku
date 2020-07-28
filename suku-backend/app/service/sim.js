@@ -261,13 +261,15 @@ class SimService extends BaseService {
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
       flowServStatus: 2,
-    }, 100);
+    }, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
+      let j = 0;
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('MigratBatchSyncUpdate', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
-          .save();
+        .delay((i+j)*20000+100).save();
       }
+      j++;
     }
     const endTime = moment().milliseconds();
     logger.info(`【同步卡基本信息(迁移)，接口总响应时间：】:${endTime - startTime} ms`);
@@ -342,7 +344,7 @@ class SimService extends BaseService {
       const activeTime = baseInfo.activeDt;
       params.activeTime = activeTime;
       params.isActive = 1;
-      if (simType === SIM_TYPE.CALLED) {
+      if (simType === SIM_TYPE.CALLED && !isMigrat) {
         const combo = await service.simCombo.getSimComboById(activeComboId);
         const newTime = moment(activeTime).add((combo.months - 1), 'M');
         if (!sim.overdueTime) {
@@ -351,9 +353,11 @@ class SimService extends BaseService {
       }
     }
     // 如果是迁移，则更据过期时间计算余额
-    if (isMigrat && params.overdueTime) {
+    if (params.overdueTime) {
       const overdueTime = params.overdueTime;
-      const remainMonths = moment(overdueTime).month() - moment(new Date()).month();
+      const diffYear =  calc(`${moment(overdueTime).year()} - ${moment(new Date()).year()}`);
+      const yearMonth =  calc(`${diffYear} * 12`);
+      const remainMonths =  calc (`${yearMonth}+(${moment(overdueTime).month()} - ${moment(new Date()).month()})`);
       params.shengyuMoney = calc(`${remainMonths}*${sim.monthRent}`);
     }
 

@@ -4,6 +4,7 @@ const moment = require('moment');
 const _ = require('lodash');
 const xml2js = require('xml2js');
 const parser = new xml2js.Parser();
+const urlNode = require('url');
 const retcodeMap = {
   '00': '成功',
   '01': '失败',
@@ -95,8 +96,9 @@ class ChinaMobileService extends BaseService {
   async fetchData(apiKey, data, simId, onelinkId, options) {
     const { appId, apiHost, apiVersion, status, id } = await this.getOnelink(simId, onelinkId);
     if (status === 0) {
-      return null;
+      return [];
     }
+    const {logger} = this.ctx;
     // const params = JSON.parse(JSON.stringify(data));
     data.token = await this.getToken(simId, onelinkId);
     // if (!data.token) {
@@ -105,19 +107,27 @@ class ChinaMobileService extends BaseService {
     // }
     data.transid = getTransid(appId);
     const api = getApi(apiKey);
-    const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.url}`, {
-      data,
-      dataType: 'json',
-      timeout: 1000 * 60 * 3,
-      headers: {
-        'Connection': 'keep-alive',
-        'Accept-Encoding': '',
-        // 'Accept-Language': 'en-US,en;q=0.8'
-      },
-      ...options,
-    });
-    // console.log('res')
-    return await this.getResult(res, api, data, id);
+    const host = urlNode.parse(apiHost).hostname;
+    try{
+      const res = await this.ctx.curl(`${apiHost}${apiVersion}${api.url}`, {
+        data,
+        dataType: 'json',
+        timeout: 1000 * 60 * 3,
+        headers: {
+          'Host': host,
+          'Connection': 'keep-alive',
+          'Accept-Encoding': '',
+          // 'Accept-Language': 'en-US,en;q=0.8'
+        },
+        ...options,
+      });
+      // console.log('res')
+      return await this.getResult(res, api, data, id);
+    } catch(e) {
+      logger.error(e);
+      return [];
+    }
+    
   }
 
   async getResult(res, api, params, onelinkId) {
@@ -146,7 +156,7 @@ class ChinaMobileService extends BaseService {
       errorLog.source = 1;
       errorLog.result = JSON.stringify(res);
       errorLog.params = JSON.stringify(params);
-      // await this.ctx.service.errorLog.create(errorLog);
+      await this.ctx.service.errorLog.create(errorLog);
       if (resData.status === '12021') {
         // await this.app.runSchedule('tokenCurl');
       }
@@ -250,7 +260,9 @@ class ChinaMobileService extends BaseService {
     if (_.isNil(msisdn)) {
       return [];
     }
+    
     if (msisdn.length > 13) {
+      console.log(msisdn.length)
       msisdn = _.split(msisdn, '_')[0];
     }
     const result = await this.fetchData(url, data, msisdn, onelinkId);
@@ -384,6 +396,7 @@ class ChinaMobileService extends BaseService {
    */
   async queryOnOffStatus(msisdn, onelinkId) {
     const result = await this.handleBy(7, msisdn, { msisdn }, onelinkId);
+    
     const { status } = result[0] || {};
     return status;
   }

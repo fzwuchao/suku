@@ -83,6 +83,7 @@ export default {
       tableHeight: null,
       list: [],
       data: null,
+      searchParams: {},
       searchData: [
         {
           name: "flowNo",
@@ -119,15 +120,19 @@ export default {
     editCombo(row) {
       this.$router.push(`/warehouse/editInfo/${row.id}`);
     },
-    getlist(params) {
-      if(!params) {
-        params = {};
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
       }
-      params.pageNum = this.pageNum;
-      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params,
+        params: {
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams,
+        },
         url: API.SIMLOGISTICS.GET_SIMLOGISTICS_LIST
       }).then(r => {
         this.data = r.data;

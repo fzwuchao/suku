@@ -160,11 +160,15 @@ export default {
     },
     getlist(val) {
       let params = {};
-      if (val) params = { ...val };
+      let pageNum = this.pageNum;
+      if (val) {
+        params = { ...val }
+        pageNum = 1
+      }
       this.axios({
         method: "get",
         params: {
-          pageNum: this.pageNum,
+          pageNum: pageNum,
           pageSize: this.pageSize,
           comboType: this.comboType,
           ...params

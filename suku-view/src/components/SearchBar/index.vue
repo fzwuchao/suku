@@ -39,7 +39,7 @@
             size="small"
             class="inputRange"
             @input.native="handleSearch(index, {'value': item.values},true)"
-            :maxlength="10"
+            :maxlength="15"
           ></el-input>
           <span>-</span>
           <el-input
@@ -48,7 +48,7 @@
             size="small"
             class="inputRange"
             @input.native="handleSearch(index, {'value': item.values},true)"
-            :maxlength="10"
+            :maxlength="15"
           ></el-input>
           <el-button size="small" @click="handleSearch(index, {'value': item.values})">确定</el-button>
         </div>
@@ -59,7 +59,7 @@
             size="small"
             class="inputRange"
             @input.native="handleSearch(index, {'value': item.values},true)"
-            :maxlength="10"
+            :maxlength="15"
           ></el-input>
           <span>-</span>
           <el-input
@@ -68,7 +68,7 @@
             size="small"
             class="inputRange"
             @input.native="handleSearch(index, {'value': item.values},true)"
-            :maxlength="10"
+            :maxlength="15"
           ></el-input>
           <el-button size="small" @click="handleSearch(index, {'value': item.values})">确定</el-button>
         </div>
