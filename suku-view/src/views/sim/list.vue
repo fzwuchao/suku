@@ -410,7 +410,7 @@ export default {
       curUser: {},
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
-      pageSize: 10,
+      pageSize: 30,
       isOneRow: false,
       importDialog: false,
       importDialogForTransfor: false,

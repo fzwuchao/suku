@@ -78,7 +78,7 @@ export default {
       pageNum: 1,
       simType: "A",
       pageTotal: 1,
-      pageSize: 10,
+      pageSize: 30,
       importDialog: false,
       tableHeight: null,
       list: [],

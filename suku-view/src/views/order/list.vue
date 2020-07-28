@@ -94,12 +94,13 @@ export default {
       pageNum: 1,
       orderType: 1,
       pageTotal: 1,
-      pageSize: 10,
+      pageSize: 30,
       withdrawalDialog: false,
       tableHeight: null,
       list: [],
       withdrawalMoney: '00',
       data: null,
+      searchParams: {},
       searchData: [
         {
           name: "simId",
@@ -168,16 +169,20 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
-    getlist(params) {
-      if(!params) {
-        params = {}
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
       }
-      params.orderType = this.orderType;
-      params.pageNum = this.pageNum;
-      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params,
+        params: {
+          pageNum: pageNum,
+          orderType: this.orderType,
+          pageSize: this.pageSize,
+          ...this.searchParams,
+        },
         url: API.ORDER.GET_SIMORDER_LIST
       }).then(r => {
         this.data = r.data;

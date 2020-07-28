@@ -123,10 +123,11 @@ export default {
   data() {
     return {
       pageNum: 1,
-      pageSize: 10,
+      pageSize: 30,
       comboType: 2,
       importDialog: false,
       tableHeight: null,
+      searchParams: {},
       list: [],
       data: null,
       searchData: [
@@ -159,10 +160,9 @@ export default {
       }
     },
     getlist(val) {
-      let params = {};
       let pageNum = this.pageNum;
       if (val) {
-        params = { ...val }
+        this.searchParams = { ...val }
         pageNum = 1
       }
       this.axios({
@@ -171,7 +171,7 @@ export default {
           pageNum: pageNum,
           pageSize: this.pageSize,
           comboType: this.comboType,
-          ...params
+          ...this.searchParams
         },
         url: API.SIMCOMBO.COMBO_PACK_LIST
       }).then(r => {

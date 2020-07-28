@@ -72,11 +72,12 @@ export default {
     return {
       pageNum: 1,
       pageTotal: 1,
-      pageSize: 10,
+      pageSize: 30,
       importDialog: false,
       tableHeight: null,
       list: [],
       data: null,
+      searchParams: {},
       searchData: [
         {
           name: "simId",
@@ -158,15 +159,19 @@ export default {
     editCombo(row) {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
-    getlist(params) {
-      if(!params) {
-        params = {};
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
       }
-      params.pageNum = this.pageNum;
-      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params,
+        params: {
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams,
+        },
         url: API.MESSAGE.GET_MESSAGE_SEND_LIST
       }).then(r => {
         this.data = r.data;

@@ -87,9 +87,10 @@ export default {
     return {
       pageNum: 1,
       pageTotal: 1,
-      pageSize: 10,
+      pageSize: 30,
       list: [],
       data: null,
+      searchParams: {},
       multipleSelection: []
     };
   },
@@ -139,12 +140,18 @@ export default {
     editUser(user) {
       this.$router.push(`/system/edituser/${user.id}`);
     },
-    getlist() {
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
+      }
       this.axios({
         method: "get",
         params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams
         },
         url: API.USERS.ROLE_LIST
       }).then(r => {

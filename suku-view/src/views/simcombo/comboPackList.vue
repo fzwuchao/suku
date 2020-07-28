@@ -70,7 +70,7 @@ export default {
   data() {
     return {
       pageNum: 1,
-      pageSize: 10,
+      pageSize: 30,
       comboType: 1,
       importDialog: false,
       tableHeight: null,

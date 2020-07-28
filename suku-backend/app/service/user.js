@@ -132,7 +132,7 @@ class UserService extends BaseService {
     return users;
   }
 
-  async getUsersPage(pid, pageSize, pageNum) {
+  async getUsersPage(pid, pageSize, pageNum, name) {
     const Op = this.getOp();
     const user = this.getCurUser();
     const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'createdAt', 'updatedAt' ];
@@ -147,7 +147,11 @@ class UserService extends BaseService {
       ids = await this.ctx.service.user.getAllUserIdsByPid([ user.id ]);
     }
     where.id = { [Op.in]: ids };
-
+    if (name) {
+      where['name'] = {
+        [Op.substring]: name,
+      };
+    }
     const result = await this.findAndCountAll('User', pageSize, pageNum, {
       attributes,
       where,
