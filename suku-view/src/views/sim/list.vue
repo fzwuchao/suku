@@ -791,8 +791,8 @@ export default {
     },
     handleExport() {
       this.axios({
-        methods: "get",
-        params: {
+        method: "post",
+        data: {
           simType: this.simType,
           ...this.searchParams
         },
@@ -835,8 +835,8 @@ export default {
         pageNum = 1;
       }
       this.axios({
-        method: "get",
-        params: {
+        method: "post",
+        data: {
           simType: this.simType,
           pageNum: pageNum,
           pageSize: this.pageSize,

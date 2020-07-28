@@ -183,8 +183,8 @@ class SimService extends BaseService {
     if (simTypeIsB) {
       attributes = attributes.concat(attrsOfB);
     }
-    whereCondition.attributes = attributes;
-    const simData = await this.app.model.Sim.findAll(whereCondition);
+    whereCondition.whereCondition.attributes = attributes;
+    const simData = await this.app.model.Sim.findAll(whereCondition.whereCondition);
     return simData;
   }
 

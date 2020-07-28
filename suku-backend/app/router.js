@@ -39,7 +39,7 @@ module.exports = app => {
   router.get('/role/roleType', controller.role.getRoleType);
 
   // 查询sim卡
-  router.get('/sim/search', controller.sim.search);
+  router.post('/sim/search', controller.sim.search);
   // 导入物联卡
   // router.post('/sim/importSims', controller.sim.importSims);
   router.post('/sim/importSims', controller.sim.importSimsWithHeadField);
@@ -48,7 +48,7 @@ module.exports = app => {
   // 根据simId获取sim信息
   router.get('/sim/getSim', controller.sim.getSim);
   // 导出sim卡
-  router.get('/sim/export', controller.sim.exportExcel);
+  router.post('/sim/export', controller.sim.exportExcel);
   // 同步更新
   router.get('/sim/syncUpdate', controller.sim.syncUpdate);
   // 更新
