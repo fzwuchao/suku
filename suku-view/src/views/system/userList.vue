@@ -12,6 +12,7 @@
       ref="multipleTable"
       header-row-class-name="table-head"
       :data="list"
+      :height="tableHeight"
       tooltip-effect="dark"
       border
       stripe
@@ -70,15 +71,19 @@
       ></el-pagination>
     </div>
     <modify-pwd :dialogVisible="dialogVisible" @close="close" :userId="userId" :username="username"></modify-pwd>
+    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
   </div>
 </template>
 
 <script>
 import API from "@/api";
 import ModifyPwd from "@/components/ModifyPwd";
+import searchBar from "@/components/SearchBar";
+import { getTableHeight } from "@/utils";
 export default {
   components: {
     ModifyPwd,
+    searchBar,
   },
   data() {
     return {
@@ -87,9 +92,19 @@ export default {
       dialogVisible: false,
       pageNum: 1,
       pageTotal: 1,
-      pageSize: 10,
+      tableHeight: null,
+      pageSize: 30,
+      searchParams: {},
       list: [],
       data: null,
+      searchData: [
+        {
+          name: "name",
+          title: "昵称",
+          type: "inputText",
+          value: ""
+        }
+      ],
       cueUser: {},
       multipleSelection: []
     };
@@ -154,12 +169,18 @@ export default {
       });
       
     },
-    getlist() {
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
+      }
       this.axios({
         method: "get",
         params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams
         },
         url: API.USERS.USER_LIST
       }).then(r => {
@@ -186,6 +207,7 @@ export default {
   },
   created() {
     this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+    this.tableHeight = getTableHeight();
   }
 };
 </script>

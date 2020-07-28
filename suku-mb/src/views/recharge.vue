@@ -27,7 +27,7 @@
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">剩余流量</p>
-            <p class="recharge-info-value">{{sim.monthShengyuFlow? sim.monthShengyuFlow: '--' }} M</p>
+            <p class="recharge-info-value">{{sim.monthShengyuFlow | DisplayFlow }} </p>
           </van-grid-item>
           <van-grid-item>
             <p class="recharge-info-title">剩余语音</p>
@@ -81,7 +81,7 @@
                 <p class="cpmbo-pack-name">{{pack.name}}</p>
                 <p class="cpmbo-pack-flow">
                   流量:
-                  <strong>{{pack.monthFlow}}M</strong>
+                  <strong>{{pack.monthFlow | DisplayFlow}}</strong>
                 </p>
                 <p class="cpmbo-pack-voice">
                   语音:
@@ -109,6 +109,7 @@
 import { Toast } from "vant";
 import Pay from './pay';
 import calcu from 'calculatorjs';
+import { formatDisplayFlow } from  '../utils';
 export default {
   data() {
     return {
@@ -126,6 +127,10 @@ export default {
     Pay
   },
   filters: {
+    DisplayFlow(val) {
+      const str = formatDisplayFlow(val ? val : 0);
+      return str;
+    },
     cardStatus(val) {
       let str = '';
       const status= {
@@ -379,13 +384,18 @@ export default {
     margin-top: 15px;
     .combo-packs {
       display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      flex-wrap: wrap;
       margin: 15px;
       .combo-pack {
         flex: 1;
         width: 50%;
         max-width: 50%;
+        min-width: 50%;
         color: #fff;
         font-size: 14px;
+        margin-bottom: 15px;
 
         p {
           font-size: 14px;

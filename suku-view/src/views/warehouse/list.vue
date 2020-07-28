@@ -79,7 +79,7 @@ export default {
     return {
       pageNum: 1,
       pageTotal: 1,
-      pageSize: 10,
+      pageSize: 30,
       tableHeight: null,
       list: [],
       data: null,

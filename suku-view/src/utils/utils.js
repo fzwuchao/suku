@@ -2,9 +2,13 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-control-regex */
-import mem from 'mem';
-import axios from './request';
 import API from "@/api";
+
+import mem from 'mem';
+
+import axios from './request';
+
+
 
 export const getByteLen = function(val, maxLen) {
     var len = 0
@@ -113,6 +117,8 @@ export function param2Obj(url) {
 export function formatUrl(url) {
     return new RegExp(`${url.replace(/\//g, '\\\/')}`)
 }
+
+
 
 const _roleType = mem(async () => {
     const result = await axios({

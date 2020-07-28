@@ -77,6 +77,7 @@ export default {
       importDialog: false,
       tableHeight: null,
       list: [],
+      searchParams: {},
       multipleSelection:[],
       data: null,
       searchData: [
@@ -125,15 +126,19 @@ export default {
         this.getlist();
       });
     },
-    getlist(params) {
-      if(!params) {
-        params = {};
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
       }
-      params.pageNum = this.pageNum;
-      params.pageSize = this.pageSize;
       this.axios({
         method: "get",
-        params,
+        params: {
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams,
+        },
         url: API.LOGS.GET_ERRORLOGS
       }).then(r => {
         this.data = r.data;

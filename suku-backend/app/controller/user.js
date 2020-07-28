@@ -19,9 +19,9 @@ class UserController extends BaseController {
 
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.query);
-    const { pageNum, pageSize } = request.query;
+    const { pageNum, pageSize, name } = request.query;
     const user = this.getCurUser();
-    const result = await ctx.service.user.getUsersPage(user.id, pageSize, pageNum);
+    const result = await ctx.service.user.getUsersPage(user.id, pageSize, pageNum, name);
     this.success(result, '');
   }
 

@@ -267,7 +267,7 @@ class SimService extends BaseService {
       let j = 0;
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('MigratBatchSyncUpdate', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
-        .delay((i+j)*20000+100).save();
+        .delay((i+j)*15000+100).save();
       }
       j++;
     }
@@ -281,16 +281,17 @@ class SimService extends BaseService {
     logger.info('********************【手动设置阀值】*********************');
     const startTime = moment().milliseconds();
     const isMigrat = true;
-
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
-    }, 1000);
+    }, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
+      let j=0;
       for (let i = 0; i < simsList.length; i++) {
-        this.app.queue.create('configLimtValue', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
+        this.app.queue.create('configLimtValue', { sims: simsList[i], isMigrat }).delay((i+j)*20000+100).ttl(1000*60*3) // 延时多少毫秒
           .save();
       }
+      j++;
     }
     const endTime = moment().milliseconds();
     logger.info(`【手动设置阀值，接口总响应时间：】:${endTime - startTime} ms`);

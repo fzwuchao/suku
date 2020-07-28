@@ -40,7 +40,7 @@
         <template slot-scope="scope">{{ scope.row.belongsToSimType | simType }}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="套餐月流量" show-overflow-tooltip>
-        <template slot-scope="scope">{{ `${scope.row.monthFlow ? scope.row.monthFlow : 0} M`}}</template>
+        <template slot-scope="scope">{{ scope.row.monthFlow | DisplayFlow}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="月通话时长" show-overflow-tooltip>
         <template slot-scope="scope">{{ `${scope.row.monthVoice ? scope.row.monthVoice : 0} 分`}}</template>
@@ -79,16 +79,17 @@
 <script>
 import API from "@/api";
 import searchBar from "@/components/SearchBar";
-import { getTableHeight } from "@/utils";
+import { getTableHeight, formatDisplayFlow } from "@/utils";
 export default {
   data() {
     return {
       pageNum: 1,
-      pageSize: 10,
+      pageSize: 30,
       importDialog: false,
       comboType: 1,
       tableHeight: null,
       list: [],
+      searchParams: {},
       data: null,
       searchData: [
         {
@@ -146,7 +147,11 @@ export default {
         }
       }
       return returnStr;
-    }
+    },
+    DisplayFlow(val) {
+      const str = formatDisplayFlow(val ? val : 0);
+      return str;
+    },
   },
   methods: {
     pageChange(page) {
@@ -160,10 +165,9 @@ export default {
       this.$router.push(`/simcombo/editinfo/${row.id}`);
     },
     getlist(val) {
-      let params = {}
       let pageNum = this.pageNum;
       if (val) {
-        params = { ...val }
+        this.searchParams = { ...val }
         pageNum = 1
       }
       this.axios({
@@ -172,7 +176,7 @@ export default {
           pageNum: pageNum,
           pageSize: this.pageSize,
           comboType: this.comboType,
-          ...params
+          ...this.searchParams
         },
         url: API.SIMCOMBO.SIM_COMBO_LIST
       }).then(r => {
