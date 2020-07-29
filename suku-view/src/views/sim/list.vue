@@ -330,6 +330,7 @@
           >同步更新</el-button>
           <el-button
             type="text"
+            v-if="isSysManager && isShowTransforBtn"
             @click="configLimtValueBySimId(scope.row)"
             size="small"
           >设置阀值</el-button>

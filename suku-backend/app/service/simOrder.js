@@ -68,7 +68,7 @@ class SimOrderService extends BaseService {
     return result;
   }
   async changeSim(sim, order) {
-    const newSim = { id: sim.id };
+    const newSim = {};
     const pack = await this.ctx.service.comboPack.getComboPackById(order.cpid);
     const packMoney = calc(`${pack.awardMoney ? pack.awardMoney : 0} + ${pack.money ? pack.money : 0}`).toFixed(2);
     const packMonths = calc(`${packMoney ? packMoney : 0}/${sim.monthRent ? sim.monthRent : 1}`);
@@ -104,7 +104,7 @@ class SimOrderService extends BaseService {
       // limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
       // await this.ctx.service.chinaMobile.configLimtValue(operType, limtValue, sim.simId);
     }
-    await this.ctx.service.sim.update(newSim);
+    await this.ctx.service.sim.updateBySimId(newSim, sim.simId);
 
     
   }

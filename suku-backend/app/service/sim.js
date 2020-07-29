@@ -11,11 +11,11 @@ class SimService extends BaseService {
   async update(sim) {
     let result = null;
     const ctx = this.ctx;
-    try {
-      result = await this.app.model.Sim.update(sim, { where: { id: sim.id } });
-    } catch (e) {
-      ctx.logger.info(e);
-    }
+    // try {
+    result = await this.app.model.Sim.update(sim, { where: { id: sim.id } });
+    // } catch (e) {
+    //   ctx.logger.info(e);
+    // }
     return result;
   }
 
@@ -331,18 +331,20 @@ class SimService extends BaseService {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId, onelinkId));
     }
     const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
-    params.overdueTime = sim.overdueTime;
-    params.shengyuMoney = sim.shengyuMoney;
-    params.activeTime = sim.activeTime;
-    params.isActive = sim.isActive;
-    params.voiceAmount = sim.voiceAmount;
-    params.iccid = sim.iccid;
-    params.cardStatus = sim.cardStatus;
-    params.openStatus = sim.openStatus;
-    params.voiceServStatus = sim.voiceServStatus;
-    params.msgServStatus = sim.msgServStatus;
-    params.flowServStatus = sim.flowServStatus;
-    params.monthUsedFlow = sim.monthUsedFlow;
+    if(isBatch){
+      params.overdueTime = sim.overdueTime;
+      params.shengyuMoney = sim.shengyuMoney;
+      params.isActive = sim.isActive;
+      params.activeTime = sim.activeTime;
+      params.voiceAmount = sim.voiceAmount;
+      params.iccid = sim.iccid;
+      params.cardStatus = sim.cardStatus;
+      params.openStatus = sim.openStatus;
+      params.voiceServStatus = sim.voiceServStatus;
+      params.msgServStatus = sim.msgServStatus;
+      params.flowServStatus = sim.flowServStatus;
+      params.monthUsedFlow = sim.monthUsedFlow;
+    }
     if (voiceAmount) {
       params.voiceAmount = voiceAmount;
     }
