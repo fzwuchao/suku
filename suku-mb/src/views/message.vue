@@ -21,8 +21,9 @@
 
     <van-list>
       <van-cell v-for="(item, index) in sendList" :key="index">
-        <p>{{item.content}}</p>
-        <p>{{item.retcode | retcode}}</p>
+        <p>{{`时间：${item.createdAt}（${item.type}）`}}</p>
+        <p>{{`内容：${item.content}`}}</p>
+        <!-- <p>{{item.retcode | retcode}}</p> -->
       </van-cell>
     </van-list>
   </div>

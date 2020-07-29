@@ -1,5 +1,6 @@
 'use strict';
 
+const moment = require('moment');
 const BaseController = require('../core/baseController');
 
 class MessageSendController extends BaseController {
@@ -20,8 +21,34 @@ class MessageSendController extends BaseController {
     const rule = helper.rules.messageSend([ 'simId' ]);
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     ctx.validate(rule, request.query);
-    const result = await ctx.service.messageSend.getSendlistBySimId(request.query);
-    this.success(result, '');
+    const sendList = await ctx.service.messageSend.getSendlistBySimId(request.query);
+    const upgoingList = await ctx.service.messageUpgoing.getMessageUpgoingBySimId(request.query);
+    const sendMsgList = sendList.map(sendMsg => {
+      return {
+        content: sendMsg.dataValues.content,
+        type: '发送',
+        createdAt: moment(sendMsg.dataValues.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    });
+    const upgoingMsgList = upgoingList.map(upMsg => {
+      return {
+        content: upMsg.dataValues.content,
+        type: '回复',
+        createdAt: moment(upMsg.dataValues.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+      };
+    });
+    const msgList = sendMsgList.concat(upgoingMsgList).sort((prev, next) => {
+      if (moment(prev.createdAt).isAfter(next.createdAt)) {
+        return -1;
+      }
+
+      if (moment(prev.createdAt).isBefore(next.createdAt)) {
+        return 1;
+      }
+
+      return 0;
+    });
+    this.success(msgList, '');
   }
 
   async save() {

@@ -39,7 +39,14 @@ class MessageUpgoingService extends BaseService {
     });
     return result;
   }
-
+  async getMessageUpgoingBySimId({ simId }) {
+    const attributes = [ 'content', 'createdAt' ];
+    const result = await this.app.model.MessageUpgoing.findAll({
+      attributes,
+      where: { simId },
+    });
+    return result;
+  }
   async create(messageUpgoing) {
     try {
       const curUser = this.getCurUser();

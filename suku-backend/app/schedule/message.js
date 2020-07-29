@@ -5,10 +5,10 @@ class Message extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      interval: '3m', // 59 分钟间隔
+      interval: '3m',
       type: 'worker', // 让一个worker执行
       immediate: true,
-      disable: true,
+      disable: false,
     };
   }
 

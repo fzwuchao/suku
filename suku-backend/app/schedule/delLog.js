@@ -4,7 +4,7 @@ class DelLog extends Subscription {
   // 通过 schedule 属性来设置定时任务的执行间隔等配置
   static get schedule() {
     return {
-      cron: '0 0 0 */2 * *', // 每隔2天执行一次
+      cron: '0 0 0 */1 * *', // 每隔2天执行一次
       type: 'all', // 指定所有的 worker 都需要执行
 
     };
