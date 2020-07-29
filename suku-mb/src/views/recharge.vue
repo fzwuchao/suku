@@ -63,7 +63,7 @@
             </p>
             <p class="fun-btns-text">短信</p>
           </van-grid-item>
-          <van-grid-item v-if="sim.simType == 'B'" :to="'/contact/'+simId" >
+          <van-grid-item v-if="sim.simType == 'B' && (sim.simId+'').length<13" :to="'/contact/'+simId" >
             <p class="fun-btns-icon">
               <svg-icon name="contact" class="icon-contact" />
             </p>
