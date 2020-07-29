@@ -39,6 +39,7 @@
         </div>
       </div>
     </div>
+    <p class="tip" v-if="isShowTip">*仅对当月生效，次月自动清零</p>
     <div class="btn">
       <van-button type="primary" size="large" @click="createOrder">确认支付</van-button>
     </div>
@@ -51,6 +52,7 @@ import { formatDisplayFlow } from  '../utils';
 export default {
   data() {
     return {
+      isShowTip: false,
       payInfo: {},
       radioCheck: "",
       radio: ""
@@ -102,16 +104,22 @@ export default {
     },
     onClickLeft() {
       this.$emit("clickLeft")
+    },
+    setIsShowTip(payInfo) {
+      // 叠加套餐才显示
+      this.isShowTip = payInfo.comboType === 2;
     }
   },
   mounted() {},
   watch:{
     pay(newval) {
       this.payInfo = newval;
+      this.setIsShowTip(newval);
     } 
   },
   created() {
     this.payInfo = this.pay;
+    this.setIsShowTip(this.payInfo);
     if (typeof WeixinJSBridge == "undefined"){
       if( document.addEventListener ){
         document.addEventListener('WeixinJSBridgeReady', this.onBridgeReady, false);
@@ -200,5 +208,10 @@ export default {
       }
     }
   }
+}
+.tip {
+  font-size: 12px;
+  padding: 10px;
+  margin-left: 15px;
 }
 </style>

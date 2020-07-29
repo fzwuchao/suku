@@ -137,6 +137,14 @@
       >
         <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
+      <el-table-column
+        align="left"
+        label="ICCID"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.iccid}}</template>
+      </el-table-column>
 
       <el-table-column
         align="left"
@@ -429,10 +437,64 @@ export default {
       list: [],
       data: null,
       searchParams: {},
+      initSearchData: [
+        {
+          name: "simId",
+          title: "sim卡号",
+          type: "inputText",
+          value: ""
+        },
+        {
+          name: "iccid",
+          title: "ICCID",
+          type: "inputText",
+          value: ""
+        },
+        {
+          name: "simIdRange",
+          title: "sim卡段号",
+          type: "inputRange",
+          values: []
+        },
+
+        {
+          name: "activeComboName",
+          title: "套餐",
+          type: "inputText",
+          values: ""
+        },
+        {
+          name: "uname",
+          title: "用户",
+          type: "inputText",
+          values: ""
+        },
+        {
+          name: "cardStatus",
+          title: "平台状态",
+          type: "select",
+          values: [
+            { value: "", key: "全部" },
+            { value: "1", key: "待激活" },
+            { value: "2", key: "已激活" },
+            { value: "4", key: "停机" },
+            { value: "21", key: "注销" },
+            { value: "6", key: "可测试" },
+            { value: "22", key: "欠费" }
+          ],
+          active: [1, 2, 3, 4, 5, 6, 7]
+        }
+      ],
       searchData: [
         {
           name: "simId",
           title: "sim卡号",
+          type: "inputText",
+          value: ""
+        },
+        {
+          name: "iccid",
+          title: "ICCID",
           type: "inputText",
           value: ""
         },
@@ -890,6 +952,10 @@ export default {
       }else {
         this.isOneRow = false;
       }
+    },
+    resetCondition() {
+      this.searchParams = {};
+      this.searchData = JSON.parse(JSON.stringify(this.initSearchData));
     }
   },
   mounted() {
@@ -902,6 +968,7 @@ export default {
       this.simType = newVal;
       if (!isSame) {
         this.pageNum = 1;
+        this.resetCondition();
         this.getlist();
       }
       // 由于动态展示列表字段，当被叫卡切换到主叫卡时，主叫卡的数据部份top,height计算不对，导致未显示出来
