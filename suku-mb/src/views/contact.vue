@@ -13,7 +13,7 @@
       </div>
     </div>
     <div class="btn">
-      <van-button type="primary" size="large" @click="addContact">添加亲情号</van-button>
+      <van-button type="primary" size="large" @click="onclickAddContact">添加亲情号</van-button>
     </div>
     <!--<div class="btn">
       <van-button type="primary" color="#7232dd" size="large" @click="getContactList">亲情号列表</van-button>
@@ -29,12 +29,14 @@
 
 <script>
 import { Toast } from "vant";
+import { debounce } from '../utils/throttle-debounce';
 export default {
   data() {
     return {
       simId: "",
       returnSim: "",
       phone: "",
+      debounceFun: null,
       writeList:[]
     };
   },
@@ -56,6 +58,9 @@ export default {
         Toast('设置成功！')
       });
     },
+    onclickAddContact () {
+      this.debounceFun()
+    },
     onClickLeft() {
       this.$router.back(-1);
     },
@@ -72,7 +77,9 @@ export default {
       
     }
   },
-  mounted() {},
+  mounted() {
+    this.debounceFun = debounce(1000, true, this.addContact)
+  },
   created() {
     this.simId = this.$route.params.simId;
     this.getContactList();
