@@ -117,6 +117,7 @@
       </el-form-item>
       <el-form-item
         label="虚拟倍数"
+        v-if="isSysManager"
         prop="virtualMult"
       >
         <el-input-number
@@ -130,6 +131,7 @@
         <el-date-picker
           v-model="sim.overdueTime"
           type="datetime"
+          :disabled="!isSysManager"
           placeholder="选择日期时间"
           value-format="yyyy-MM-dd HH:mm:ss"
         >
@@ -162,6 +164,8 @@ export default {
       simComboList: [],
       comboIds: [],
       simId: null,
+      isSysManager: false,
+      isShowTransforBtn: false,
       rules: {
         comboIds: [
           {
@@ -221,6 +225,11 @@ export default {
         }
       });
     },
+    getRoleType() {
+      this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
+      this.isShowTransforBtn = this.curUser.username === 'youlan';
+    },
     async getSimBySimId() {
       await this.axios({
         method: "get",
@@ -250,6 +259,7 @@ export default {
   async mounted() {
     const { id } = this.$route.params;
     this.simId = id;
+    this.getRoleType();
     await this.getSimBySimId();
     await this.getSimComboList();
   }
