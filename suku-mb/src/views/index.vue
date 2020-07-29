@@ -6,7 +6,7 @@
     <div class="search">
       <div class="search_c">
         <div class="input">
-          <input type="tel" placeholder="请输入物联卡卡号：" v-model="simId" />
+          <input type="tel" placeholder="请输入物联卡卡号：" v-model="simIdOrIccid" />
         </div>
         <span>
           <img src="../assets/ic1.jpg" alt />
@@ -39,7 +39,7 @@ import { Toast } from "vant";
 export default {
   data() {
     return {
-      simId: "",
+      simIdOrIccid: "",
       manualActive: 0,
       returnSim: "",
       show: false,
@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     querySim() {
-      if (this.simId.trim() == "") {
+      if (this.simIdOrIccid.trim() == "") {
         Toast("请输入物联卡卡号");
         return;
       }
@@ -60,12 +60,13 @@ export default {
       this.axios({
         method: "get",
         params: {
-          simId: this.simId
+          simIdOrIccid: this.simIdOrIccid
         },
         url: "/sim/getSim"
       }).then((r) => {
         if(r.data) {
-          this.$router.push(`/recharge/${this.simId}`);
+          const simId = r.data.simId
+          this.$router.push(`/recharge/${simId}`);
         }else{
           Toast("此卡号不是本平台的卡，请仔细检查！");
         }

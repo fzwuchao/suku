@@ -488,11 +488,21 @@ class SimController extends BaseController {
     const rule = {
       ...sim(),
     };
-    ctx.validate(rule, request.query);
-    const { simId } = request.query;
-    const openStatus = await service.chinaMobile.queryOnOffStatus(simId);
-    await service.sim.updateBySimId({ openStatus }, simId);
-    const result = await service.sim.getSimBySimId(simId);
+    const { simIdOrIccid, simId } = request.query;
+    const idValue = simId || simIdOrIccid;
+    const params = {
+      simId: idValue, iccid: idValue,
+    };
+    ctx.validate(rule, params);
+    const simData = await service.sim.getSimBySimIdOrIccid(params);
+    if (!simData) {
+      this.fail(null, null, '此卡号不是本平台的卡！');
+      return;
+    }
+    const sId = simData.simId;
+    const openStatus = await service.chinaMobile.queryOnOffStatus(sId);
+    await service.sim.updateBySimId({ openStatus }, sId);
+    const result = await service.sim.getSimBySimId(sId);
     this.success(result, '');
   }
 

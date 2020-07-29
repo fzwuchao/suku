@@ -54,6 +54,15 @@ class SimService extends BaseService {
     return sim;
   }
 
+  async getSimBySimIdOrIccid({ simId, iccid }) {
+    const Op = this.getOp();
+    const sim = await this.app.model.Sim.findOne({
+      where: {
+        [Op.or]: [{ simId }, { iccid }],
+      },
+    });
+    return sim;
+  }
   /**
    * sim卡列表
    * @param { object } - 参数对象如下：
