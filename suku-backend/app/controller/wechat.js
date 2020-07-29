@@ -16,12 +16,13 @@ class WechatController extends BaseController {
   }
   async payBack() {
     const { ctx } = this;
-    const { request, service } = ctx;
+    const { request, service, logger } = ctx;
     const info = request.weixin;
+    logger.info('********************微信支付回调*********************')
     // const info = {
     //   return_code: 'SUCCESS',
-    //   out_trade_no: 'PRE14809331354T183658R4796',
-    //   transaction_id: '4200000602202007123750226959',
+    //   out_trade_no: 'PRE1440229284001T020707R8413',
+    //   transaction_id: '4200000713202007292278385978',
     // };
     if (info.return_code === 'SUCCESS') {
       const order = await service.simOrder.getOrderByOrderId(info.out_trade_no);
@@ -33,7 +34,7 @@ class WechatController extends BaseController {
       if (order.orderType === 1) {
         await service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
         // await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
-        this.app.queue.create('openFlowServ', { simId }).priority('high').delay(10000*2) // 延时多少毫秒
+        this.app.queue.create('openFlowServ', { simId }).priority('high').delay(10000*6*2) // 延时多少毫秒
           .save();
       }
       if (order.orderType === 2 && (pack.monthFlow - 0) > 0 && sim.flowServStatus === SERV_STATUS.OFF) {
@@ -47,7 +48,7 @@ class WechatController extends BaseController {
     } else {
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 0 });
     }
-    // ctx.reply();
+    ctx.reply();
   }
 
 }

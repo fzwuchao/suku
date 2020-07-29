@@ -29,7 +29,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </el-menu>
-    <modify-pwd :dialogVisible="dialogVisible" @close="close" :userId="userId" :username="loginUsername"></modify-pwd>
+    <modify-pwd :dialogVisible="dialogVisible" @close="close" :userId="userId" :username="username"></modify-pwd>
   </div>
 </template>
 
@@ -59,6 +59,9 @@ export default {
     },
     loginUsername() {
       return JSON.parse(localStorage.getItem('userInfo')).name;
+    },
+    username() {
+      return JSON.parse(localStorage.getItem('userInfo')).username;
     },
     ...mapGetters(["sidebar", "avatar"])
   },
