@@ -60,7 +60,10 @@ const SimRules = {
   },
   renewPrice: {
     type: 'number?',
-  }
+  },
+  iccid: {
+    type: 'string?',
+  },
 };
 
 module.exports = SimRules;

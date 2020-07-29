@@ -68,14 +68,14 @@ class SimService extends BaseService {
    * }
    * @return {{count, rows}} - 总条数，一页的数据
    */
-  async getSimPageData({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, pageSize, pageNum }) {
-    const result = await this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName });
+  async getSimPageData({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, iccid, pageSize, pageNum }) {
+    const result = await this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, iccid });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
 
     return simData;
   }
 
-  async getWhereCondition({ simId, simIdRange, uname, cardStatus, isActive, simType, activeComboName }) {
+  async getWhereCondition({ simId, simIdRange, uname, cardStatus, isActive, simType, activeComboName, iccid }) {
     const Op = this.getOp();
     const condition = {};
     const queryKey = {};
@@ -85,6 +85,13 @@ class SimService extends BaseService {
         [Op.substring]: simId,
       };
       queryKey['simId'] = simId;
+    }
+
+    if (iccid !== undefined) {
+      condition['iccid'] = {
+        [Op.substring]: iccid,
+      };
+      queryKey['iccid'] = iccid;
     }
 
     if (simIdRange && simIdRange.length > 0) {
@@ -159,10 +166,11 @@ class SimService extends BaseService {
     return result;
   }
 
-  async getSimDataForExcel({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName }, simTypeIsB) {
-    const whereCondition = await this.getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName });
+  async getSimDataForExcel({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName, iccid }, simTypeIsB) {
+    const whereCondition = await this.getWhereCondition({ simId, simIdRange, uname, netStatus, isActive, simType, activeComboName, iccid });
     const commonAttrs = [
       [ 'sim_id', 'Sim卡号' ],
+      [ 'iccid', 'ICCID' ],
       // [ 'net_status', '状态' ],
       [ 'flow_serv_status', '流量服务关停状态' ],
       [ 'active_combo_name', '激活套餐名' ],
