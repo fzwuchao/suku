@@ -70,8 +70,14 @@ class SimOrderService extends BaseService {
   async changeSim(sim, order) {
     const newSim = {};
     const pack = await this.ctx.service.comboPack.getComboPackById(order.cpid);
-    const packMoney = calc(`${pack.awardMoney ? pack.awardMoney : 0} + ${pack.money ? pack.money : 0}`).toFixed(2);
-    const packMonths = calc(`${packMoney ? packMoney : 0}/${sim.monthRent ? sim.monthRent : 1}`);
+    let packMonths = 1
+    if(pack) {
+      const packMoney = calc(`${pack.awardMoney ? pack.awardMoney : 0} + ${pack.money ? pack.money : 0}`).toFixed(2);
+      packMonths = calc(`${packMoney ? packMoney : 0}/${sim.monthRent ? sim.monthRent : 1}`);
+    } else {
+      packMonths = calc(`${sim.renewPrice} / ${sim.monthRent}`);
+    }
+    
     const operType = LIMT_OPTY.UPDATE;
     let limtValue = 0;
     // pack.months = packMonths;
@@ -81,7 +87,7 @@ class SimOrderService extends BaseService {
       case 4:
       case 3:
         newSim.shengyuMoney = calc(`${sim.shengyuMoney ? sim.shengyuMoney : 0} + ((${sim.monthRent}+${sim.privateMoney}) * ${packMonths})`);
-        if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0) {
+        if (!sim.overdueTime || moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0 || order.orderType === 4) {
           newSim.shengyuMoney = calc(`${newSim.shengyuMoney} - ${sim.monthRent}`);
           order.months = packMonths - 1; 
         } else {
