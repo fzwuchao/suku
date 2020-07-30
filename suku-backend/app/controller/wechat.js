@@ -3,6 +3,9 @@
 const BaseController = require('../core/baseController');
 const {
   SERV_STATUS,
+  SIM_TYPE,
+  SIM_CARD_STATUS,
+  OPER_TYPE_SINGLE,
 } = require('../extend/constant')();
 
 class WechatController extends BaseController {
@@ -21,8 +24,8 @@ class WechatController extends BaseController {
     logger.info('********************微信支付回调*********************')
     // const info = {
     //   return_code: 'SUCCESS',
-    //   out_trade_no: 'PRE1440229284001T020707R8413',
-    //   transaction_id: '4200000713202007292278385978',
+    //   out_trade_no: 'RENEW17290027808T163422R1179',
+    //   transaction_id: '4200000706202007303206061660',
     // };
     if (info.return_code === 'SUCCESS') {
       const order = await service.simOrder.getOrderByOrderId(info.out_trade_no);
@@ -32,10 +35,13 @@ class WechatController extends BaseController {
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 2, wxSerialNum: info.transaction_id });
       await ctx.service.simOrder.changeSim(sim, order);
       if (order.orderType === 1) {
-        await service.chinaMobile.changeSimStatus(simId, 6);// 6: 待激活转已激活
+        await service.chinaMobile.changeSimStatus(simId, OPER_TYPE_SINGLE.WAIT_ACTIVE);// 6: 待激活转已激活
         // await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务
         this.app.queue.create('openFlowServ', { simId }).priority('high').ttl(1000*60*2).delay(10000*6*2) // 延时多少毫秒
           .save();
+      }
+      if(sim.simType === SIM_TYPE.CALLED && sim.cardStatus === SIM_CARD_STATUS.STOP && sim.monthShengyuFlow > 0) {
+        await service.chinaMobile.changeSimStatus(simId, OPER_TYPE_SINGLE.RECOVER);// 1: 停机转已激活
       }
       if (order.orderType === 2 && (pack.monthFlow - 0) > 0 && sim.flowServStatus === SERV_STATUS.OFF) {
         await service.chinaMobile.operateSimApnFunction('0', simId); // 开启数据服务

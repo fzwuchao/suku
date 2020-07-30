@@ -24,7 +24,7 @@
         <template slot-scope="scope">{{ scope.row.name}}</template>
       </el-table-column>
 
-      <el-table-column align="left" min-width="120px" label="参数" >
+      <el-table-column align="left" min-width="120px" show-overflow-tooltip label="参数" >
         <template slot-scope="scope">{{ scope.row.params }}</template>
       </el-table-column>
       <el-table-column align="left" label="url" >
@@ -35,7 +35,7 @@
       <el-table-column align="left" min-width="150px" label="接口返回状态码" >
         <template slot-scope="scope">{{ scope.row.status}}</template>
       </el-table-column>
-      <el-table-column align="left" min-width="150px" label="接口返回信息" >
+      <el-table-column align="left" min-width="150px" show-overflow-tooltip label="接口返回信息" >
         <template slot-scope="scope">{{ scope.row.result }}</template>
       </el-table-column>
       <el-table-column align="left" label="平台名称" >
