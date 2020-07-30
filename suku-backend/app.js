@@ -39,7 +39,15 @@ class AppBootHook {
     this.app.queue.process('openFlowServ', 12, (job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();
-      ctx.service.jobLog.openFlowServ(job.data, done); // dealOrder是自定义的方法
+       // dealOrder是自定义的方法
+      var domain = require('domain').create();
+      domain.on('error', function(err){
+        done(err);
+      });
+      domain.run(function(){ // your process functio
+        ctx.service.jobLog.openFlowServ(job.data, done); // dealOrder是自定义的方法
+        done();
+      });
     });
 
     this.app.queue.process('BatchSyncUpdate', 4, (job, done) => {

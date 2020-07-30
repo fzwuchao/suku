@@ -73,20 +73,20 @@ class ScheduleService extends BaseService {
  */
   async syncUpdateBatch() {
     const { service, logger } = this.ctx;
-    // const OP = this.getOp();
+    const OP = this.getOp();
     logger.info('********************同步卡基本信息*********************');
 
     const startTime = moment().milliseconds();
     const isMigrat = fasle;
     const { oneLinkSims } = await service.sim.getOnelinkSimIds({
-      cardStatus: 2,
+      cardStatus: {[OP.in]:[2,4]}
     }, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       let j = 0
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('BatchSyncUpdate', { sims: simsList[i], isMigrat }).delay((i+j)*20000+100).ttl(1000*60*3) // 延时多少毫秒
-          .save();
+        .save();
       }
       j++;
     }

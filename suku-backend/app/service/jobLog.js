@@ -117,11 +117,9 @@ class JobLogService extends BaseService {
     const results = data.sims;
     const ctx = this.ctx;
     const { service, logger } = ctx;
-    logger.warn('【同步更开始1500条】');
+    logger.warn('【同步更开始200条】');
     const promises = results.map(result => {
-      const operType = LIMT_OPTY.ADD;
-      const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
-      service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
+      service.sim.configLimtValueBySim(result);
       return service.sim.syncUpdate(result, data.isMigrat, true);
     });
     const datas = await Promise.all(promises);

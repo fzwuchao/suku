@@ -842,8 +842,8 @@ class ChinaMobileService extends BaseService {
       await this.ctx.service.jobLog.create(jobLog);
     }
     if (jobStatus === '0' || jobStatus === '1') {
-      this.app.queue.create('jobLog', jobLog).delay(10000 * 60) // 延时多少毫秒
-        .save();
+      this.app.queue.create('jobLog', jobLog).delay(10000 * 60).ttl(10000*6*2) // 延时多少毫秒
+      .removeOnComplete( true ).save();
     }
     return result;
   }

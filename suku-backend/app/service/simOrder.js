@@ -99,9 +99,8 @@ class SimOrderService extends BaseService {
         break;
       case 2:
         newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow ? sim.monthOverlapFlow : 0} + ${pack.monthFlow ? pack.monthFlow : 0}`);
-        newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration ? sim.monthOverlapVoiceDuration : 0} + ${pack.monthVoice ? pack.monthVoice : 0}`);
-        limtValue = calc(`(${sim.monthFlow}+${newSim.monthOverlapFlow})/${sim.virtualMult}`).toFixed(3); 
-        await this.ctx.service.chinaMobile.configLimtValue(operType, limtValue, sim.simId);
+        newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration ? sim.monthOverlapVoiceDuration : 0} + ${pack.monthVoice ? pack.monthVoice : 0}`); 
+        await this.ctx.service.sim.configLimtValueBySim(sim);
         break;
     }
     if (order.orderType === 1) {

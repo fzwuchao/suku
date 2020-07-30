@@ -284,7 +284,7 @@ class SimService extends BaseService {
       let j = 0;
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('MigratBatchSyncUpdate', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
-        .delay((i+j)*15000+100).save();
+        .delay((i+j)*15000+100).removeOnComplete( true ).save();
       }
       j++;
     }
@@ -306,7 +306,7 @@ class SimService extends BaseService {
       let j=0;
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('configLimtValue', { sims: simsList[i], isMigrat }).delay((i+j)*20000+100).ttl(1000*60*3) // 延时多少毫秒
-          .save();
+        .removeOnComplete( true ).save();
       }
       j++;
     }
@@ -316,8 +316,8 @@ class SimService extends BaseService {
 
   async configLimtValueBySim(sim) {
     const limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
-    await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.DEL, limtValue, sim.simId);
-    await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId);
+    this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.DEL, limtValue, sim.simId);
+    this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId);
     return true;
   }
 
@@ -405,6 +405,9 @@ class SimService extends BaseService {
       return params;
     }
     await service.sim.updateBySimId(params, simId);
+    if(sim.cardStatus === SIM_CARD_STATUS.STOP) {
+      await service.chinaMobile.changeSimStatus(simId, OPER_TYPE_SINGLE.RECOVER);// 1: 停机转已激活
+    }
   }
 
   /**
