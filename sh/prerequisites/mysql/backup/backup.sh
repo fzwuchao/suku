@@ -2,7 +2,7 @@
 # 全量备份
 backupFileName=`date '+%Y-%m-%d_%H%M'`
 backupDir=/home/suku/backup
-sukuUname=root
+sukuUname=suku
 sukuPwd=ZY1305@OULAN
 
 mysqldump -u$sukuUname -p$sukuPwd --single-transaction --flush-logs --master-data=2 --delete-master-logs suku > $backupDir/full_$backupFileName.sql
