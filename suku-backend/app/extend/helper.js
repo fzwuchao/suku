@@ -69,6 +69,16 @@ function rnd(n, m) {
   const random = Math.floor(Math.random() * (m - n + 1) + n);
   return random;
 }
+
+
+function splitArray(array, subGroupLength) {
+  let index = 0;
+  let newArray = [];
+  while(index < array.length) {
+      newArray.push(array.slice(index, index += subGroupLength));
+  }
+  return newArray;
+}
 module.exports = {
   // 登录用户
   loginUser: {
@@ -82,4 +92,5 @@ module.exports = {
   rules,
   rnd,
   apiConfig,
+  splitArray,
 };

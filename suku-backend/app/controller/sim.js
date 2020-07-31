@@ -5,7 +5,7 @@ const _ = require('lodash');
 const moment = require('moment');
 
 const BaseController = require('../core/baseController');
-const { SERV_STATUS, SERV_OP_SINGLE, LIMT_OPTY, COMBO_TYPE, SIM_TYPE } = require('../extend/constant')();
+const { SERV_STATUS, SERV_OP_SINGLE, LIMT_OPTY, SIM_FLOW_SERV_STATUS, COMBO_TYPE, SIM_TYPE } = require('../extend/constant')();
 const calc = require('calculatorjs');
 const activeComboOldToNewMap = [{
   old: [ '30M季度卡' ],
@@ -540,7 +540,9 @@ class SimController extends BaseController {
     ctx.validate(rule, request.query);
     const { simType } = request.query;
 
-    await ctx.service.sim.migrationSyncUpdate(simType);
+    // await ctx.service.sim.migrationSyncUpdate(simType);
+    // await ctx.service.schedule.syncUpdateBatch();
+    await ctx.service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '((month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow) and card_status=2)');
     this.success('', '同步更新完成');
   }
 

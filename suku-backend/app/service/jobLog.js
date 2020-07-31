@@ -10,7 +10,7 @@ const BaseService = require('../core/baseService');
 
 // user表名
 // const TABLE_USER = 'user';
-const { LIMT_OPTY, SIM_FLOW_SERV_STATUS,SIM_VOICE_SERV_STATUS} = require('../extend/constant')();
+const { SIM_CARD_STATUS,OPER_TYPE_BATCH,SERVICE_TYPE,SERV_OP_BATCH, SIM_FLOW_SERV_STATUS,SIM_VOICE_SERV_STATUS} = require('../extend/constant')();
 const calc = require('calculatorjs');
 class JobLogService extends BaseService {
 
@@ -41,7 +41,6 @@ class JobLogService extends BaseService {
   async dealUnfinishedJobs(jobLog, done) {
     const { ctx } = this;
     const { service, logger } = ctx;
-    let isDone = false;
     logger.info(`【开始执行队列：】:${jobLog.name} ms`);
     const { params, name, onelinkId, jobId, url } = jobLog;
     const api = {
@@ -49,24 +48,29 @@ class JobLogService extends BaseService {
       url,
     };
     const res = await service.chinaMobile.querySimBatchResult(jobId, params.msisdns, params, api, onelinkId);
-    setTimeout(function(){
-      if(!isDone) {
-        isDone = true;
-        done();
-      }
-    }, 2.4*60*1000)
+    
     if (res.sucessIds) {
       const data = {};
-      if (params.cardStatus) {
-        data.cardStatus = params.cardStatus === '2' ? '4' : '2';
+      if (params.serviceType = SERVICE_TYPE.FLOW) {
+        data.flowServStatus = params.operType;
+      }
+      if (params.serviceType = SERVICE_TYPE.VOICE) {
+        data.voiceServStatus = params.operType;
+      }
+      if(!params.serviceType){
+        switch(params.operType) {
+          case OPER_TYPE_BATCH.ACTIVE_STOP:
+            data.cardStatus = SIM_CARD_STATUS.STOP;
+            break;
+          case OPER_TYPE_BATCH.STOP_ACTIVE:
+            data.cardStatus = SIM_CARD_STATUS.ACTIVE;
+            break;
+        }
+        
       }
       await service.sim.batchUpdateBySimIds(data, res.sucessIds);
     }
-    
-    if(!isDone) {
-      isDone = true;
-      done();
-    }
+    done();
     // return true;
   }
 
@@ -116,17 +120,69 @@ class JobLogService extends BaseService {
   async BatchSyncUpdate(data, done) {
     const results = data.sims;
     const ctx = this.ctx;
-    const { service, logger } = ctx;
-    logger.warn('【同步更开始200条】');
+    const { service, logger,helper } = ctx;
+    const Op = this.getOp();
+    logger.warn('【同步更开始100条】');
     const promises = results.map(result => {
-      service.sim.configLimtValueBySim(result);
+      // service.sim.configLimtValueBySim(result);
       return service.sim.syncUpdate(result, data.isMigrat, true);
     });
     const datas = await Promise.all(promises);
     await service.sim.bulkUpdate(datas);
-    // 超流量的卡进行停流量，超语音的卡进行停语音处理
-    await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
-    await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
+    // let overdueIds=[];
+    let flowIds = [];
+    let voiceIds = [];
+    for (let i = 0; i < datas.length; i++) { // result.length
+      const item = datas[i];
+      if((item.virtualMult * item.monthUsedFlow) > ((item.monthOverlapFlow-0)+(item.monthFlow-0))) {
+        flowIds.push(item.simId);
+      }
+      if((item.monthUsedVoiceDuration) > ((item.monthOverlapVoiceDuration-0)+(item.monthVoice-0))) {
+        voiceIds.push(item.simId);
+      }
+    }
+
+    // 关掉超流的卡
+    const flowSpIds = helper.splitArray(flowIds, 100);
+    for(let i=0; i < flowSpIds.length; i++) {
+      const simIds = flowSpIds[i];
+      const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(
+        simIds.join('_'),
+        SERVICE_TYPE.FLOW,
+        SERV_OP_BATCH.OFF,
+        'CMIOT'
+      );
+      
+      if (result.sucessIds) {
+        await service.sim.batchUpdateBySimIds({flowServStatus: SIM_FLOW_SERV_STATUS.OFF}, result.sucessIds);
+      }
+    }
+    // 关掉潮流测语音
+    const voiceSpIds = helper.splitArray(voiceIds, 100);
+
+    for(let i=0; i<voiceSpIds.length; i++) {
+      const simIds = voiceSpIds[i];
+      const result = await service.chinaMobile.operateSimCommunicationFuctionBatch(
+        simIds.join('_'),
+        SERVICE_TYPE.VOICE,
+        SERV_OP_BATCH.OFF,
+        'CMIOT'
+      );
+      if (result.sucessIds) {
+        await service.sim.batchUpdateBySimIds({voiceServStatus:SIM_VOICE_SERV_STATUS.OFF }, result.sucessIds);
+      }
+    }
+    
+    
+    logger.warn('【同步更完成100条】');
+    // const calledQuery = {
+    //   overdueTime: { [Op.gt]: new Date() },
+    //   cardStatus: SIM_CARD_STATUS.STOP
+    // };
+    // await service.sim.updateCardStatusBatch(SIM_CARD_STATUS.ACTIVE, calledQuery);
+    // // 超流量的卡进行停流量，超语音的卡进行停语音处理
+    // await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '(month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow)');
+    // await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, '(month_used_voice_duration) >= (month_overlap_voice_duration+month_voice)');
     
   }
 

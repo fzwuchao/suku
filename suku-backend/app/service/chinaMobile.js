@@ -555,6 +555,7 @@ class ChinaMobileService extends BaseService {
    * @return {array} [{jobId}] - 任务流水号
    */
   async operateSimCommunicationFuctionBatch(msisdns, serviceType, operType, apnName) {
+    
     const { logger } = this.ctx;
     const data = {
       msisdns,
@@ -573,6 +574,10 @@ class ChinaMobileService extends BaseService {
       return [];
     }
     const simId = _.split(msisdns, '_')[0];
+    logger.info('*********************通信功能批量开停************************')
+    logger.info(msisdns)
+    logger.info(simId)
+    logger.info('*********************通信结束************************')
     const result = await this.handleBy(19, simId, data);
     // const jobId = (result[0] || {}).jobId;
     // await this.querySimBatchResult(jobId, simId,
@@ -803,9 +808,10 @@ class ChinaMobileService extends BaseService {
    */
   async querySimBatchResult(jobId, msisdn, params, api, onelinkId) {
     const result = await this.handleBy(15, msisdn, { jobId });
-    if (result.length === 0) {
+    if (!result[0] && result.length === 0) {
       return;
     }
+    
     const { jobStatus } = result[0];
     const jobLog = { jobStatus, jobId };
     jobLog.result = JSON.stringify(result);
@@ -845,6 +851,7 @@ class ChinaMobileService extends BaseService {
       this.app.queue.create('jobLog', jobLog).delay(10000 * 60).ttl(10000*6*2) // 延时多少毫秒
       .removeOnComplete( true ).save();
     }
+    
     return result;
   }
 

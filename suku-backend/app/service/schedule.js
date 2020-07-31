@@ -38,17 +38,16 @@ class ScheduleService extends BaseService {
     await this.app.model.query(updateSql);
 
     // 已过期的被叫卡进行停机处理
-    const calledQuery = {
-      overdueTime: { [OP.lt]: new Date() },
-      cardStatus: SIM_CARD_STATUS.ACTIVE,
-      simType: SIM_TYPE.CALLED,
-    };
-    await service.sim.updateCardStatusBatch(SIM_CARD_STATUS.STOP, calledQuery);
+    // const calledQuery = {
+    //   overdueTime: { [OP.lt]: new Date() },
+    //   cardStatus: SIM_CARD_STATUS.ACTIVE,
+    //   simType: SIM_TYPE.CALLED,
+    // };
+    // await service.sim.updateCardStatusBatch(SIM_CARD_STATUS.STOP, calledQuery);
     // 已过期的主叫卡进行停流量停语音的处理
     const callQuery = {
       overdueTime: { [OP.lt]: new Date() },
       cardStatus: SIM_CARD_STATUS.ACTIVE,
-      simType: SIM_TYPE.CALL,
     };
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, callQuery);
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, callQuery);
@@ -74,24 +73,24 @@ class ScheduleService extends BaseService {
   async syncUpdateBatch() {
     const { service, logger } = this.ctx;
     const OP = this.getOp();
-    logger.info('********************同步卡基本信息*********************');
+    logger.info('********************批量同步卡基本信息*********************');
 
     const startTime = moment().milliseconds();
-    const isMigrat = fasle;
+    const isMigrat = false;
     const { oneLinkSims } = await service.sim.getOnelinkSimIds({
-      cardStatus: {[OP.in]:[2,4]}
+      cardStatus: {[OP.in]:[4]}
     }, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       let j = 0
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('BatchSyncUpdate', { sims: simsList[i], isMigrat }).delay((i+j)*20000+100).ttl(1000*60*3) // 延时多少毫秒
-        .save();
+        .removeOnComplete( true ).save();
       }
       j++;
     }
     const endTime = moment().milliseconds();
-    logger.info(`【同步卡基本信息(迁移)，接口总响应时间：】:${endTime - startTime} ms`);
+    logger.info(`【批量同步卡基本信息，接口总响应时间：】:${endTime - startTime} ms`);
   }
   /**
  * 删除已经处理过的日志

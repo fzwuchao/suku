@@ -6,7 +6,7 @@
 const BaseService = require('../core/baseService');
 const moment = require('moment');
 const calc = require('calculatorjs');
-const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS, LIMT_OPTY, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
+const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS,OPER_TYPE_SINGLE, LIMT_OPTY, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
 class SimService extends BaseService {
   async update(sim) {
     let result = null;
@@ -347,13 +347,14 @@ class SimService extends BaseService {
     if (simType === SIM_TYPE.CALL) {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId, onelinkId));
     }
-    const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, voiceAmount ] = await Promise.all(promiseList);
+    const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, monthUsedVoiceDuration ] = await Promise.all(promiseList);
     if(isBatch){
+      params.simId = sim.simId;
       params.overdueTime = sim.overdueTime;
       params.shengyuMoney = sim.shengyuMoney;
       params.isActive = sim.isActive;
       params.activeTime = sim.activeTime;
-      params.voiceAmount = sim.voiceAmount;
+      params.monthUsedVoiceDuration = sim.monthUsedVoiceDuration;
       params.iccid = sim.iccid;
       params.cardStatus = sim.cardStatus;
       params.openStatus = sim.openStatus;
@@ -361,9 +362,14 @@ class SimService extends BaseService {
       params.msgServStatus = sim.msgServStatus;
       params.flowServStatus = sim.flowServStatus;
       params.monthUsedFlow = sim.monthUsedFlow;
+      params.virtualMult = sim.virtualMult;
+      params.monthFlow = sim.monthFlow;
+      params.monthOverlapFlow = sim.monthOverlapFlow;
+      params.monthOverlapVoiceDuration = sim.monthOverlapVoiceDuration;
+      params.monthVoice = sim.monthVoice;
     }
-    if (voiceAmount) {
-      params.voiceAmount = voiceAmount;
+    if (monthUsedVoiceDuration) {
+      params.monthUsedVoiceDuration = monthUsedVoiceDuration;
     }
     
     if (baseInfo.activeDt) {
@@ -573,7 +579,7 @@ class SimService extends BaseService {
       let result;
       if (typeof where === 'string') {
         where = where + ' and onelink_id = ' + onelinks[i].id;
-        const sql = 'SELECT * AS `simId` FROM `sim` WHERE (`deleted_at` IS NULL AND (' + where + '));';
+        const sql = 'SELECT id,sim_id as simId FROM `sim` WHERE (`deleted_at` IS NULL AND (' + where + '));';
         result = await this.app.model.query(sql);
         result = result[0];
       } else {
