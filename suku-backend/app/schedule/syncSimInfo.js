@@ -13,7 +13,7 @@ class SyncSimInfo extends Subscription {
   // subscribe 是真正定时任务执行时被运行的函数
   async subscribe() {
     const { service } = this.ctx;
-    this.ctx.logger.info('********************同步更新*********************');
+    this.ctx.logger.info('********************总同步更新*********************');
     await service.schedule.syncUpdateBatch();
   }
 }
