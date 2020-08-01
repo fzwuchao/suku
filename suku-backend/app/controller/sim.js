@@ -541,8 +541,8 @@ class SimController extends BaseController {
     const { simType } = request.query;
 
     // await ctx.service.sim.migrationSyncUpdate(simType);
-    // await ctx.service.schedule.syncUpdateBatch();
-    await ctx.service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '((month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow) and card_status=2)');
+    await ctx.service.schedule.monthCalculate();
+    // await ctx.service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '((month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow) and card_status=2)');
     this.success('', '同步更新完成');
   }
 

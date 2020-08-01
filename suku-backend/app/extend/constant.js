@@ -100,6 +100,17 @@ const ROLE_TYPE = [
   { NAME: 'reseller', DISPLAYNAME: '分销商', CODE: 6, LEVEL: 4 },
 ];
 
+const VOICE_GROUPID = {
+  "shenzhenlikang1": '8811000009550018',
+  "shenzhensukudianzikeji": '311000011072103'
+}
+
+const WRITELIST_STATUS = {
+  SUCCESS: '1',
+  FAILED: '0',
+  DEALING: '2'
+}
+
 module.exports = () => {
   return {
     SERV_STATUS,
@@ -122,5 +133,7 @@ module.exports = () => {
     SERVICE_TYPE,
     ROLE_TYPE,
     LIMT_OPTY,
+    VOICE_GROUPID,
+    WRITELIST_STATUS
   };
 };
