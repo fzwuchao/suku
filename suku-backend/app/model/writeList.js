@@ -24,7 +24,7 @@ module.exports = app => {
     },
     status: {
       type: INTEGER(1),
-      comment: '是否开启短信。0：成功 非0:失败',
+      comment: '设置状态。0：失效 1:生效  2:处理中',
     },
     createdAt: {
       type: DATE, // '创建时间',

@@ -38,12 +38,13 @@ class ScheduleService extends BaseService {
     await this.app.model.query(updateSql);
 
     // 已过期的被叫卡进行停机处理
-    // const calledQuery = {
-    //   overdueTime: { [OP.lt]: new Date() },
-    //   cardStatus: SIM_CARD_STATUS.ACTIVE,
-    //   simType: SIM_TYPE.CALLED,
-    // };
+    const calledQuery = {
+      overdueTime: { [OP.lt]: new Date() },
+      cardStatus: SIM_CARD_STATUS.ACTIVE,
+      simType: SIM_TYPE.CALLED,
+    };
     // await service.sim.updateCardStatusBatch(SIM_CARD_STATUS.STOP, calledQuery);
+    await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, calledQuery);
     // 已过期的主叫卡进行停流量停语音的处理
     const callQuery = {
       overdueTime: { [OP.lt]: new Date() },
@@ -51,7 +52,7 @@ class ScheduleService extends BaseService {
     };
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, callQuery);
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, callQuery);
-    // 上月超流量，超语音的卡服务打开处理
+    // // 上月超流量，超语音的卡服务打开处理
     const servQuery = {
       overdueTime: { [OP.gt]: new Date() },
       cardStatus: SIM_CARD_STATUS.ACTIVE,

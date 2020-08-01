@@ -39,7 +39,7 @@ const getNowStr = () => {
 const getTransid = appid => {
   return `${appid}${getNowStr()}${getIndexStr()}`;
 };
-
+const {VOICE_GROUPID} = require('../extend/constant')();
 /* const OPREATE_TYPE = {
   query: 1,
   change: 2,
@@ -413,7 +413,9 @@ class ChinaMobileService extends BaseService {
    *  ]
    * }]
    */
-  async queryMemberVoiceWhitelist(groupId, msisdn) {
+  async queryMemberVoiceWhitelist(msisdn) {
+    const { nameKey } = await this.getOnelink(msisdn);
+    const groupId = VOICE_GROUPID[nameKey];
     const result = await this.handleBy(8, msisdn, { msisdn, groupId });
     return result;
   }
@@ -491,7 +493,8 @@ class ChinaMobileService extends BaseService {
   async configMemberVoiceWhitelist(operType, whiteNumber, msisdn) {
     // 当 operType=1 新增时，whiteNumber只能传 1 个值。
     // 当 operType=4 删除时，whiteNumber可传 2 个值，2 个号码用下划线分隔，例如：xxxx_xxxx
-    const groupId = await this.queryGroupByMember(msisdn);
+    const { nameKey } = await this.getOnelink(msisdn);
+    const groupId = VOICE_GROUPID[nameKey];
     const len = _.split(whiteNumber, '_').length;
     const whiteNumberIsRight = (operType === 1 && len === 1) || (operType === 4 && len <= 2 && len >= 1);
     if (!whiteNumberIsRight) {

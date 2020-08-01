@@ -1,5 +1,5 @@
 <template>
-  <div class="message">
+  <div class="contact">
     <div class="htmlbanner">
       <van-nav-bar title="添加亲情号" @click-left="onClickLeft" left-text left-arrow right-text />
       <div class="sim-content">
@@ -21,7 +21,7 @@
 
     <van-list>
       <van-cell v-for="(item, index) in writeList" :key="index">
-        <p>{{item.phone}}</p>
+        <p class="write-list-item"><span class="item-phone">{{item.phone}}</span><span v-bind:class="{ 'item-success': item.status==1, 'item-deal': item.status==2}" class="item-status">{{item.status | getStatus}}</span></p>
       </van-cell>
     </van-list>
   </div>
@@ -40,6 +40,17 @@ export default {
       writeList:[]
     };
   },
+  filters: {
+    getStatus(val) {
+      let str = '';
+      const status= {
+        '1' : "生效",
+        '2' : "处理中"
+      }
+      str = status[val];
+      return str;
+    }
+  },
   methods: {
     addContact() {
       if(this.phone.trim() === '') {
@@ -55,7 +66,7 @@ export default {
         url: "/writeList/save"
       }).then(() => {
         this.getContactList();
-        Toast('设置成功！')
+        Toast('亲情号处理中，请耐心等待，20分钟可查询状态!')
       });
     },
     onclickAddContact () {
@@ -87,7 +98,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.message {
+.contact {
   padding-bottom: 40px;
   .htmlbanner {
     background: url("../assets/ic_bj.png") no-repeat;
@@ -126,6 +137,23 @@ export default {
     padding: 5px;
     background: #fff;
     border-radius: 5px;
+  }
+
+  .write-list-item {
+    display: flex;
+    .item-phone {
+      flex: 2;
+    }
+    .item-status {
+      flex: 1;
+      font-size: 12px;
+    }
+    .item-deal {
+      color: #f99710;
+    }
+    .item-success {
+      color: green;
+    }
   }
 }
 </style>
