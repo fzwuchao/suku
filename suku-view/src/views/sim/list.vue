@@ -348,11 +348,12 @@
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
+        @size-change="handleSizeChange"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[20, 30, 50, 100]"
+        :page-sizes="[200, 500, 1000]"
         background
-        layout="total,prev, pager, next"
+        layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
         :total="data.totalRecords"
       ></el-pagination>
@@ -424,7 +425,7 @@ export default {
       curUser: {},
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
-      pageSize: 30,
+      pageSize: 200,
       isOneRow: false,
       importDialog: false,
       importDialogForTransfor: false,
@@ -592,6 +593,10 @@ export default {
   },
 
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getlist();
+    },
     changeUser() {
       const isNonSelected = this.multipleSelection.length === 0;
       if (isNonSelected) {

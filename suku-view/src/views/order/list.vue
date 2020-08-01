@@ -67,11 +67,12 @@
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
+        @size-change="handleSizeChange"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[20, 30, 50, 100]"
+        :page-sizes="[200, 500, 1000]"
         background
-        layout="total,prev, pager, next"
+        layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
         :total="data.totalRecords"
       ></el-pagination>
@@ -94,7 +95,7 @@ export default {
       pageNum: 1,
       orderType: 1,
       pageTotal: 1,
-      pageSize: 30,
+      pageSize: 200,
       withdrawalDialog: false,
       tableHeight: null,
       list: [],
@@ -159,6 +160,10 @@ export default {
     }
   },
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getlist();
+    },
     pageChange(page) {
       this.pageNum = page;
       this.getlist();
