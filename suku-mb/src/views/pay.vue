@@ -8,7 +8,7 @@
       </div>
       <div class="combo-desc">
         <p class="combo-desc-item">套餐包含: {{payInfo.flow | DisplayFlow}} {{payInfo.voice?payInfo.voice:'--'}}分钟</p>
-        <p class="combo-desc-item">有效期: {{payInfo.months? `${payInfo.months}个月`: '当月'}}</p>
+        <p class="combo-desc-item">有效期: {{payInfo.months && payInfo.orderType !==2? `${payInfo.months}个月`: '当月'}}</p>
       </div>
     </div>
     <div class="search">
@@ -107,7 +107,7 @@ export default {
     },
     setIsShowTip(payInfo) {
       // 叠加套餐才显示
-      this.isShowTip = payInfo.comboType === 2;
+      this.isShowTip = payInfo.orderType === 2;
     }
   },
   mounted() {},
