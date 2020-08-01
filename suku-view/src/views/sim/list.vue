@@ -351,7 +351,7 @@
         @size-change="handleSizeChange"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[200, 500, 1000]"
+        :page-sizes="[50, 100, 200, 300, 400]"
         background
         layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
@@ -425,7 +425,7 @@ export default {
       curUser: {},
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
-      pageSize: 200,
+      pageSize: 50,
       isOneRow: false,
       importDialog: false,
       importDialogForTransfor: false,

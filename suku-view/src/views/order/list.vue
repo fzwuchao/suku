@@ -70,7 +70,7 @@
         @size-change="handleSizeChange"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[200, 500, 1000]"
+        :page-sizes="[50, 100, 200, 300, 400]"
         background
         layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
@@ -95,7 +95,7 @@ export default {
       pageNum: 1,
       orderType: 1,
       pageTotal: 1,
-      pageSize: 200,
+      pageSize: 50,
       withdrawalDialog: false,
       tableHeight: null,
       list: [],
