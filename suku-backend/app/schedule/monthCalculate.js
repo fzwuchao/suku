@@ -5,7 +5,7 @@ class MonthCalculate extends Subscription {
   static get schedule() {
     return {
       cron: '0 0 4 1 * *', // 每月1号凌晨4点执行
-      type: 'all', // 指定所有的 worker 都需要执行
+      type: 'worker', // 指定所有的 worker 都需要执行
       disable: true,
     };
   }
