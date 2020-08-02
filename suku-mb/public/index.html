@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>
+        物联卡
+    </title>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=057fe5be3265bcad0e047b35ecbba20e">
+    </script>
+</head>
+
+<body>
+    <noscript>
+    <strong>We're sorry but
+      <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to
+      continue.</strong>
+  </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+</body>
+<script>
+  function getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+      return unescape(r[2]);
+    }
+    return null;
+  }
+  // 正式环境
+  var id = 'wxc3a09378c6f6fb74';
+  // 测试环境
+  // var id = 'wxea710ac5bcb962d5';
+  // if (getQueryString('openid')) sessionStorage.setItem('shareOpenId', getQueryString('openid'));
+  // if (location.href.indexOf('code') === -1) {
+    
+  //   var url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=' + id + '&redirect_uri=' + escape('http://api.sukudianzi.com/weixin/') + '&response_type=code&scope=snsapi_base&state=123#wechat_redirect';
+    
+  //   window.location.replace(url);
+  // }
+  
+</script>
+
+</html>
