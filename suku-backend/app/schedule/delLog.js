@@ -5,7 +5,7 @@ class DelLog extends Subscription {
   static get schedule() {
     return {
       cron: '0 0 0 */1 * *', // 每隔2天执行一次
-      type: 'all', // 指定所有的 worker 都需要执行
+      type: 'worker', // 指定所有的 worker 都需要执行
 
     };
   }

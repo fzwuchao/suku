@@ -661,5 +661,54 @@ class SimController extends BaseController {
     await service.sim.batchUpdateBySimIds(data, simIds);
     this.success(null, '批量更新成功');
   }
+
+  async changeComboBySimNumOrSimRange() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.body);
+    const { simNum, simRange, otherComboIds } = request.body;
+    if (!simNum && !simRange) {
+      this.fail(null, null, '传入的卡号或卡段值为空');
+      return;
+    }
+    const data = { otherComboIds };
+    let isSuccess = false;
+    if (simNum) {
+      isSuccess = await service.sim.batchUpdateBySimIds(data, simNum.split(','));
+    }
+    if (simRange) {
+      isSuccess = await service.sim.batchUpdateByLikeSimId(data, simRange);
+    }
+    isSuccess ? this.success(null, '批量更换套餐成功') : this.fail(null, null, '批量更换套餐失败');
+
+  }
+
+  async changeUserBySimNumOrSimRange() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.body);
+    const { simNum, simRange, uid, uname } = request.body;
+    if (!simNum && !simRange) {
+      this.fail(null, null, '传入的卡号或卡段值为空');
+      return;
+    }
+    const data = { uid, uname };
+    let isSuccess = false;
+    if (simNum) {
+      isSuccess = await service.sim.batchUpdateBySimIds(data, simNum.split(','));
+    }
+    if (simRange) {
+      isSuccess = await service.sim.batchUpdateByLikeSimId(data, simRange);
+    }
+    isSuccess ? this.success(null, '批量更换用户成功') : this.fail(null, null, '批量更换用户失败');
+  }
 }
 module.exports = SimController;

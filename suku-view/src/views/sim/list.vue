@@ -99,6 +99,12 @@
       <el-button
         type="primary"
         size="mini"
+        v-if="curUser.roleType !==6"
+        @click="changeUserWithSimNumOrRange"
+      >转让(卡号或卡段)</el-button>
+      <el-button
+        type="primary"
+        size="mini"
         @click="handlePrice"
       >用户增价</el-button>
       <el-button
@@ -107,6 +113,12 @@
         v-if="isSysManager"
         @click="handleComboChange"
       >更换套餐</el-button>
+      <el-button
+        type="primary"
+        size="mini"
+        v-if="isSysManager"
+        @click="handleComboChangeInput"
+      >更换套餐(卡号或卡段)</el-button>
     </div>
 
     <el-table
@@ -348,11 +360,12 @@
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
+        @size-change="handleSizeChange"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[20, 30, 50, 100]"
+        :page-sizes="[50, 100, 200, 300, 400]"
         background
-        layout="total,prev, pager, next"
+        layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
         :total="data.totalRecords"
       ></el-pagination>
@@ -390,7 +403,17 @@
         @close="closeComboChange"
       ></combo-change>
     </el-dialog>
-
+    <el-dialog
+      title="更换套餐(卡号或卡段)"
+      :before-close="handleChangeComboClose"
+      :visible.sync="comboInputDialog"
+    >
+      <combo-change-input
+        ref="comboChangeInput"
+        :type="simType"
+        @close="closeComboInputChange"
+      ></combo-change-input>
+    </el-dialog>
     <el-dialog
       title="用户增价"
       :visible.sync="priceDialog"
@@ -403,7 +426,13 @@
     >
       <user-list @save="saveUser"></user-list>
     </el-dialog>
-    
+    <el-dialog
+      title="转让(卡号或卡段)"
+      :before-close="handleClose"
+      :visible.sync="userWithSimNumOrRangeDialog"
+    >
+      <user-list-input ref="ulistInput" @save="saveUserWithSimNumOrRange"></user-list-input>
+    </el-dialog>
   </div>
 </template>
 
@@ -413,8 +442,10 @@ import searchBar from "@/components/SearchBar";
 import comImport from "./com-import";
 import comImportTransfor from "./com-import-transfor";
 import comboChange from "./combo-change";
+import comboChangeInput from "./combo-change-input";
 import userPrice from "./user-price";
 import userList from "./user-list";
+import userListInput from "./user-list-input";
 import { getTableHeight, formatDisplayFlow } from "@/utils";
 export default {
   data() {
@@ -424,13 +455,15 @@ export default {
       curUser: {},
       simType: "A",
       mapSimTypeToName: { A: "被叫卡", B: "主叫卡" },
-      pageSize: 30,
+      pageSize: 50,
       isOneRow: false,
       importDialog: false,
       importDialogForTransfor: false,
       comboDialog: false,
+      comboInputDialog: false,
       priceDialog: false,
       userDialog: false,
+      userWithSimNumOrRangeDialog: false,
       isSysManager: false,
       isShowTransforBtn: false,
       tableHeight: null,
@@ -587,11 +620,17 @@ export default {
     comImport,
     comImportTransfor,
     comboChange,
+    comboChangeInput,
     userPrice,
-    userList
+    userList,
+    userListInput
   },
 
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getlist();
+    },
     changeUser() {
       const isNonSelected = this.multipleSelection.length === 0;
       if (isNonSelected) {
@@ -603,6 +642,9 @@ export default {
       }
       this.userDialog = true;
     },
+    changeUserWithSimNumOrRange() {
+      this.userWithSimNumOrRangeDialog = true;
+    },
     getRoleType() {
       this.curUser = JSON.parse(localStorage.getItem('userInfo'));
       this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
@@ -612,6 +654,37 @@ export default {
       this.batchUpdate({
         ...user
       })
+    },
+    saveUserWithSimNumOrRange(user) {
+      this.axios({
+        method: "post",
+        data: {
+          ...user
+        },
+        url: API.SIMLIST.SIM_BATCH_UPDATE_SIM_USER
+      }).then((r) => {
+        if (!r.success) {
+          this.$message({
+            message: r.msg,
+            type: 'warning',
+          })
+        } else {
+          this.$message({
+            message: '批量更新成功',
+            type: 'success'
+          })
+          this.getlist();
+          this.userWithSimNumOrRangeDialog = false;
+        }
+      });
+    },
+    handleClose() {
+      this.$refs['ulistInput'].$refs['ruleForm'].resetFields();
+      this.userWithSimNumOrRangeDialog = false;
+    },
+    handleChangeComboClose() {
+      this.$refs['comboChangeInput'].$refs['ruleForm'].resetFields();
+      this.comboInputDialog = false;
     },
     activate(isActivated) {
       // 对应要复机/停机的卡的状态
@@ -901,8 +974,15 @@ export default {
       this.reset();
       this.getlist();
     },
+    closeComboInputChange() {
+      this.comboInputDialog = false;
+      this.getlist();
+    },
     handleComboChange() {
       this.comboDialog = this.checkIsSelected();
+    },
+    handleComboChangeInput() {
+      this.comboInputDialog = true;
     },
     reset() {
       this.multipleSelection = [];
