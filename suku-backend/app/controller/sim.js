@@ -122,6 +122,7 @@ class SimController extends BaseController {
         'onelinkId', 'onelinkName',
         'simType',
         'filepath',
+        'netStatus',
       ]),
     };
     const params = { ...request.body };
@@ -186,6 +187,7 @@ class SimController extends BaseController {
         onelinkName: params.onelinkName,
         simType: params.simType,
         virtualMult: params.virtualMult,
+        netStatus: params.netStatus,
         monthFlow,
         monthVoice,
         renewPrice,

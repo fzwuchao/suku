@@ -35,6 +35,19 @@
         <span class="unit">倍</span>
       </el-form-item>
       <el-form-item
+        label="资费群组"
+        prop="tariffGroup"
+      >
+        <el-select placeholder="请选择" v-model="sim.netStatus">
+           <el-option
+            v-for="tgroup in tariffGroup"
+            :key="tgroup.value"
+            :label="tgroup.label"
+            :value="tgroup.value"
+            ></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item
         label="选择叠加套餐"
         prop="increaseComboIds"
       >
@@ -142,6 +155,10 @@ import { urlPrefix } from "@/utils";
 export default {
   data() {
     return {
+      tariffGroup: [
+        { value: 2, label: '小流群组' },
+        { value: 1, label: '大流群组' },
+      ],
       url: `${urlPrefix}/sheet/upload`,
       uploadHeaders: {
         "x-csrf-token": getToken()
@@ -156,7 +173,8 @@ export default {
         onelinkName: "",
         simType: "A",
         virtualMult: 1,
-        filepath: ""
+        filepath: "",
+        netStatus: 2
       },
       increaseComboIds: [],
       discountsComboIds: [],
