@@ -55,6 +55,10 @@ module.exports = app => {
   router.post('/sim/update', controller.sim.update);
   // 批量更新
   router.post('/sim/batchUpdate', controller.sim.batchUpdate);
+  // 更换套餐
+  router.post('/sim/batchUpdateSimCombo', controller.sim.changeComboBySimNumOrSimRange);
+  // 转让
+  router.post('/sim/batchUpdateSimUser', controller.sim.changeUserBySimNumOrSimRange);
   // 导入sim卡（迁移）
   router.post('/sim/transfer', controller.sim.importSimsWithHeadFieldForTransfer);
   // 迁移同步

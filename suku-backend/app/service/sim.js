@@ -39,6 +39,21 @@ class SimService extends BaseService {
         },
       } });
     } catch (e) {
+      this.ctx.logger.error(e);
+      return false;
+    }
+    return true;
+  }
+  async batchUpdateByLikeSimId(data, simRange) {
+    const Op = this.getOp();
+    try {
+      await this.app.model.Sim.update(data, { where: {
+        simId: {
+          [Op.startsWith]: simRange,
+        },
+      } });
+    } catch (e) {
+      this.ctx.logger.error(e);
       return false;
     }
     return true;
