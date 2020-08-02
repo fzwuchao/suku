@@ -331,8 +331,10 @@ class SimService extends BaseService {
 
   async configLimtValueBySim(sim) {
     const limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
-    this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.DEL, limtValue, sim.simId);
-    this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId);
+    const res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId, sim.netStatus);
+    if(res.errorCode === '12077') {
+      await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.UPDATE, limtValue, sim.simId, sim.netStatus);
+    }
     return true;
   }
 
@@ -535,29 +537,7 @@ class SimService extends BaseService {
     return true;
   }
 
-  /**
- * 修改流量阀值
- */
-  async configLimtValue() {
-    const ctx = this.ctx;
-    const { service } = ctx;
-    const Op = this.getOp();
-    const where = {
-      monthOverlapFlow: { [Op.gt]: 0 },
-      cardStatus: SIM_CARD_STATUS.ACTIVE,
-      overdueTime: { [Op.lt]: new Date() },
-    };
-    const simList = await this.app.model.Sim.findAll({
-      where,
-    });
-    for (let i = 0; i < simList.length; i++) {
-      const item = simList[i];
-      const operType = LIMT_OPTY.UPDATE;
-      const limtValue = calc(`${item.monthFlow}/${item.virtualMult}`).toFixed(3);
-      await service.chinaMobile.configLimtValue(operType, limtValue, item.simId);
-    }
-    return true;
-  }
+
   /**
    * 单卡状态修改
    */

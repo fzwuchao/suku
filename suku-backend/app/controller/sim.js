@@ -595,7 +595,7 @@ class SimController extends BaseController {
     const result = await service.sim.getSimBySimId(simId);
     const operType = LIMT_OPTY.UPADTE;
     const limtValue = calc(`${result.monthFlow}/${result.virtualMult}`).toFixed(3);
-    await service.chinaMobile.configLimtValue(operType, limtValue, result.simId);
+    await service.chinaMobile.configLimtValue(operType, limtValue, result.simId, result.netStatus);
     this.success(null, '更新成功');
   }
 
