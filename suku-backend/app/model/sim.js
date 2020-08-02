@@ -208,7 +208,10 @@ module.exports = app => {
     netStatus: {
       type: TINYINT(2),
       field: 'net_status',
-      comment: '状态: 1-未启用, 2-正常, 3-停机, 4-过期, 5-注销, 6-欠费, 7-手动复机',
+      get() {
+        return this.getDataValue('netStatus') || 2;
+      },
+      comment: '流量资费类型：1:大流量，2:小流量',
     },
     onelinkId: {
       type: BIGINT(20),

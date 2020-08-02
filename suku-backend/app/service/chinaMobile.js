@@ -39,7 +39,7 @@ const getNowStr = () => {
 const getTransid = appid => {
   return `${appid}${getNowStr()}${getIndexStr()}`;
 };
-const {VOICE_GROUPID} = require('../extend/constant')();
+const {VOICE_GROUPID,FLOW_GROUP} = require('../extend/constant')();
 /* const OPREATE_TYPE = {
   query: 1,
   change: 2,
@@ -156,7 +156,10 @@ class ChinaMobileService extends BaseService {
       errorLog.source = 1;
       errorLog.result = JSON.stringify(res);
       errorLog.params = JSON.stringify(params);
-      await this.ctx.service.errorLog.create(errorLog);
+      if(resData.status !== '12077') {
+        await this.ctx.service.errorLog.create(errorLog);
+      }
+      
       if (resData.status === '12021') {
         // await this.app.runSchedule('tokenCurl');
       }
@@ -526,11 +529,13 @@ class ChinaMobileService extends BaseService {
    * @param {string} msisdn - 物联卡号码 (msisdn、iccid、imsi必须有且只有一项)
    * @return {array} []
    */
-  async configLimtValue(operType, limitValue, msisdn) {
+  async configLimtValue(operType, limitValue, msisdn, flowType) {
     // 当 operType=1 新增时，whiteNumber只能传 1 个值。
     // 当 operType=4 删除时，whiteNumber可传 2 个值，2 个号码用下划线分隔，例如：xxxx_xxxx
-    const { groupId, offerId } = await this.queryGroupByMemberFlow(msisdn);
+    // const { groupId, offerId } = await this.queryGroupByMemberFlow(msisdn);
     // offerId = 'IO111000000009';
+    const { nameKey } = await this.getOnelink(msisdn);
+    const { groupId, offerId } = FLOW_GROUP[nameKey][flowType];
     const apnName = 'CMIOT';
     const actionRule = 1;
     limitValue = limitValue - 0;
@@ -545,7 +550,7 @@ class ChinaMobileService extends BaseService {
     };
     const result = await this.handleBy(24, msisdn, data);
     const simIdR = (result[0] || {}).msisdn;
-    return simIdR;
+    return result;
   }
 
   /**

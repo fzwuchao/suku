@@ -104,6 +104,29 @@ const VOICE_GROUPID = {
   "shenzhenlikang1": '8811000009550018',
   "shenzhensukudianzikeji": '311000011072103'
 }
+const FLOW_GROUP_TYPE = {
+  SMALL: 2,
+  BIG: 1
+}
+
+const FLOW_GROUP = {
+  "shenzhenlikang1": {
+    '1':{
+      'groupId': '8811000012875167',
+      'offerId': '100004863'
+    },
+    '2': {
+      'groupId': '8811000009546026',
+      'offerId': '100004842'
+    }
+  },
+  "shenzhensukudianzikeji": {
+    '2': {
+      'groupId': '311000011032095',
+      'offerId': '100004842'
+    }
+  }
+}
 
 const WRITELIST_STATUS = {
   SUCCESS: '1',
@@ -134,6 +157,8 @@ module.exports = () => {
     ROLE_TYPE,
     LIMT_OPTY,
     VOICE_GROUPID,
-    WRITELIST_STATUS
+    WRITELIST_STATUS,
+    FLOW_GROUP,
+    FLOW_GROUP_TYPE
   };
 };

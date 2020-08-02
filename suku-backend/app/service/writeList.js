@@ -45,7 +45,7 @@ class WriteListService extends BaseService {
   async getWriteListBySimIdInCHM(simId) {
     const {service} = this.ctx;
     const res = await service.chinaMobile.queryMemberVoiceWhitelist(simId);
-    const writeList = res[0].memVoiceWhiteList
+    const writeList = (res[0] || {}).memVoiceWhiteList
     for(let i=0; i<writeList.length; i++) {
       const item = writeList[i];
       let write = await this.getWriteListBySimdIdAndPhone(simId,item.whiteNumber);
