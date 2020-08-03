@@ -18,16 +18,17 @@ do
   ((len++))
 done
 
-# 保留最近备份的3个文件
-# 备份文件小于等于3个，不清除
-if [ $len -le 3 ];then
+sqlFileTotal=7
+# 保留最近备份的7个文件
+# 备份文件小于等于7个，不清除
+if [ $len -le $sqlFileTotal ];then
   echo '备份完成'
   exit
 fi
 
 # 获取要删除的文件名，只保留最近的3个
 d=0
-for((i=0;i<=len-4;i++))
+for((i=0;i<=len-sqlFileTotal-1;i++))
 do
   delFileList[$d]=${filelist[$i]}
   ((d++))
