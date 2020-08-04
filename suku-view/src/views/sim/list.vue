@@ -925,13 +925,22 @@ export default {
       });
     },
     configLimtValue() {
-      this.axios({
-        method: "get",
-        params: {
-          simType: this.simType
-        },
-        url: API.SIMLIST.SIM_CONFIG_LIMT_VALUE
+      this.$confirm('此操作一键设置所有卡的阀值，是否操作?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }).then(() => {
+        this.axios({
+          method: "get",
+          params: {
+            simType: this.simType
+          },
+          url: API.SIMLIST.SIM_CONFIG_LIMT_VALUE
+        }).then(() => {
+        });
+        
+      }).catch(() => {
+                
       });
     },
     migrationSyncUpdate() {
