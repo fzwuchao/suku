@@ -38,7 +38,7 @@ const activeComboOldToNewMap = [{
   old: [ '30M三年年卡' ],
   new: '30M三年年卡',
 }, {
-  old: [ '2个月100M' ],
+  old: [ '2个月100M卡' ],
   new: '2个月100M',
 }, {
   old: [ '季度特惠包', '半年畅享包', '一年实惠包' ],
@@ -543,8 +543,9 @@ class SimController extends BaseController {
     const { simType } = request.query;
 
     // await ctx.service.sim.migrationSyncUpdate(simType);
-    await ctx.service.schedule.monthCalculate();
+    // await ctx.service.schedule.monthCalculate();
     // await ctx.service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '((month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow) and card_status=2)');
+    // await ctx.service.schedule.syncUpdateBatch();
     this.success('', '同步更新完成');
   }
 

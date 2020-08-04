@@ -27,6 +27,9 @@
       <el-table-column align="left" label="手机号" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.phone}}</template>
       </el-table-column>
+      <el-table-column align="left" label="状态" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.status | getStatus}}</template>
+      </el-table-column>
       <el-table-column align="left" label="添加时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
@@ -68,6 +71,18 @@ export default {
           title: "sim卡号",
           type: "inputText",
           value: ""
+        },
+        {
+          name: "status",
+          title: "亲情号状态",
+          type: "select",
+          values: [
+            { value: "", key: "全部" },
+            { value: "0", key: "失效" },
+            { value: "1", key: "生效" },
+            { value: "2", key: "处理中" }
+          ],
+          active: [0, 1, 2, 3, 4, 5, 6, 7]
         }
       ]
     };
@@ -77,6 +92,16 @@ export default {
   },
   components: {
     searchBar
+  },
+  filters: {
+    getStatus(val) {
+      const values = {
+        1: '生效',
+        0: '失效',
+        2: '处理中'
+      }
+      return values[val];
+    }
   },
   methods: {
     pageChange(page) {

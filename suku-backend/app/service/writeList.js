@@ -10,7 +10,7 @@ const {WRITELIST_STATUS} = require('../extend/constant')();
 class WriteListService extends BaseService {
 
   async getWriteListPage(query) {
-    const attributes = [ 'id', 'simId', 'uname', 'phone', 'createdAt' ];
+    const attributes = [ 'id', 'simId', 'uname', 'phone', 'status', 'createdAt' ];
     const { pageSize, pageNum, status, simId, uid } = query;
     const Op = this.getOp();
     const where = {};
@@ -73,7 +73,6 @@ class WriteListService extends BaseService {
     if (simId) {
       where.simId = { [Op.substring]: simId };
     }
-
     const result = await this.app.model.WriteList.findAll({ attributes,
       where,
     });

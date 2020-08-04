@@ -27,7 +27,7 @@ class WriteListController extends BaseController {
     ctx.validate(rule, request.body);
     // 校验参数，会将request.query中的参数的数据类型，按rule进行转换
     const { simId, phone } = request.body;
-    let writeList = await ctx.service.writeList.getWriteListBySimdIdAndPhone(simId, phone)
+    let writeList = await ctx.service.writeList.getWriteListBySimdIdAndPhone(simId, phone);
     if(writeList && writeList.status == WRITELIST_STATUS.DEALING){
       this.fail('99', writeList, '亲情号正在处理中, 请勿重复添加！');
       return ;

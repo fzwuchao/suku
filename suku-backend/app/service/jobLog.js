@@ -10,7 +10,7 @@ const BaseService = require('../core/baseService');
 
 // user表名
 // const TABLE_USER = 'user';
-const { SIM_CARD_STATUS,OPER_TYPE_BATCH,SERVICE_TYPE,SERV_OP_BATCH, SIM_FLOW_SERV_STATUS,SIM_VOICE_SERV_STATUS} = require('../extend/constant')();
+const { SIM_CARD_STATUS,OPER_TYPE_BATCH,SERVICE_TYPE,SERV_OP_BATCH, SERV_STATUS, SIM_FLOW_SERV_STATUS,SIM_VOICE_SERV_STATUS} = require('../extend/constant')();
 const calc = require('calculatorjs');
 class JobLogService extends BaseService {
 
@@ -134,11 +134,18 @@ class JobLogService extends BaseService {
     let voiceIds = [];
     for (let i = 0; i < datas.length; i++) { // result.length
       const item = datas[i];
-      if((item.virtualMult * item.monthUsedFlow) > ((item.monthOverlapFlow-0)+(item.monthFlow-0))) {
-        flowIds.push(item.simId);
+      if((item.virtualMult * item.monthUsedFlow) > ((item.monthOverlapFlow-0)+(item.monthFlow-0)) || (!sim.overdueTime && moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0)) {
+        if(item.flowServStatus ===  SERV_STATUS.ON)
+        {
+          flowIds.push(item.simId);
+        }
+        
       }
-      if((item.monthUsedVoiceDuration) > ((item.monthOverlapVoiceDuration-0)+(item.monthVoice-0))) {
-        voiceIds.push(item.simId);
+      if((item.monthUsedVoiceDuration) > ((item.monthOverlapVoiceDuration-0)+(item.monthVoice-0))  || (!sim.overdueTime && moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0)) {
+        if(item.voiceServStatus ===  SERV_STATUS.ON)
+        {
+          voiceIds.push(item.simId)
+        }
       }
     }
 

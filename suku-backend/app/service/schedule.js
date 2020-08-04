@@ -79,7 +79,8 @@ class ScheduleService extends BaseService {
     const startTime = moment().milliseconds();
     const isMigrat = false;
     const { oneLinkSims } = await service.sim.getOnelinkSimIds({
-      cardStatus: {[OP.in]:[4]}
+      // cardStatus: {[OP.in]:[2,4]}
+      isActive : 1
     }, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
