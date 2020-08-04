@@ -49,7 +49,7 @@ class SimService extends BaseService {
     try {
       await this.app.model.Sim.update(data, { where: {
         simId: {
-          [Op.startsWith]: simRange,
+          [Op.between]: simRange,
         },
       } });
     } catch (e) {

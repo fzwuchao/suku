@@ -69,7 +69,7 @@ class ChinaMobileService extends BaseService {
       return resState;
     }
     resState.success = true;
-
+    this.ctx.logger.info(`[${interfaceType === 'send' ? '发送短信' : '上行短信查询'}, 移动端返回结果-xml]:`, (result || {}).data);
     await parser.parseStringPromise(result.data).then(rs => {
       resState.data = rs;
     }).catch(err => {

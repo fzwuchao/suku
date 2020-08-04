@@ -9,6 +9,7 @@ class Message extends Subscription {
       type: 'worker', // 让一个worker执行
       immediate: true,
       disable: false,
+      env: [ 'prod' ], // 定时任务，只在生产环境才执行
     };
   }
 
