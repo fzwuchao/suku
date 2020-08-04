@@ -679,11 +679,13 @@ export default {
       });
     },
     handleClose() {
-      this.$refs['ulistInput'].$refs['ruleForm'].resetFields();
+      // this.$refs['ulistInput'].$refs['ruleForm'].resetFields();
+      this.$refs['ulistInput'].reset();
       this.userWithSimNumOrRangeDialog = false;
     },
     handleChangeComboClose() {
-      this.$refs['comboChangeInput'].$refs['ruleForm'].resetFields();
+      // this.$refs['comboChangeInput'].$refs['ruleForm'].resetFields();
+      this.$refs['comboChangeInput'].reset();
       this.comboInputDialog = false;
     },
     activate(isActivated) {

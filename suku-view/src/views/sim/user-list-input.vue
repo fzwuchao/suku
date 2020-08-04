@@ -30,8 +30,12 @@
           <el-radio label="simRange">卡段</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="卡号/卡段" prop="inputValue">
+      <el-form-item label="卡号" prop="inputValue" v-if="radioType === 'simNum'">
         <el-input  v-model="params.inputValue" :placeholder="inputPlaceHolder"></el-input>
+      </el-form-item>
+      <el-form-item label="卡段" prop="inputValue" v-if="radioType !== 'simNum'">
+        <el-input style="width: 150px" v-model="params.inputValue" :placeholder="inputPlaceHolder"></el-input>-
+        <el-input style="width: 150px" v-model="params.inputValue2" :placeholder="inputPlaceHolder"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button
@@ -47,7 +51,7 @@
 import API from "@/api";
 const radioTypeToPlaceholderMap = {
   simNum: '多个卡号用英文的逗号隔开, 如: 卡号1,卡号2',
-  simRange: '请输入一个卡段',
+  simRange: '请输入卡号',
 }
 export default {
   data() {
@@ -68,11 +72,25 @@ export default {
             required: true,
             trigger: "blur",
             validator: (rule, value, callback) => {
-              if (!value || value.trim() === '') {
-                callback("不能为空");
+              if (this.radioType === 'simNum') {
+                if (!value || value.trim() === '') {
+                  callback("不能为空");
+                } else {
+                  const error = this.checkSimNum(value);
+                  callback(error);
+                }
               } else {
-                const error = this.radioType === 'simNum' ? this.checkSimNum(value) : this.checkSimRange(value);
-                callback(error);
+                if (!this.params.inputValue || !this.params.inputValue.trim() === '' || !this.params.inputValue2 || !this.params.inputValue2.trim() === '') {
+                  callback('卡段不能为空')
+                } else {
+                  const error1 = this.checkSimRange(this.params.inputValue);
+                  const error2 = this.checkSimRange(this.params.inputValue2);
+                  if (error1 || error2) {
+                    callback(error1 || error2)
+                  } else {
+                    callback();
+                  }
+                }
               }
               
             }
@@ -105,20 +123,21 @@ export default {
     reset() {
       this.radioType = 'simNum';
       this.$refs["ruleForm"].resetFields();
+      this.params.inputValue2 = '';
     },
     submit() {
       this.$refs["ruleForm"].validate(valid => {
         if (!valid) return;
         const params = {};
         if (this.radioType === 'simNum') params.simNum = this.params.inputValue;
-        if (this.radioType === 'simRange') params.simRange = this.params.inputValue;
+        if (this.radioType === 'simRange') params.simRange = [this.params.inputValue, this.params.inputValue2];
         const [user] = this.userList
                       .filter(item => item.value === this.params.user)
                       .map(item => {
                         return { uid: item.value, uname: item.key}
                       })
         this.$emit("save", {...user, ...params});
-        this.$refs["ruleForm"].resetFields();
+        this.reset();
       })
     },
     getUserList() {
