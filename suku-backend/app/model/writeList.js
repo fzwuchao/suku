@@ -26,6 +26,16 @@ module.exports = app => {
       type: INTEGER(1),
       comment: '设置状态。0：失效 1:生效  2:处理中',
     },
+    onelinkId: {
+      type: BIGINT(20),
+      field: 'onelink_id',
+      comment: 'onelink平台id',
+    },
+    onelinkName: {
+      type: STRING(30),
+      field: 'onelink_name',
+      comment: 'onelink平台名称',
+    },
     createdAt: {
       type: DATE, // '创建时间',
       get() {

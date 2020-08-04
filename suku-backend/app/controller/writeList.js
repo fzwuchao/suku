@@ -29,10 +29,10 @@ class WriteListController extends BaseController {
     const { simId, phone } = request.body;
     let writeList = await ctx.service.writeList.getWriteListBySimdIdAndPhone(simId, phone);
     if(writeList && writeList.status == WRITELIST_STATUS.DEALING){
-      this.fail('99', writeList, '亲情号正在处理中, 请勿重复添加！');
+      this.fail('99', writeList, '亲情号正在处理中, 请勿重复添加！请3分钟后再操作');
       return ;
     } else if(writeList && writeList.status == WRITELIST_STATUS.SUCCESS){
-      this.fail('99', writeList, '亲情号已经存在, 请勿重复添加！');
+      this.fail('99', writeList, '亲情号已经存在, 请勿重复添加！请3分钟后再操作');
       return ;
     }
     if(!writeList) {
@@ -41,6 +41,8 @@ class WriteListController extends BaseController {
       // 缺少调用移动端发送短信的接口，在此位置调用
       writeList.uname = sim.uname;
       writeList.uid = sim.uid;
+      writeList.onelinkId = sim.onelinkId;
+      writeList.onelinkName = sim.onelinkName;
       writeList.status = WRITELIST_STATUS.DEALING;
       await ctx.service.writeList.create(writeList);
     }

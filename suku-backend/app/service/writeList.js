@@ -10,7 +10,7 @@ const {WRITELIST_STATUS} = require('../extend/constant')();
 class WriteListService extends BaseService {
 
   async getWriteListPage(query) {
-    const attributes = [ 'id', 'simId', 'uname', 'phone', 'status', 'createdAt' ];
+    const attributes = [ 'id', 'simId', 'uname', 'phone', 'status', 'onelinkId','onelinkName','createdAt' ];
     const { pageSize, pageNum, status, simId, uid } = query;
     const Op = this.getOp();
     const where = {};

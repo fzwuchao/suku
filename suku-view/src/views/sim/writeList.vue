@@ -30,6 +30,9 @@
       <el-table-column align="left" label="状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.status | getStatus}}</template>
       </el-table-column>
+      <el-table-column align="left" label="onelink" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.onelinkName}}</template>
+      </el-table-column>
       <el-table-column align="left" label="添加时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>

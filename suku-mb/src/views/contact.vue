@@ -5,6 +5,7 @@
       <div class="sim-content">
         <p class="sim-title">卡号</p>
         <p class="sim-number">{{simId}}</p>
+        <p class="tips">每隔3分钟后再添加一个亲情号码，请耐心操作</p>
       </div>
     </div>
     <div class="search">
@@ -66,7 +67,7 @@ export default {
         url: "/writeList/save"
       }).then(() => {
         this.getContactList();
-        Toast('亲情号处理中，请耐心等待，20分钟可查询状态!')
+        Toast('亲情号处理中，请耐心等待，请3分钟后操作下一个亲情号!')
       });
     },
     onclickAddContact () {
@@ -89,7 +90,7 @@ export default {
     }
   },
   mounted() {
-    this.debounceFun = debounce(1000, true, this.addContact)
+    this.debounceFun = debounce(1000*60*3, true, this.addContact)
   },
   created() {
     this.simId = this.$route.params.simId;
@@ -123,6 +124,9 @@ export default {
         line-height: 30px;
         font-weight: bold;
         color: #f99710;
+      }
+      .tips {
+        font-size: 12px;
       }
     }
   }
