@@ -119,12 +119,12 @@
         v-if="isSysManager"
         @click="handleComboChangeInput"
       >更换套餐(卡号或卡段)</el-button>
-      <el-button
+      <!-- <el-button
         type="primary"
         size="mini"
         v-if="isSysManager && simType === 'A'"
         @click="handleActiveComboChangeInput"
-      >更换激活套餐(卡号或卡段)</el-button>
+      >更换激活套餐(卡号或卡段)</el-button> -->
     </div>
 
     <el-table
