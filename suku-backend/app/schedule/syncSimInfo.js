@@ -6,7 +6,7 @@ class SyncSimInfo extends Subscription {
     return {
       interval: '240m', // 60 分钟间隔
       type: 'worker',
-      disable: true,
+      disable: false,
       env: [ 'prod' ], // 定时任务，只在生产环境才执行
     };
   }

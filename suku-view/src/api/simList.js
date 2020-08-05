@@ -9,6 +9,7 @@ export default {
     SIM_BATCH_UPDATE: "/sim/batchUpdate",
     SIM_BATCH_UPDATE_SIM_COMBO: "/sim/batchUpdateSimCombo",
     SIM_BATCH_UPDATE_SIM_USER: "/sim/batchUpdateSimUser",
+    SIM_BATCH_UPDATE_SIM_ACTIVE_COMBO: "/sim/batchUpdateActiveCombo",
     SIM_TRANSFOR: "/sim/transfer",
     SIM_MIGRAT_SYNC_UPDATE: "/sim/migrationSyncUpdate",
     SIM_CONFIG_LIMT_VALUE: "/sim/configLimtValue",
