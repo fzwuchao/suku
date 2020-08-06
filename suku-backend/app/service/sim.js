@@ -243,6 +243,14 @@ class SimService extends BaseService {
     return sims.length === simList.length;
   }
 
+  async bulkUpdateIccid(simList) {
+    const { Sim } = this.app.model;
+    const sims = await Sim.bulkCreate(simList, {
+      updateOnDuplicate: ['id', 'iccid', ]
+    });
+    // await this.app.redis.del('Sim:{"simType":"B"}:10:1');
+    return sims.length === simList.length;
+  }
   
 
   // 获取表中存在的simId
@@ -306,6 +314,57 @@ class SimService extends BaseService {
     const endTime = moment().milliseconds();
     logger.info(`【同步卡基本信息(迁移)，接口总响应时间：】:${endTime - startTime} ms`);
   }
+  async iccidUpdate(sim) {
+
+    const ctx = this.ctx;
+    const { service, logger } = ctx;
+    const startTime = moment().milliseconds();
+    const { simId, onelinkId } = sim;
+    const params = {id: sim.id};
+    
+    // 被叫卡有激活时间，主叫卡有语音使用量
+    const promiseList = [];
+    // await service.chinaMobile.querySimBasicInfo(simId, onelinkId)
+    // 激活时间
+    promiseList.push(service.chinaMobile.querySimBasicInfo(simId, onelinkId));
+    
+    const [ baseInfo ] = await Promise.all(promiseList);
+    params.iccid = sim.iccid;
+
+    if(baseInfo.iccid) {
+      params.iccid = baseInfo.iccid;
+    }
+    const endTime = moment().milliseconds();
+    logger.info(`【同步更新iccid，接口总响应时间：】:${endTime - startTime} ms`);
+     //如果是批量更新，则返回需要更新的信息，不直接更新
+    return params;
+    
+  }
+
+  async iccidSyncUpdate(simType) {
+    const { logger } = this.ctx;
+    const OP = this.getOp();
+    logger.info('********************同步iccid*********************');
+    const startTime = moment().milliseconds();
+    const isMigrat = true;
+
+    const { oneLinkSims } = await this.getOnelinkSimIds({
+      simType,
+      iccid: {[OP.eq]: null},
+    }, 200);
+    for (const key in oneLinkSims) {
+      const simsList = oneLinkSims[key];
+      let j = 0;
+      for (let i = 0; i < simsList.length; i++) {
+        this.app.queue.create('iccidSyncUpdate', { sims: simsList[i], isMigrat }).ttl(1000*60*3) // 延时多少毫秒
+        .delay((i+j)*15000+100).removeOnComplete( true ).save();
+      }
+      j++;
+    }
+    const endTime = moment().milliseconds();
+    logger.info(`【同步卡iccid，接口总响应时间：】:${endTime - startTime} ms`);
+  }
+
 
   async configLimtValue(simType) {
     const { logger } = this.ctx;

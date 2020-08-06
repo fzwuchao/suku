@@ -77,6 +77,22 @@ class AppBootHook {
       
     });
 
+
+
+    this.app.queue.process('iccidSyncUpdate', 4,(job, done) => {
+      // 这里可以调用service里面的方法来消费这些信息
+      // const ctx = this.app.createAnonymousContext();
+      var domain = require('domain').create();
+      domain.on('error', function(err){
+        done(err);
+      });
+      domain.run(function(){ // your process functio
+        ctx.service.jobLog.iccidSyncUpdate(job.data, done); // dealOrder是自定义的方法
+        done();
+      });
+      
+    });
+
     this.app.queue.process('configLimtValue', 4 ,(job, done) => {
       // 这里可以调用service里面的方法来消费这些信息
       // const ctx = this.app.createAnonymousContext();

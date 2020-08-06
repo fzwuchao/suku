@@ -1,8 +1,12 @@
 <template>
-  <div class="sim-write-list">
+  <div class="sim-write-list" id="write-list">
     <div class="btn-list">
-      <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
-      <!--<el-button type="primary" size="mini">删除</el-button> -->
+      <el-button
+        type="warning"
+        size="mini"
+        v-if="isSysManager"
+        @click="queryWriteListStatus()"
+      >同步白名单</el-button>
     </div>
 
     <el-table
@@ -67,6 +71,7 @@ export default {
       tableHeight: null,
       list: [],
       data: null,
+      isSysManager: false,
       searchParams: {},
       searchData: [
         {
@@ -111,6 +116,22 @@ export default {
       this.pageNum = page;
       this.getlist();
     },
+    getRoleType() {
+      this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
+      this.isShowTransforBtn = this.curUser.username === 'youlan';
+    },
+    queryWriteListStatus() {
+      this.axios({
+        method: "get",
+        url: API.SIMLIST.QUERY_WRITE_LIST_STATUS
+      }).then(() => {
+        this.$message({
+          message: "同步成功!",
+          type: "success"
+        });
+      });
+    },
     getlist(val) {
      let pageNum = this.pageNum;
       if (val) {
@@ -119,6 +140,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#write-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,
@@ -133,6 +155,7 @@ export default {
     }
   },
   mounted() {
+    this.getRoleType();
     this.getlist();
   },
   watch: {

@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" id="system-role-list">
     <div class="btn-list">
       <el-button
         type="primary"
@@ -148,6 +148,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#system-role-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,

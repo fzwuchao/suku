@@ -1,5 +1,5 @@
 <template>
-  <div class="sim-list">
+  <div class="sim-list" id="sim-list">
     <div class="btn-list">
       <el-button
         type="primary"
@@ -33,6 +33,12 @@
         v-if="isSysManager"
         @click="handleExport"
       >导出查询结果</el-button>
+      <el-button
+        type="warning"
+        size="mini"
+        v-if="isSysManager"
+        @click="iccidSyncUpdate"
+      >获取iccid</el-button>
       <el-button
         type="warning"
         size="mini"
@@ -959,6 +965,20 @@ export default {
         }
       });
     },
+    iccidSyncUpdate() {
+      this.axios({
+        method: "get",
+        params: {
+          simType: this.simType
+        },
+        url: API.SIMLIST.SIM_ICCID_SYNC_UPDATE
+      }).then(r => {
+        if (r.success) {
+          this.getlist();
+          return;
+        }
+      });
+    },
     handleExport() {
       this.axios({
         method: "post",
@@ -1013,6 +1033,7 @@ export default {
       }
       this.axios({
         method: "post",
+        loadEl: "#sim-list",
         data: {
           simType: this.simType,
           pageNum: pageNum,

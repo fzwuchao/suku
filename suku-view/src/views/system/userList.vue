@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" id="system-user-list">
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
       <el-button type="primary" size="mini" @click.native="addUser">增加</el-button>
@@ -177,6 +177,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#system-user-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,

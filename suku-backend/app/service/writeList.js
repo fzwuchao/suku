@@ -39,6 +39,7 @@ class WriteListService extends BaseService {
       attributes,
       where,
     });
+    // await this.queryWriteListStatus();
     return result;
   }
 
@@ -46,6 +47,9 @@ class WriteListService extends BaseService {
     const {service} = this.ctx;
     const res = await service.chinaMobile.queryMemberVoiceWhitelist(simId);
     const writeList = (res[0] || {}).memVoiceWhiteList
+    if(!writeList) {
+      return ;
+    }
     for(let i=0; i<writeList.length; i++) {
       const item = writeList[i];
       let write = await this.getWriteListBySimdIdAndPhone(simId,item.whiteNumber);
@@ -58,6 +62,8 @@ class WriteListService extends BaseService {
         // 缺少调用移动端发送短信的接口，在此位置调用
         write.uname = sim.uname;
         write.uid = sim.uid;
+        write.onelinkId = sim.onelinkId;
+        write.onelinkName = sim.onelinkName;
         write.status = item.status;
         await this.create(write);
       }
@@ -79,6 +85,20 @@ class WriteListService extends BaseService {
     return result;
   }
   
+  async queryWriteListStatus() {
+    const attributes = ['simId'];
+    const Op = this.getOp();
+    const where = {status: {[Op.in]: [2]}};
+    const result = await this.app.model.WriteList.findAll({ attributes,
+      where,
+      group: 'simId'
+    });
+    for (let i=0; i<result.length;i++) {
+      await this.getWriteListBySimIdInCHM(result[i].simId);
+    }
+    return result;
+  }
+
   async getWriteListBySimdIdAndPhone(simId, phone) {
     const where = {};
     if (simId) {

@@ -3,7 +3,7 @@
  *        hideError 关闭默认的错误提示  默认值false
  */
 import axios from 'axios';
-// import qs from 'qs';
+
 import { Toast } from 'vant';
 // import router from '../router';
 
@@ -31,7 +31,7 @@ Axios
           config.data = qs.stringify(config.data);
         } */
         if (config.loading) {
-            Toast({ duration: 0, message: '正在加载' });
+            Toast({ duration: 0, message: '正在加载...' });
         }
         if (config.hideError) {
             hideError = config.hideError;

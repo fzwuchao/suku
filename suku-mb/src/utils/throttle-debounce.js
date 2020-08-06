@@ -16,6 +16,7 @@
  *
  * @returns {Function}  A new, throttled, function.
  */
+import { Toast } from "vant";
 function throttle(delay, noTrailing, callback, debounceMode) {
 	/*
 	 * After wrapper has stopped being called, this timeout ensures that
@@ -26,7 +27,7 @@ function throttle(delay, noTrailing, callback, debounceMode) {
 	let cancelled = false;
 	// Keep track of the last time `callback` was executed.
 	let lastExec = 0;
-
+  
 	// Function to clear existing timeout
 	function clearExistingTimeout() {
 		if (timeoutID) {
@@ -55,7 +56,6 @@ function throttle(delay, noTrailing, callback, debounceMode) {
 	function wrapper(...arguments_) {
 		let self = this;
 		let elapsed = Date.now() - lastExec;
-
 		if (cancelled) {
 			return;
 		}
@@ -80,7 +80,9 @@ function throttle(delay, noTrailing, callback, debounceMode) {
 			 * `debounceMode` is true (at begin), execute `callback`.
 			 */
 			exec();
-		}
+		} else {
+      Toast('请3分钟后再操作！')
+    }
 
 		clearExistingTimeout();
 
@@ -105,8 +107,10 @@ function throttle(delay, noTrailing, callback, debounceMode) {
 			timeoutID = setTimeout(
 				debounceMode ? clear : exec,
 				debounceMode === undefined ? delay - elapsed : delay
-			);
-		}
+      );
+      
+    }
+    
 	}
 
 	wrapper.cancel = cancel;

@@ -1,5 +1,5 @@
 <template>
-  <div class="withdrawal-list">
+  <div class="withdrawal-list" id="msg-list">
     <div class="btn-list"></div>
 
     <el-table
@@ -167,6 +167,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#msg-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,

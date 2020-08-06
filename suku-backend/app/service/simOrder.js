@@ -12,7 +12,7 @@ const calc = require('calculatorjs');
 
 // user表名
 // const TABLE_USER = 'user';
-const { LIMT_OPTY } = require('../extend/constant')();
+const { LIMT_OPTY,SIM_CARD_STATUS } = require('../extend/constant')();
 class SimOrderService extends BaseService {
 
 
@@ -95,7 +95,7 @@ class SimOrderService extends BaseService {
           newSim.overdueTime = sim.overdueTime
           order.months = packMonths;
         }
-        
+        newSim.cardStatus = SIM_CARD_STATUS.ACTIVE;
         const newTime = moment(newSim.overdueTime).add(order.months, 'M');
         newSim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         break;
@@ -107,9 +107,7 @@ class SimOrderService extends BaseService {
     }
     if (order.orderType === 1) {
       newSim.isActive = 1;
-      // operType = LIMT_OPTY.ADD;
-      // limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
-      // await this.ctx.service.chinaMobile.configLimtValue(operType, limtValue, sim.simId);
+      await this.ctx.service.sim.configLimtValueBySim(sim);;
     }
     await this.ctx.service.sim.updateBySimId(newSim, sim.simId);
 

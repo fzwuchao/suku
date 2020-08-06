@@ -1,5 +1,5 @@
 <template>
-  <div class="error-logs">
+  <div class="error-logs" id="jobLogs">
     <div class="btn-list"><el-button type="primary" size="mini" @click.native="deal">处理</el-button></div>
 
     <el-table
@@ -138,6 +138,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#jobLogs",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,
