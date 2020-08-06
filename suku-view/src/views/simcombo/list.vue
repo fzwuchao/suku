@@ -1,5 +1,5 @@
 <template>
-  <div class="sim-list">
+  <div class="sim-list" id="sim-combo-list">
     <div class="btn-list">
       <el-button type="primary" size="mini" @click="addCombo()">新增</el-button>
       <!-- <el-button type="primary" size="mini">删除</el-button> -->
@@ -172,6 +172,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#sim-combo-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,

@@ -24,11 +24,15 @@ class WechatController extends BaseController {
     logger.info('********************微信支付回调*********************')
     // const info = {
     //   return_code: 'SUCCESS',
-    //   out_trade_no: 'RENEW17290027808T163422R1179',
-    //   transaction_id: '4200000706202007303206061660',
+    //   out_trade_no: 'INCRE14809390624T161815R8272',
+    //   transaction_id: '4200000713202008063732980469',
     // };
     if (info.return_code === 'SUCCESS') {
       const order = await service.simOrder.getOrderByOrderId(info.out_trade_no);
+      if(order.orderStatus === 2) {
+        ctx.reply('OK');
+        return ;
+      }
       const simId = order.simId;
       const sim = await service.sim.getSimBySimId(order.simId);
       const pack = await service.comboPack.getComboPackById(order.cpid);
@@ -54,7 +58,7 @@ class WechatController extends BaseController {
     } else {
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 0 });
     }
-    ctx.reply();
+    ctx.reply('OK');
   }
 
 }

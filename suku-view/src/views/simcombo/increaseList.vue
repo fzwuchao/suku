@@ -1,5 +1,5 @@
 <template>
-  <div class="increase-list">
+  <div class="increase-list" id="increase-list">
     <div class="btn-list">
       <el-button
         type="primary"
@@ -192,6 +192,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#increase-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,

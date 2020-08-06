@@ -30,7 +30,8 @@
 
 <script>
 import { Toast } from "vant";
-import { debounce } from '../utils/throttle-debounce';
+import { throttle } from '../utils/throttle-debounce';
+import { isInt } from '../utils/index';
 export default {
   data() {
     return {
@@ -56,6 +57,10 @@ export default {
     addContact() {
       if(this.phone.trim() === '') {
         Toast('请输入要添加的亲情号码！')
+        return ;
+      }
+      if(!isInt(this.phone) && this.phone.length <= 11) {
+        Toast('请输入正确的号码，中间不要有空格！')
         return ;
       }
       this.axios({
@@ -90,7 +95,7 @@ export default {
     }
   },
   mounted() {
-    this.debounceFun = debounce(1000*60*3, true, this.addContact)
+    this.debounceFun = throttle(1000*60*3.1, true, this.addContact)
   },
   created() {
     this.simId = this.$route.params.simId;

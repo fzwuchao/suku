@@ -103,6 +103,23 @@ class JobLogService extends BaseService {
     
   }
 
+
+  async iccidSyncUpdate(data, done) {
+    const results = data.sims;
+    const ctx = this.ctx;
+    let isDone = false;
+    const { service, logger } = ctx;
+    logger.warn('【同步更开始1000条】');
+    const promises = results.map(result => {
+      return service.sim.iccidUpdate(result);
+    });
+    const datas = await Promise.all(promises);
+    await service.sim.bulkUpdateIccid(datas);
+    logger.warn('【同步更新完成1000条】');
+    done();
+    
+  }
+
   async configLimtValue(data, done) {
     const results = data.sims;
     const ctx = this.ctx;

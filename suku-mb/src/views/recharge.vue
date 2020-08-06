@@ -153,6 +153,7 @@ export default {
     getSim() {
       this.axios({
         method: "get",
+        loading: true,
         params: {
           simId: this.simId
         },

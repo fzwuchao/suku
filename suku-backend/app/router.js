@@ -69,8 +69,9 @@ module.exports = app => {
   router.get('/sim/configLimtValue', controller.sim.configLimtValue);
   // 手动触发单卡设置阀值
   router.get('/sim/configLimtValueBySimId', controller.sim.configLimtValueBySimId);
-
-
+  // 获取iccid
+  router.get('/sim/iccidSyncUpdate', controller.sim.iccidSyncUpdate);
+  
   // 查询套餐
   router.get('/simCombo/search', controller.simCombo.search);
   // 通过id,查询套餐
@@ -160,6 +161,8 @@ module.exports = app => {
   router.post('/writeList/save', controller.writeList.save);
   // 根据simId查询
   router.get('/writeList/getWriteListBySimId', controller.writeList.getWriteListBySimId);
+  // 同步白名单状态
+  router.get('/writeList/queryWriteListStatus', controller.writeList.queryWriteListStatus);
 
 
   // 获取onelink错误日志

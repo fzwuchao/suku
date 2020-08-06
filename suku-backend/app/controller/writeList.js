@@ -49,6 +49,15 @@ class WriteListController extends BaseController {
     const res = await ctx.service.chinaMobile.configMemberVoiceWhitelist(1, phone, simId);
     this.success(res, '亲情号处理中，请耐心等待，20分钟可查询状态');
   }
+  /**
+   * 同步白名单状态
+   */
+  async queryWriteListStatus() {
+    const { ctx } = this;
+    const result = await ctx.service.writeList.queryWriteListStatus();
+    this.success(result, '');
+  }
+
   async getWriteListBySimId() {
     const { ctx } = this;
     const { request, helper } = ctx;

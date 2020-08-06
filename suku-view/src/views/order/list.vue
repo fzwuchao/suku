@@ -1,5 +1,5 @@
 <template>
-  <div class="sim-list">
+  <div class="sim-list" id="order-list">
     <div class="btn-list">
      <!-- <el-button type="primary" size="mini" @click="openWithdrawal">提现</el-button>
       <span>开启自动转账的用户所有订单提现状态都是已完成</span> -->
@@ -182,6 +182,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#order-list",
         params: {
           pageNum: pageNum,
           orderType: this.orderType,

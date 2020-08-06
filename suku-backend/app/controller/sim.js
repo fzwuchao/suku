@@ -550,6 +550,29 @@ class SimController extends BaseController {
   }
 
   /**
+   * 获取iccid
+   * 都需要同步的字段有：状态信息、开关机状态、通信功能开通、流量累计使用量
+   * 主叫卡还需要同步的字段：语音累计使用量
+   */
+  async iccidSyncUpdate() {
+    const ctx = this.ctx;
+    const { request, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim([ 'simType' ]),
+    };
+    ctx.validate(rule, request.query);
+    const { simType } = request.query;
+
+    // await ctx.service.sim.migrationSyncUpdate(simType);
+    // await ctx.service.schedule.monthCalculate();
+    // await ctx.service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, '((month_used_flow*virtual_mult) >= (month_overlap_flow+month_flow) and card_status=2)');
+    // await ctx.service.schedule.syncUpdateBatch();
+    await ctx.service.sim.iccidSyncUpdate(simType);
+    this.success('', '同步更新完成');
+  }
+
+  /**
    * 一键设置卡阀值
    */
   async configLimtValue() {

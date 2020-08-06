@@ -1,5 +1,5 @@
 <template>
-  <div class="increase-pack-list">
+  <div class="increase-pack-list" id="increase-pack-list">
     <div class="btn-list">
       <!-- <el-button type="primary" @click="checkDemand">审核</el-button> -->
       <el-button
@@ -172,6 +172,7 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#increase-pack-list",
         params: {
           pageNum: pageNum,
           pageSize: this.pageSize,

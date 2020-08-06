@@ -35,7 +35,7 @@
 <script>
 import { Toast } from "vant";
 // import { validateTel } from "../utils/validate"
-
+import { isInt } from '../utils/index';
 export default {
   data() {
     return {
@@ -48,10 +48,20 @@ export default {
   },
   methods: {
     querySim() {
+      this.simIdOrIccid = this.simIdOrIccid.trim();
       if (this.simIdOrIccid.trim() == "") {
         Toast("请输入物联卡卡号");
         return;
       }
+      if(!isInt(this.simIdOrIccid)) {
+        Toast("请输入11或者13位的卡号，或者20位的iccid");
+        return ;
+      }
+      if(this.simIdOrIccid.length != 11 && this.simIdOrIccid.length != 13 && this.simIdOrIccid.length != 20) {
+        Toast("请输入11,13位的卡号，或者20位的iccid");
+        return ;
+      }
+      
       // if(!validateTel(this.simId)) {
       //   Toast("请输入正确的卡号");
       //   return;

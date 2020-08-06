@@ -48,3 +48,15 @@ export function formatDisplayFlow(monthFlow) {
   }
 return monthFlow;
 }
+
+export function isInt(value) {
+  value = value.trim() - 0;
+  if (typeof value !== 'number') {
+    return false;
+  }
+  if(!(/(^[1-9]\d*$)/.test(value))) {
+    return false;
+  }
+  return true;
+  
+}

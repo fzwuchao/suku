@@ -1,5 +1,5 @@
 <template>
-  <div class="withdrawal-list">
+  <div class="withdrawal-list" id="msg-above">
     <div class="btn-list"></div>
 
     <el-table
@@ -106,6 +106,7 @@ export default {
       params.pageSize = this.pageSize;
       this.axios({
         method: "get",
+        loadEl: "#msg-above",
         params,
         url: API.MESSAGE.GET_MESSAGE_UPGOING_LIST
       }).then(r => {
