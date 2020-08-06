@@ -696,11 +696,29 @@ class SimController extends BaseController {
       ...sim(),
     };
     ctx.validate(rule, request.body);
-    const { simNum, simRange, otherComboIds } = request.body;
+    const { simNum, simRange, otherComboIds, simType } = request.body;
     if (!simNum && !simRange) {
       this.fail(null, null, '传入的卡号或卡段值为空');
       return;
     }
+
+    let simIds = [];
+    let flag = 'simNum';
+    if (simNum) {
+      simIds = simNum.split(',');
+      flag = 'simNum';
+    }
+    if (simRange) {
+      simIds = simRange;
+      flag = 'simRange';
+    }
+    const result = await service.sim.getSimBySimIdsNonSimType(flag, simIds, simType);
+    if (result.length > 0) {
+      const simIdsNonSimType = result.map(item => item.dataValues[ 'simId' ]).join(',');
+      this.fail(null, simIdsNonSimType, `卡中包含非${simType}类型的卡`);
+      return;
+    }
+
     const data = { otherComboIds };
     let isSuccess = false;
     if (simNum) {
@@ -711,6 +729,53 @@ class SimController extends BaseController {
     }
     isSuccess ? this.success(null, '批量更换套餐成功') : this.fail(null, null, '批量更换套餐失败');
 
+  }
+
+  async changeActiveComboBySimNumOrSimRange() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    ctx.validate(rule, request.body);
+    const { simNum, simRange, activeComboId, activeComboName, simType } = request.body;
+    if (!simNum && !simRange) {
+      this.fail(null, null, '传入的卡号或卡段值为空');
+      return;
+    }
+    let simIds = [];
+    let flag = 'simNum';
+    if (simNum) {
+      simIds = simNum.split(',');
+      flag = 'simNum';
+    }
+    if (simRange) {
+      simIds = simRange;
+      flag = 'simRange';
+    }
+    const result = await service.sim.getSimBySimIdsNonSimType(flag, simIds, simType);
+    if (result.length > 0) {
+      const simIdsNonSimType = result.map(item => item.dataValues[ 'simId' ]).join(',');
+      this.fail(null, simIdsNonSimType, `卡中包含非${simType}类型的卡`);
+      return;
+    }
+    const {
+      monthFlow,
+      monthVoice,
+      renewPrice,
+      monthRent,
+    } = await service.simCombo.getSimComboById(activeComboId);
+
+    const data = { activeComboId, activeComboName, monthFlow, monthVoice, renewPrice, monthRent };
+    let isSuccess = false;
+    if (simNum) {
+      isSuccess = await service.sim.batchUpdateBySimIds(data, simIds);
+    }
+    if (simRange) {
+      isSuccess = await service.sim.batchUpdateByLikeSimId(data, simIds);
+    }
+    isSuccess ? this.success(null, '批量更换激活套餐成功') : this.fail(null, null, '批量更换激活套餐失败');
   }
 
   async changeUserBySimNumOrSimRange() {

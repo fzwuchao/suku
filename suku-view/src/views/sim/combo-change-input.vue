@@ -166,6 +166,7 @@ export default {
             data: {
               ...data,
               ...params,
+              simType: this.simType,
             },
             url: API.SIMLIST.SIM_BATCH_UPDATE_SIM_COMBO
           }).then(r => {

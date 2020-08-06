@@ -719,7 +719,24 @@ class SimService extends BaseService {
     return res;
   }
 
-
+  async getSimBySimIdsNonSimType(flag, simIds, simType) {
+    const Op = this.getOp();
+    const flagToSimConditionMap = {
+      simNum: { [Op.in]: simIds },
+      simRange: { [Op.between]: simIds },
+    };
+    const attributes = [ 'simId' ];
+    const result = await this.app.model.Sim.findAll({
+      attributes,
+      where: {
+        simId: flagToSimConditionMap[flag],
+        simType: {
+          [Op.ne]: simType,
+        },
+      },
+    });
+    return result;
+  }
 }
 
 module.exports = SimService;

@@ -125,6 +125,12 @@
         v-if="isSysManager"
         @click="handleComboChangeInput"
       >更换套餐(卡号或卡段)</el-button>
+      <!-- <el-button
+        type="primary"
+        size="mini"
+        v-if="isSysManager && simType === 'A'"
+        @click="handleActiveComboChangeInput"
+      >更换激活套餐(卡号或卡段)</el-button> -->
     </div>
 
     <el-table
@@ -421,6 +427,17 @@
       ></combo-change-input>
     </el-dialog>
     <el-dialog
+      title="更换激活套餐(卡号或卡段)"
+      :before-close="handleChangeActiveComboClose"
+      :visible.sync="activeComboInputDialog"
+    >
+      <active-combo-change-input
+        ref="activeComboChangeInput"
+        :type="simType"
+        @close="closeActiveComboInputChange"
+      ></active-combo-change-input>
+    </el-dialog>
+    <el-dialog
       title="用户增价"
       :visible.sync="priceDialog"
     >
@@ -449,6 +466,7 @@ import comImport from "./com-import";
 import comImportTransfor from "./com-import-transfor";
 import comboChange from "./combo-change";
 import comboChangeInput from "./combo-change-input";
+import activeComboChangeInput from "./active-combo-change-input";
 import userPrice from "./user-price";
 import userList from "./user-list";
 import userListInput from "./user-list-input";
@@ -467,6 +485,7 @@ export default {
       importDialogForTransfor: false,
       comboDialog: false,
       comboInputDialog: false,
+      activeComboInputDialog: false,
       priceDialog: false,
       userDialog: false,
       userWithSimNumOrRangeDialog: false,
@@ -627,6 +646,7 @@ export default {
     comImportTransfor,
     comboChange,
     comboChangeInput,
+    activeComboChangeInput,
     userPrice,
     userList,
     userListInput
@@ -693,6 +713,10 @@ export default {
       // this.$refs['comboChangeInput'].$refs['ruleForm'].resetFields();
       this.$refs['comboChangeInput'].reset();
       this.comboInputDialog = false;
+    },
+    handleChangeActiveComboClose() {
+      this.$refs['activeComboChangeInput'].reset();
+      this.activeComboInputDialog = false;
     },
     activate(isActivated) {
       // 对应要复机/停机的卡的状态
@@ -1009,11 +1033,18 @@ export default {
       this.comboInputDialog = false;
       this.getlist();
     },
+    closeActiveComboInputChange() {
+      this.activeComboInputDialog = false;
+      this.getlist();
+    },
     handleComboChange() {
       this.comboDialog = this.checkIsSelected();
     },
     handleComboChangeInput() {
       this.comboInputDialog = true;
+    },
+    handleActiveComboChangeInput() {
+      this.activeComboInputDialog = true;
     },
     reset() {
       this.multipleSelection = [];
