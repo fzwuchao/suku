@@ -60,3 +60,7 @@ export function isInt(value) {
   return true;
   
 }
+export function isNumAndWord(value) {
+  const reg = /^[0-9a-zA-Z]+$/
+  return reg.test(value)
+}

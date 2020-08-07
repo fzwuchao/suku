@@ -35,7 +35,7 @@
 <script>
 import { Toast } from "vant";
 // import { validateTel } from "../utils/validate"
-import { isInt } from '../utils/index';
+import { isInt, isNumAndWord } from '../utils/index';
 export default {
   data() {
     return {
@@ -53,12 +53,25 @@ export default {
         Toast("请输入物联卡卡号");
         return;
       }
-      if(!isInt(this.simIdOrIccid)) {
-        Toast("请输入11或者13位的卡号，或者20位的iccid");
+      const len = this.simIdOrIccid.length;
+      const erroMsg = '请输入11或者13位的卡号，或者20位的iccid';
+      const isLenError = [11, 13, 20].every(item => item !== len);
+      if (isLenError) {
+        Toast(erroMsg);
         return ;
       }
-      if(this.simIdOrIccid.length != 11 && this.simIdOrIccid.length != 13 && this.simIdOrIccid.length != 20) {
-        Toast("请输入11,13位的卡号，或者20位的iccid");
+      let isCheckOk = false;
+      if (len === 20 && !isNumAndWord(this.simIdOrIccid)) {
+        // iccid检验
+        isCheckOk = false;
+      } else if ((len === 11 || len === 13) && !isInt(this.simIdOrIccid)) {
+        // simId检验
+        isCheckOk = false;
+      } else {
+        isCheckOk = true;
+      }
+      if (!isCheckOk) {
+        Toast(erroMsg);
         return ;
       }
       

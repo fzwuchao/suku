@@ -491,10 +491,18 @@ class SimController extends BaseController {
       ...sim(),
     };
     const { simIdOrIccid, simId } = request.query;
-    const idValue = simId || simIdOrIccid;
-    const params = {
-      simId: idValue, iccid: idValue,
-    };
+    const params = {};
+    if (simId) {
+      params.simId = simId;
+    } else if (simIdOrIccid) {
+      const len = simIdOrIccid.length;
+      if (len === 11 || len === 13) {
+        params.simId = simIdOrIccid;
+      } else if (len === 20) {
+        params.iccid = simIdOrIccid;
+      }
+    }
+
     ctx.validate(rule, params);
     const simData = await service.sim.getSimBySimIdOrIccid(params);
     if (!simData) {

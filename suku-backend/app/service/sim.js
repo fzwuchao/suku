@@ -71,9 +71,15 @@ class SimService extends BaseService {
 
   async getSimBySimIdOrIccid({ simId, iccid }) {
     const Op = this.getOp();
+    const wCond = {};
+    if (simId) {
+      wCond.simId = simId;
+    } else if (iccid) {
+      wCond.iccid = iccid;
+    }
     const sim = await this.app.model.Sim.findOne({
       where: {
-        [Op.or]: [{ simId }, { iccid }],
+        ...wCond,
       },
     });
     return sim;
