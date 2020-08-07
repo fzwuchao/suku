@@ -151,14 +151,14 @@ class JobLogService extends BaseService {
     let voiceIds = [];
     for (let i = 0; i < datas.length; i++) { // result.length
       const item = datas[i];
-      if((item.virtualMult * item.monthUsedFlow) > ((item.monthOverlapFlow-0)+(item.monthFlow-0)) || (!sim.overdueTime && moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0)) {
+      if((item.virtualMult * item.monthUsedFlow) > ((item.monthOverlapFlow-0)+(item.monthFlow-0)) || (!item.overdueTime && moment(new Date()).diff(moment(item.overdueTime), 'years', true) >= 0)) {
         if(item.flowServStatus ===  SERV_STATUS.ON)
         {
           flowIds.push(item.simId);
         }
         
       }
-      if((item.monthUsedVoiceDuration) > ((item.monthOverlapVoiceDuration-0)+(item.monthVoice-0))  || (!sim.overdueTime && moment(new Date()).diff(moment(sim.overdueTime), 'years', true) >= 0)) {
+      if((item.monthUsedVoiceDuration) > ((item.monthOverlapVoiceDuration-0)+(item.monthVoice-0))  || (!item.overdueTime && moment(new Date()).diff(moment(item.overdueTime), 'years', true) >= 0)) {
         if(item.voiceServStatus ===  SERV_STATUS.ON)
         {
           voiceIds.push(item.simId)
