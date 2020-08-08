@@ -53,7 +53,7 @@ class WechatController extends BaseController {
       if (order.orderType === 2 && sim.monthShengyuVoiceDuration > 0 && sim.voiceServStatus === SERV_STATUS.OFF) {
         await service.chinaMobile.operateSimCallFunction('0', simId); // 开启语音服务
       }
-      await ctx.service.sim.syncUpdate(sim);
+      await ctx.service.sim.syncUpdate(sim, false, false, '[controller->wechat->payBack]');
 
     } else {
       await ctx.service.simOrder.update({ orderId: info.out_trade_no, orderStatus: 0 });

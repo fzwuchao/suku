@@ -77,8 +77,8 @@ class JobLogService extends BaseService {
   async openFlowServ(data, done) {
     const { service, logger } = this.ctx;
     await service.chinaMobile.operateSimApnFunction('0', data.simId);
-    const sim = service.sim.getSimBySimId(data.simId);
-    await service.sim.syncUpdate(sim);
+    const sim = await service.sim.getSimBySimId(data.simId);
+    await service.sim.syncUpdate(sim, false, false, '[service->jobLog->openFlowServ]');
     done();
   }
 

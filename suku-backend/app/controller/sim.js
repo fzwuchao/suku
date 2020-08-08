@@ -531,7 +531,7 @@ class SimController extends BaseController {
     ctx.validate(rule, request.query);
     const { simId } = request.query;
     const simO = await ctx.service.sim.getSimBySimId(simId)
-    await ctx.service.sim.syncUpdate(simO);
+    await ctx.service.sim.syncUpdate(simO, false, false, '[controller->sim->syncUpdate]');
     this.success('', '同步更新完成');
   }
 
