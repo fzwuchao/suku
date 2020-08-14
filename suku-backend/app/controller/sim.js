@@ -55,6 +55,9 @@ const activeComboOldToNewMap = [{
 }, {
   old: [ '88元每月3G' ],
   new: '88元每月3G',
+}, {
+  old: [ '60M半年卡' ],
+  new: '60M半年',
 }];
 class SimController extends BaseController {
   // 查询

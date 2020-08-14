@@ -3,4 +3,4 @@
 # 每天晚间23:00备份数据
 # crontab -e
 # 0       23       *       *       *        /home/suku/prerequisites/backup-data_schedule.sh
-sh ./backup-data.sh
+sh /home/suku/prerequisites/backup-data.sh
