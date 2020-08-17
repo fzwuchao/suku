@@ -9,6 +9,7 @@ import SIMLOGISTICS from './simLogistics'
 import MESSAGE from './message'
 import ORDER from './order'
 import LOGS from './logs'
+import WITHDRAWAL from './withdrawal'
 export default {
     SIMCOMBO,
     SIMLIST,
@@ -20,5 +21,6 @@ export default {
     SIMLOGISTICS,
     MESSAGE,
     ORDER,
-    LOGS
+    LOGS,
+    WITHDRAWAL
 }
