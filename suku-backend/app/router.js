@@ -185,4 +185,7 @@ module.exports = app => {
   router.post('/wechat/payBack', payApi.middleware('pay'), controller.wechat.payBack);
   // router.post('/wechat/payBack', controller.wechat.payBack);
 
+  // 提现
+  router.get('/withdrawal/getWithdrawalOrderList', controller.simOrder.getWithdrawalOrderList);
+
 };

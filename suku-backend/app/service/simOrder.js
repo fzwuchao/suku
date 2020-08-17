@@ -12,7 +12,7 @@ const calc = require('calculatorjs');
 
 // user表名
 // const TABLE_USER = 'user';
-const { LIMT_OPTY,SIM_CARD_STATUS } = require('../extend/constant')();
+const { LIMT_OPTY,SIM_CARD_STATUS, ORDER_STATUS } = require('../extend/constant')();
 class SimOrderService extends BaseService {
 
 
@@ -66,6 +66,60 @@ class SimOrderService extends BaseService {
       where,
     }, queryKey);
     return result;
+  }
+  async getWithdrawalSimOrder(query) {
+    const attributes = [ 'id', 'orderId', 'simId', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'cpname', 'wxSerialNum', 'orderStatus', 'createdAt' ];
+    const { pageSize, pageNum } = query;
+    const Op = this.getOp();
+    const where = {};
+    const curUser = this.getCurUser();
+    // 用户分成率
+    const userToRateMap = {};
+    // 当前用户信息
+    const curUserInfo = await this.ctx.service.user.getUserById(curUser.id);
+    userToRateMap[curUserInfo.id] = curUserInfo.rate;
+    // 当前用户已经提现过的订单ids
+    const orderIds = await this.ctx.service.orderWithdrawalMap.getOrderIdsByUids(curUser.id);
+    // 当前用户的下一级用户
+    const nextUsers = await this.ctx.service.user.getAllNextUserByPid(curUser.id);
+    const nextUserIds = nextUsers.map(item => {
+      userToRateMap[item.id] = item.rate;
+      return item.id;
+    });
+    where.uid = {
+      [Op.in]: nextUserIds,
+    };
+    where.orderStatus = ORDER_STATUS.SUCCESS;
+    where.id = {
+      [Op.notIn]: orderIds,
+    };
+    // 当前用户及下一级用户的所有订单金额
+    const simOrderAmount = await this.getWithdrawalOrderAmountGroupByUid(nextUserIds.conat([ curUser.id ]));
+    
+    const result = await this.findAndCountAll('SimOrder', pageSize, pageNum, {
+      attributes,
+      where,
+    });
+    return { ...result, simOrderAmount };
+  }
+
+  async getWithdrawalOrderAmountGroupByUid(uids) {
+    const attributes = [
+      'uid',
+      [ this.app.model.fn('SUM', this.app.model.col('deal_amount')), 'total' ],
+    ];
+    const Op = this.getOp();
+    const simOrder = await this.app.model.SimOrder.findAll({
+      attributes,
+      where: {
+        uid: {
+          [Op.in]: uids,
+        },
+        orderStatus: ORDER_STATUS.SUCCESS,
+      },
+      group: 'uid',
+    });
+    return simOrder;
   }
   async changeSim(sim, order) {
     const newSim = {};
