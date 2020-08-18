@@ -8,6 +8,7 @@ const simLogistics = require('./simLogistics');
 const messageSend = require('./messageSend');
 const simOrder = require('./simOrder');
 const writeList = require('./writeList');
+const wbAccount = require('./wbAccount');
 const permission = require('./permission');
 const role = require('./role');
 
@@ -46,5 +47,6 @@ module.exports = () => {
     writeList: createRule(writeList),
     permission: createRule(permission),
     role: createRule(role),
+    wbAccount: createRule(wbAccount),
   };
 };
