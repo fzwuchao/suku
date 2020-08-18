@@ -28,10 +28,11 @@ class WbAccountService extends BaseService {
   }
 
   async create(account) {
+    const { logger } = this.ctx;
     try {
       await this.app.model.WbAccount.create(account);
     } catch (e) {
-      return false;
+      logger.error(e);
     }
     return true;
   }

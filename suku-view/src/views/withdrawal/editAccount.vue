@@ -1,88 +1,87 @@
 <template>
   <div class="add-person">
-    <edit-bar></edit-bar>
-    <el-form label-width="130px" :model="user" :rules="rules" ref="ruleForm">
-      <el-form-item label="账户名" prop="name">
-        <el-input v-model="user.name"></el-input>
+    <el-form label-width="130px" :model="account" :rules="rules" ref="ruleForm">
+      <el-form-item label="别名" prop="aliasName">
+        <el-input v-model="account.aliasName"></el-input>
       </el-form-item>
-      <el-form-item label="账户号" prop="username">
-        <el-input v-model="user.username"></el-input>
+      <el-form-item  label="账户名" prop="acName">
+        <el-input v-model="account.acName"></el-input>
       </el-form-item>
-      <el-form-item label="开户行" prop="phone">
-        <el-input v-model="user.phone"></el-input>
+      <el-form-item  label="账户号" prop="account">
+        <el-input v-model="account.account"></el-input>
+      </el-form-item>
+      <el-form-item  label="开户行" prop="acAddr">
+        <el-input v-model="account.acAddr"></el-input>
       </el-form-item>
 
       <el-form-item>
         <el-button type="primary" @click="submit">提交</el-button>
       </el-form-item>
     </el-form>
+    
   </div>
 </template>
 
 <script>
-import EditBar from "../../components/EditBar";
-// import API from "@/api";
+import API from "@/api";
 // import { validateTel } from "../../utils/validate.js";
 export default {
-  components: {
-    EditBar
-  },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
-      user: {
-        id: 25,
-        pid: 2,
-        level: 2,
-        username: "test",
-        phone: "13707949965",
-        name: "系统管理员",
-        email: null,
-        open_msg: 1,
-        mch_id: "1230000109",
-        rate: 0.5,
-        float_price: "0.00",
-        uuid: "deaff25c-335d-35e0-bad4-3d359461ac3c",
-        created_at: "2019-08-22 15:08:13",
-        updated_at: "2019-10-31 17:18:41",
-        role_id: 1,
-        parent_name: "系统管理员",
-        open_msg_text: "<span style='color:green'>已开通</span>",
-        role_name: "1"
+      account: {
+        id: null,
+        aliasName: '',
+        acName: '',
+        account: '',
+        acAddr: ''
       },
       rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
+        acName: [
+          { required: true, message: "请输入账户名", trigger: "blur" }
+        ],
+        account: [
+          { required: true, message: "请输入账户号", trigger: "blur" }
+        ],
+        acAddr: [
+          { required: true, message: "请输入开户行", trigger: "blur" }
         ]
       }
     };
   },
+  props:['dataAccount'],
   methods: {
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
+          let data = this.account;
           this.axios({
             method: "post",
             data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
+            url: API.WITHDRAWAL.ACCOUNT_SAVE
           }).then(() => {
-            this.$router.push("/demand/list");
+            this.$emit('complateAc')
           });
         } else {
           return false;
         }
-      }); */
+      });
+    },
+    resetForm() {
+      this.$refs["ruleForm"].resetFields();
     }
   },
-  mounted() {}
+  mounted() {},
+  watch: {
+    dataAccount(val) {
+      this.account = val;
+    }
+  },
+  created() {
+    if(this.dataAccount) {
+      this.account = this.dataAccount;
+    }
+    
+  }
 };
 </script>
 

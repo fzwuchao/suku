@@ -187,5 +187,7 @@ module.exports = app => {
 
   // 提现
   router.get('/withdrawal/getWithdrawalOrderList', controller.simOrder.getWithdrawalOrderList);
-
+  router.post('/wbAccount/saveAccount', controller.wbAccount.save);
+  router.get('/wbAccount/getAccountList', controller.wbAccount.getAccountList);
+  
 };
