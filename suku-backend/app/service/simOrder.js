@@ -73,34 +73,58 @@ class SimOrderService extends BaseService {
     const Op = this.getOp();
     const where = {};
     const curUser = this.getCurUser();
-    // 用户分成率
     const userToRateMap = {};
     // 当前用户信息
     const curUserInfo = await this.ctx.service.user.getUserById(curUser.id);
     userToRateMap[curUserInfo.id] = curUserInfo.rate;
+    const roleId = curUser.roleId;
     // 当前用户已经提现过的订单ids
-    const orderIds = await this.ctx.service.orderWithdrawalMap.getOrderIdsByUids(curUser.id);
-    // 当前用户的下一级用户
-    const nextUsers = await this.ctx.service.user.getAllNextUserByPid(curUser.id);
-    const nextUserIds = nextUsers.map(item => {
-      userToRateMap[item.id] = item.rate;
-      return item.id;
-    });
+    const orderIds = await this.ctx.service.orderWithdrawalMap.getOrderIdsByUids([curUser.id]);
+    let uids = [];
+    let rateAmount = 0;
+    if (roleId === 6) {
+      // 分销商
+      // 当前用户的下一级用户
+      const nextUsers = await this.ctx.service.user.getAllNextUserByPid(curUser.id);
+      const nextUserIds = nextUsers.map(item => {
+        userToRateMap[item.id] = item.rate;
+        return item.id;
+      });
+      uids = [ curUser.id ].concat(nextUserIds);
+      // 当前用户及下一级用户的所有订单金额
+      const nextUserOrderAmount = await this.getWithdrawalOrderAmountGroupByUid(nextUserIds);
+      let count = 0;
+      nextUserOrderAmount.forEach(item => {
+        const total = item.total;
+        const rate = userToRateMap[item.uid].rate;
+        count += (1 - rate) * total;
+
+      });
+      const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ]);
+      rateAmount = curUserAmount.total * userToRateMap[curUser.id].rate + count; 
+    } else if (roleId === 7) {
+      // 经销商
+      uids = [ curUser.id ];
+      const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ]);
+      rateAmount = curUserAmount.total * userToRateMap[curUser.id].rate; 
+    }
     where.uid = {
-      [Op.in]: nextUserIds,
+      [Op.in]: uids,
     };
     where.orderStatus = ORDER_STATUS.SUCCESS;
-    where.id = {
-      [Op.notIn]: orderIds,
-    };
-    // 当前用户及下一级用户的所有订单金额
-    const simOrderAmount = await this.getWithdrawalOrderAmountGroupByUid(nextUserIds.conat([ curUser.id ]));
+    if (orderIds && orderIds.length > 0) {
+      where.id = {
+        [Op.notIn]: orderIds,
+      };
+
+    }
+    
     
     const result = await this.findAndCountAll('SimOrder', pageSize, pageNum, {
       attributes,
       where,
     });
-    return { ...result, simOrderAmount };
+    return { ...result, rateAmount };
   }
 
   async getWithdrawalOrderAmountGroupByUid(uids) {
