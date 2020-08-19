@@ -12,7 +12,7 @@ const calc = require('calculatorjs');
 
 // user表名
 // const TABLE_USER = 'user';
-const { LIMT_OPTY,SIM_CARD_STATUS } = require('../extend/constant')();
+const { LIMT_OPTY, SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS } = require('../extend/constant')();
 class SimOrderService extends BaseService {
 
 
@@ -96,6 +96,7 @@ class SimOrderService extends BaseService {
           order.months = packMonths;
         }
         newSim.cardStatus = SIM_CARD_STATUS.ACTIVE;
+        newSim.flowServStatus = SIM_FLOW_SERV_STATUS.ON;
         const newTime = moment(newSim.overdueTime).add(order.months, 'M');
         newSim.overdueTime = new Date(((newTime.date(newTime.daysInMonth())).format('YYYY-MM-DD') + ' 23:59:59'));
         break;
