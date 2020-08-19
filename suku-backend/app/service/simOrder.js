@@ -82,8 +82,11 @@ class SimOrderService extends BaseService {
     const orderIds = await this.ctx.service.orderWithdrawalMap.getOrderIdsByUids([curUser.id]);
     let uids = [];
     let rateAmount = 0;
-    if (roleId === 6) {
-      // 分销商
+    let total = 0;
+    let rate = 0;
+    
+    if (roleId === 7) {
+      // 经销商
       // 当前用户的下一级用户
       const nextUsers = await this.ctx.service.user.getAllNextUserByPid(curUser.id);
       const nextUserIds = nextUsers.map(item => {
@@ -95,18 +98,39 @@ class SimOrderService extends BaseService {
       const nextUserOrderAmount = await this.getWithdrawalOrderAmountGroupByUid(nextUserIds);
       let count = 0;
       nextUserOrderAmount.forEach(item => {
-        const total = item.total;
-        const rate = userToRateMap[item.uid].rate;
+        const totalStr = item.dataValues['total'];
+        const total = Number(totalStr ? totalStr : 0);
+        const rateStr = userToRateMap[item.uid];
+        let rate = 0;
+        if (rateStr) {
+          rate = Number(rateStr);
+        }
         count += (1 - rate) * total;
 
       });
       const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ]);
-      rateAmount = curUserAmount.total * userToRateMap[curUser.id].rate + count; 
-    } else if (roleId === 7) {
-      // 经销商
+      if (curUserAmount && curUserAmount.length > 0) {
+        const totalStr = curUserAmount[0].dataValues['total'];
+        total = Number(totalStr ? totalStr : 0);
+      }
+      const rateStr = userToRateMap[curUser.id];
+      if (rateStr) {
+        rate = Number(rateStr);
+      }
+      rateAmount = total * rate + count; 
+    } else if (roleId === 6) {
+      // 分销商
       uids = [ curUser.id ];
       const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ]);
-      rateAmount = curUserAmount.total * userToRateMap[curUser.id].rate; 
+      if (curUserAmount && curUserAmount.length > 0) {
+        const totalStr = curUserAmount[0].dataValues['total'];
+        total = Number(totalStr ? totalStr : 0);
+      }
+      const rateStr = userToRateMap[curUser.id];
+      if (rateStr) {
+        rate = Number(rateStr);
+      }
+      rateAmount = total * rate;
     }
     where.uid = {
       [Op.in]: uids,
@@ -118,7 +142,6 @@ class SimOrderService extends BaseService {
       };
 
     }
-    
     
     const result = await this.findAndCountAll('SimOrder', pageSize, pageNum, {
       attributes,

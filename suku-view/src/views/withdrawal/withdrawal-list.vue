@@ -1,8 +1,8 @@
 <template>
-  <div class="withdrawal-list">
+  <div class="sim-list" id="order-list">
     <div class="btn-list">
-      <el-button type="primary" size="mini">导出查询结果</el-button>
-      <el-button type="primary" size="mini">完成查询结果</el-button>
+     <span :style="{marginRight: '20px'}">{{`可提现金额：${withdrawalMoney}`}}</span>
+     <el-button type="primary" size="mini" @click="openWithdrawal">提现</el-button>
     </div>
 
     <el-table
@@ -23,187 +23,151 @@
       <el-table-column
         align="left"
         fixed="left"
-        label="流水号"
+        label="SIM卡号"
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.simId}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.uname}}</template>
       </el-table-column>
-      <el-table-column align="left" label="提现金额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" label="套餐" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.cname}}</template>
       </el-table-column>
-      <el-table-column align="left" label="账户号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="120px" label="套餐包" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.cpname}}</template>
       </el-table-column>
-      <el-table-column align="left" label="账户名" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="120px" label="交易金额" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.dealAmount}}</template>
       </el-table-column>
-      <el-table-column align="left" label="开户行" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+      <el-table-column align="left" min-width="120px" label="续增金额" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.renewIncrAmount}}</template>
       </el-table-column>
-      <el-table-column align="left" min-width="120px" label="提现时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+      <el-table-column align="left" label="订单号" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.orderId }}</template>
       </el-table-column>
-      <el-table-column align="left" min-width="120px" label="状态" show-overflow-tooltip>
-        <template>{{ "1:待处理；2:处理中；3:完成"}}</template>
+      <el-table-column align="left" label="订单状态" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.orderStatus | orderStatus }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="微信流水号" min-width="120px" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.wxSerialNum }}</template>
+      </el-table-column>
+      <el-table-column align="left" label="创建时间" show-overflow-tooltip>
+        <template slot-scope="scope">{{ scope.row.createdAt }}</template>
       </el-table-column>
     </el-table>
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
-        :current-page="data.pageNum"
+        @size-change="handleSizeChange"
+        :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[20, 30, 50, 100]"
+        :page-sizes="[50, 100, 200, 300, 400]"
         background
-        layout="total,prev, pager, next"
+        layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
-    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+    <el-dialog title="提现" :visible.sync="withdrawalDialog">
+      <withdrawal :money="withdrawalMoney"></withdrawal>
+    </el-dialog>
+    
   </div>
 </template>
 
 <script>
 import API from "@/api";
-import searchBar from "@/components/SearchBar";
 import { getTableHeight } from "@/utils";
+import Withdrawal from "./withdrawal";
 export default {
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
-      pageSize: 30,
-      importDialog: false,
+      pageSize: 50,
+      withdrawalDialog: false,
       tableHeight: null,
       list: [],
+      withdrawalMoney: 0,
       data: null,
-      searchData: [
-        {
-          name: "simId1",
-          title: "提现流水号",
-          type: "inputText",
-          value: ""
-        },
-        {
-          name: "netStatus",
-          title: "用户",
-          type: "multiple",
-          values: [
-            { value: 1, key: "激活套餐" },
-            { value: 2, key: "叠加套餐" },
-            { value: 3, key: "特惠套餐" }
-          ],
-          active: [1, 2, 3]
-        },
-        {
-          name: "netStatus",
-          title: "状态",
-          type: "multiple",
-          values: [
-            { value: 1, key: "待处理" },
-            { value: 2, key: "处理中" },
-            { value: 3, key: "完成" }
-          ],
-          active: [1, 2, 3]
-        }
-      ]
-    };
-  },
-  props: {
-    type: String
+
+    }
   },
   components: {
-    searchBar
+    Withdrawal
   },
   filters: {
-    comboType(type) {
-      type = type - 0;
+    orderStatus(val) {
       let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
+      switch (val) {
         case 2:
-          returnStr = "叠加套餐";
+          returnStr = "成功";
           break;
-        case 3:
-          returnStr = "特惠套餐";
+        case 0:
+          returnStr = "失败";
           break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
+        case 1:
+          returnStr = "未支付";
+          break;
       }
       return returnStr;
     }
   },
   methods: {
-    pageChange() {
+    handleSizeChange(val) {
+      this.pageSize = val;
       this.getlist();
     },
-    editCombo(row) {
-      this.$router.push(`/simcombo/editinfo/${row.id}`);
+    pageChange(page) {
+      this.pageNum = page;
+      this.getlist();
     },
-    getlist() {
+    openWithdrawal() {
+      this.withdrawalDialog = true;
+    },
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
+      }
       this.axios({
         method: "get",
         params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize
+          pageNum: pageNum,
+          pageSize: this.pageSize,
         },
         url: API.WITHDRAWAL.GET_WD_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
+        this.withdrawalMoney = this.data.rateAmount || 0;
       });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
-    }
+    
   },
   mounted() {
     this.getlist();
   },
-  watch: {
-    type: function(newVal) {
-      this.simType = newVal;
-    }
-  },
   created() {
-    this.simType = this.type;
+    this.orderType = this.type;
     this.tableHeight = getTableHeight();
   }
 };
 </script>
 <style lang="scss">
-.withdrawal-list {
+.sim-list {
   padding: 0 60px;
   font-weight: 400;
   .el-table__body-wrapper {
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: auto;
   }
 }
 </style>
