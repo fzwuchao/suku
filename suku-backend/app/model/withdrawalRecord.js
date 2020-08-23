@@ -9,7 +9,8 @@ module.exports = app => {
     id: {
       type: BIGINT(20),
       primaryKey: true,
-      comment: '流水号',
+      autoIncrement: true,
+      comment: '提现id',
     },
     uid: {
       type: BIGINT(20),
@@ -26,20 +27,28 @@ module.exports = app => {
       defaultValue: 0,
       comment: '提现金额',
     },
-    accountNum: {
+    accId: {
       type: BIGINT(20),
-      field: 'account_num',
-      allowNull: false,
+      field: 'acc_id',
+      comment: '账户id',
+    },
+    account: {
+      type: STRING(30),
       comment: '账户号',
     },
-    accountName: {
-      type: STRING(50),
-      field: 'account_name',
-      allowNull: false,
+    aliasName: {
+      type: STRING(45),
+      field: 'alias_name',
+      comment: '别名',
+    },
+    accName: {
+      type: STRING(20),
+      field: 'acc_name',
       comment: '账户名',
     },
-    bank: {
+    accAddr: {
       type: STRING(100),
+      field: 'acc_addr',
       comment: '开户行',
     },
     status: {
@@ -50,7 +59,7 @@ module.exports = app => {
     createdAt: {
       type: DATE,
       get() {
-        return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
+        return this.getDataValue('createdAt') ? moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss') : '';
       },
       field: 'created_at',
       comment: '创建时间',
@@ -58,7 +67,7 @@ module.exports = app => {
     updatedAt: {
       type: DATE,
       get() {
-        return moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss');
+        return this.getDataValue('updatedAt') ? moment(this.getDataValue('updatedAt')).format('YYYY-MM-DD HH:mm:ss') : '';
       },
       field: 'updated_at',
       comment: '更新时间',

@@ -68,7 +68,7 @@ class SimOrderService extends BaseService {
     return result;
   }
   async getWithdrawalSimOrder(query) {
-    const attributes = [ 'id', 'orderId', 'simId', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'cpname', 'wxSerialNum', 'orderStatus', 'createdAt' ];
+    const attributes = [ 'id', 'orderId', 'simId', 'uid', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'cpname', 'wxSerialNum', 'orderStatus', 'createdAt' ];
     const { pageSize, pageNum } = query;
     const Op = this.getOp();
     const where = {};
@@ -95,7 +95,7 @@ class SimOrderService extends BaseService {
       });
       uids = [ curUser.id ].concat(nextUserIds);
       // 当前用户及下一级用户的所有订单金额
-      const nextUserOrderAmount = await this.getWithdrawalOrderAmountGroupByUid(nextUserIds);
+      const nextUserOrderAmount = await this.getWithdrawalOrderAmountGroupByUid(nextUserIds, orderIds);
       let count = 0;
       nextUserOrderAmount.forEach(item => {
         const totalStr = item.dataValues['total'];
@@ -108,7 +108,7 @@ class SimOrderService extends BaseService {
         count += (1 - rate) * total;
 
       });
-      const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ]);
+      const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ], orderIds);
       if (curUserAmount && curUserAmount.length > 0) {
         const totalStr = curUserAmount[0].dataValues['total'];
         total = Number(totalStr ? totalStr : 0);
@@ -121,7 +121,7 @@ class SimOrderService extends BaseService {
     } else if (roleId === 6) {
       // 分销商
       uids = [ curUser.id ];
-      const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ]);
+      const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ], orderIds);
       if (curUserAmount && curUserAmount.length > 0) {
         const totalStr = curUserAmount[0].dataValues['total'];
         total = Number(totalStr ? totalStr : 0);
@@ -147,10 +147,22 @@ class SimOrderService extends BaseService {
       attributes,
       where,
     });
-    return { ...result, rateAmount };
+    let list = [];
+    result.list.forEach(order => {
+      const dealAmountStr = order.dataValues['dealAmount'];
+      const rateStr = userToRateMap[order.dataValues['uid']];
+      const dealAmount = dealAmountStr ? Number(dealAmountStr) : 0;
+      const rate = rateStr ? Number(rateStr) : 0;
+      list.push({
+        ...order.dataValues,
+        rateAmount:  dealAmount * rate
+      })
+    })
+    const newRes = { ...result, list };
+    return { ...newRes, rateAmount };
   }
 
-  async getWithdrawalOrderAmountGroupByUid(uids) {
+  async getWithdrawalOrderAmountGroupByUid(uids, orderIds) {
     const attributes = [
       'uid',
       [ this.app.model.fn('SUM', this.app.model.col('deal_amount')), 'total' ],
@@ -161,6 +173,9 @@ class SimOrderService extends BaseService {
       where: {
         uid: {
           [Op.in]: uids,
+        },
+        id: {
+          [Op.notIn]: orderIds,
         },
         orderStatus: ORDER_STATUS.SUCCESS,
       },

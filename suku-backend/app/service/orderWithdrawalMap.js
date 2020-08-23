@@ -21,6 +21,9 @@ class OrderWithdrawalMapService extends BaseService {
     return oIds;
   }
 
+  async bulkSave(list, options) {
+    await this.app.model.OrderWithdrawalMap.bulkCreate(list, {...options});
+  }
 
 }
 

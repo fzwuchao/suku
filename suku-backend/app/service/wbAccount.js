@@ -23,7 +23,7 @@ class WbAccountService extends BaseService {
     const where = {};
     const curUser = this.getCurUser();
     where.uid = curUser.id;
-    const results = await this.app.model.User.findAll({ where });
+    const results = await this.app.model.WbAccount.findAll({ where });
     return results;
   }
 
@@ -43,6 +43,14 @@ class WbAccountService extends BaseService {
       return false;
     }
     return true;
+  }
+  async getWbAccountById(id) {
+    try {
+      return await this.app.model.WbAccount.findByPk(id);
+    } catch (error) {
+      this.ctx.logger.error(error);
+      return false;
+    }
   }
 
 }

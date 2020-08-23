@@ -1,7 +1,7 @@
 <template>
   <div class="sim-list" id="order-list">
     <div class="btn-list">
-     <span :style="{marginRight: '20px'}">{{`可提现金额：${withdrawalMoney}`}}</span>
+     <span :style="{marginRight: '20px'}">{{`可提现金额：${totalWithdrawalMoney}`}}</span>
      <el-button type="primary" size="mini" @click="openWithdrawal">提现</el-button>
     </div>
 
@@ -72,7 +72,7 @@
       ></el-pagination>
     </div>
     <el-dialog title="提现" :visible.sync="withdrawalDialog">
-      <withdrawal :money="withdrawalMoney"></withdrawal>
+      <withdrawal :money="withdrawalMoney" :orderIds="orderIds"></withdrawal>
     </el-dialog>
     
   </div>
@@ -92,8 +92,10 @@ export default {
       tableHeight: null,
       list: [],
       withdrawalMoney: 0,
+      totalWithdrawalMoney: 0,
       data: null,
-
+      multipleSelection: [],
+      orderIds: '',
     }
   },
   components: {
@@ -125,8 +127,18 @@ export default {
       this.pageNum = page;
       this.getlist();
     },
+    check() {
+      const isOpen = (this.multipleSelection || []).length > 0;
+      if (!isOpen) {
+        this.$message({
+          message: '请先勾选要提现的订单',
+          type: 'warning',
+        })
+      }
+      return isOpen;
+    },
     openWithdrawal() {
-      this.withdrawalDialog = true;
+      this.check() && (this.withdrawalDialog = true);
     },
     getlist(val) {
       let pageNum = this.pageNum;
@@ -145,13 +157,25 @@ export default {
         this.data = r.data;
         this.list = this.data.list;
         this.pageTotal = this.data.totalRecords;
-        this.withdrawalMoney = this.data.rateAmount || 0;
+        this.totalWithdrawalMoney = this.data.rateAmount || 0;
       });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
     
+  },
+  watch: {
+    multipleSelection(val) {
+      let orderIds = [];
+      let amount = val.reduce((acc, current) => {
+        orderIds.push(current['id'])
+        acc += current['rateAmount'];
+        return acc;
+      }, 0);
+      this.withdrawalMoney = amount;
+      this.orderIds = orderIds.join(',');
+    }
   },
   mounted() {
     this.getlist();

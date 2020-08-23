@@ -1,24 +1,28 @@
 <template>
   <div class="add-person">
-    <el-form label-width="130px" :model="user" :rules="rules" ref="ruleForm">
+    <el-form label-width="130px" :model="selectedAccount" ref="ruleForm">
       <el-form-item label="可选常用账户">
-        <el-select v-model="user.role_id" clearable placeholder="请选择">
-          <el-option label="运营商" :value="1">运营商</el-option>
-          <el-option label="经销商" :value="2">经销商</el-option>
+        <el-select v-model="accId" clearable placeholder="请选择" @change="handleChange">
+          <el-option
+            v-for="account in accountList"
+            :label="account.aliasName"
+            :value="account.id"
+            :key="account.id"
+           />
         </el-select>
       </el-form-item>
-      <el-form-item label="提现金额" prop="name">
-        <span>93993939</span>
+      <el-form-item label="提现金额(元)">
+        <span>{{money}}</span>
       </el-form-item>
-      <el-form-item label="账户名" prop="name">
-        <el-input v-model="user.name"></el-input>
+      <el-form-item label="账户名">
+        <span>{{selectedAccount.acName}}</span>
       </el-form-item>
 
-      <el-form-item label="账户号" prop="username">
-        <el-input v-model="user.username"></el-input>
+      <el-form-item label="账户号">
+        <span>{{selectedAccount.account}}</span>
       </el-form-item>
-      <el-form-item label="开户行" prop="phone">
-        <el-input v-model="user.phone"></el-input>
+      <el-form-item label="开户行">
+        <span>{{selectedAccount.acAddr}}</span>
       </el-form-item>
 
       <el-form-item>
@@ -29,65 +33,54 @@
 </template>
 
 <script>
-// import API from "@/api";
-// import { validateTel } from "../../utils/validate.js";
+import API from "@/api";
 export default {
+  props: {
+    money: Number,
+    orderIds: String,
+  },
   data() {
-    /* let checkPhone = (rule, value, callback) => {
-      if (!validateTel(value)) {
-        callback("请输入正确的手机号");
-      } else {
-        callback();
-      }
-    }; */
     return {
-      user: {
-        id: 25,
-        pid: 2,
-        level: 2,
-        username: "test",
-        phone: "13707949965",
-        name: "系统管理员",
-        email: null,
-        open_msg: 1,
-        mch_id: "1230000109",
-        rate: 0.5,
-        float_price: "0.00",
-        uuid: "deaff25c-335d-35e0-bad4-3d359461ac3c",
-        created_at: "2019-08-22 15:08:13",
-        updated_at: "2019-10-31 17:18:41",
-        role_id: 1,
-        parent_name: "系统管理员",
-        open_msg_text: "<span style='color:green'>已开通</span>",
-        role_name: "1"
-      },
-      rules: {
-        username: [
-          { required: true, message: "请输入机构名称", trigger: "blur" }
-        ]
-      }
+      accountList: [],
+      accId: '',
+      selectedAccount: {},
     };
   },
   methods: {
+    handleChange(accId) {
+      this.selectedAccount = this.accountList.filter(item => item.id === accId)[0];
+    },
+    getAllAccount() {
+      this.axios({
+        method: "get",
+        url: API.WITHDRAWAL.GET_ALL_ACCOUNT
+      }).then(r => {
+        this.accountList = r.data || [];
+      })
+    },
     submit() {
-      this.$router.push("/system/userList");
-      /* this.$refs["ruleForm"].validate(valid => {
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
-          let data = this.user;
           this.axios({
             method: "post",
-            data: data,
-            url: API.USERS.SHANYUAN.DEMAND_CREATE
+            data: {
+              amount: this.money,
+              accId: this.selectedAccount.id,
+              orderIds: this.orderIds,
+            },
+            url: API.WITHDRAWAL.WITHDRAWAL
           }).then(() => {
-            this.$router.push("/demand/list");
+            this.$router.push("/withdrawal/withdrawal-list");
           });
         } else {
           return false;
         }
-      }); */
+      });
     }
   },
-  mounted() {}
+  mounted() {
+    this.getAllAccount();
+  }
 };
 </script>
 
