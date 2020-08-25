@@ -5,4 +5,5 @@ export default {
   GET_ALL_ACCOUNT:"/wbAccount/getAllAccount",
   WITHDRAWAL: "/withdrawal/save",
   GET_WD_RECORD: "/withdrawal/wdRecord",
+  EXPORT: "/withdrawal/exportExcel"
 }

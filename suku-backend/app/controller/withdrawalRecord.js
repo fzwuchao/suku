@@ -47,5 +47,32 @@ class WithdrawalRecordController extends BaseController {
     this.success(result, '');
   }
 
+  async exportExcel() {
+    const { ctx } = this;
+    const { request, service, helper } = ctx;
+    const { withdrawalRecord } = helper.rules;
+
+    const rule = {
+      ...withdrawalRecord(),
+    };
+
+    const params = request.body;
+    ctx.validate(rule, params);
+    const ids = params.ids.split(',')
+    const result = await service.withdrawalRecord.updateToProcessedStatus(ids);
+    if (!result) {
+      this.fail(null, null, '更新成已处理状态失败')
+      return;
+    }
+    const excelData = await service.withdrawalRecord.getWithdRecords(ids);
+    const jsonExcel = JSON.parse(JSON.stringify(excelData, null, 2));
+    const buffer = await service.sheet.generateWorkbookBuffer(jsonExcel);
+    // application/octet-stream application/vnd.openxmlformats application/msexcel
+    this.ctx.set('Content-Type', 'application/msexcel');
+    this.ctx.set('Content-disposition', 'attachment; filename=1.xlsx');
+    // this.success(buffer, '');
+    this.ctx.body = buffer;
+  }
+
 }
 module.exports = WithdrawalRecordController;

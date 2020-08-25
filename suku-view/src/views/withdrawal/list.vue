@@ -1,8 +1,8 @@
 <template>
   <div class="withdrawal-list">
     <div class="btn-list">
-      <el-button type="primary" size="mini">导出查询结果</el-button>
-      <el-button type="primary" size="mini">完成查询结果</el-button>
+      <el-button type="primary" size="mini" @click="handleExport">导出查询结果</el-button>
+      <!-- <el-button type="primary" size="mini">完成查询结果</el-button> -->
     </div>
 
     <el-table
@@ -23,7 +23,7 @@
       <el-table-column
         align="left"
         fixed="left"
-        label="流水号"
+        label="ID"
         min-width="120px"
         show-overflow-tooltip
       >
@@ -78,6 +78,7 @@ export default {
       tableHeight: null,
       list: [],
       data: null,
+      ids: [],
     }
   },
   filters: {
@@ -108,8 +109,40 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
+      this.ids = this.multipleSelection.map(item => item.id)
     },
-    
+    handleExport() {
+      if (this.ids.length === 0) {
+        this.$message({
+          message: '请勾选要提现的记录',
+          type: 'warning',
+        })
+        return;
+      }
+      this.axios({
+        method: "post",
+        data: {
+          ids: this.ids.join(',')
+        },
+        responseType: "blob",
+        url: API.WITHDRAWAL.EXPORT
+      }).then(r => {
+        this.download(r, '提现记录', "xlsx");
+        this.getlist();
+      });
+    },
+    download(data, fileName, suffix) {
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.style.display = "none";
+      link.href = url;
+      link.setAttribute("download", fileName + "." + suffix);
+      document.body.appendChild(link);
+      link.click();
+      //释放资源
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    },
   },
   mounted() {
     this.getlist();

@@ -192,4 +192,5 @@ module.exports = app => {
   router.get('/wbAccount/getAllAccount', controller.wbAccount.getAllAccount);
   router.post('/withdrawal/save', controller.withdrawalRecord.save);
   router.get('/withdrawal/wdRecord', controller.withdrawalRecord.getWithdRecordList);
+  router.post('/withdrawal/exportExcel', controller.withdrawalRecord.exportExcel);
 };
