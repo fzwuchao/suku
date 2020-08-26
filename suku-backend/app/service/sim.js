@@ -395,7 +395,8 @@ class SimService extends BaseService {
   }
 
   async configLimtValueBySim(sim) {
-    const limtValue = calc(`${sim.monthFlow}/${sim.virtualMult}`).toFixed(3);
+    const monthOverlapFlow = sim.monthOverlapFlow || 0;
+    const limtValue = calc(`(${sim.monthFlow}+${monthOverlapFlow})/${sim.virtualMult}`).toFixed(3);
     const res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId, sim.netStatus);
     if(res.errorCode === '12077') {
       await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.UPDATE, limtValue, sim.simId, sim.netStatus);

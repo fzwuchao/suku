@@ -26,15 +26,16 @@ class ScheduleService extends BaseService {
     logger.info('********************月结处理*********************');
     const startTime = moment().milliseconds();
     // await service.sim.configLimtValue();
-    // 修改余额，已用流量，已用语音清零，叠加流量清零
+    // 修改余额，已用流量，已用语音清零，叠加流量清零 逻辑有问题，会漏掉当月刚过期的情况
     let updateSql = 'update sim set';
     updateSql += ' shengyu_money = shengyu_money - month_rent,'; // 余额减去月租
     updateSql += ' month_used_flow =0,'; // 已用流量清零
     updateSql += ' month_used_voice_duration=0,'; // 已用语音清零
     updateSql += ' month_overlap_voice_duration=0,'; // 叠加语音清零
     updateSql += ' month_overlap_flow=0'; // 叠加流量清零
-    updateSql += ' where shengyu_money > 0';
-    updateSql += '  and is_active = 1';
+    // updateSql += ' where shengyu_money > 0';
+    // updateSql += '  and is_active = 1';
+    updateSql += '  where is_active = 1';
     await this.app.model.query(updateSql);
 
     // 已过期的被叫卡进行停机处理
