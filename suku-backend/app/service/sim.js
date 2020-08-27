@@ -745,6 +745,34 @@ class SimService extends BaseService {
     });
     return result;
   }
+
+  async checkAllMySims(simIds, type) {
+    const curUser = this.getCurUser();
+    const curUid = curUser.id;
+    const Op = this.getOp();
+    let condition = {}
+    if (type === 'simRange') {
+      condition = {[Op.between]: simIds}
+    } else {
+      condition = {[Op.in]: simIds}
+    }
+    try {
+      const sim = await this.app.model.Sim.findOne({
+        where: {
+          simId: {
+            ...condition
+          },
+          uid: {
+            [Op.ne]: curUid,
+          }
+        }
+      });
+      return !sim;
+    } catch (e) {
+      this.ctx.logger.error(e);
+      return false;
+    }
+  }
 }
 
 module.exports = SimService;

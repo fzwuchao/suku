@@ -445,9 +445,12 @@
     </el-dialog>
     <el-dialog
       title="转让"
+      :before-close="handleCloseUserList"
       :visible.sync="userDialog"
     >
-      <user-list @save="saveUser"></user-list>
+      <user-list 
+      ref="changeUserRef"
+      @save="saveUser"></user-list>
     </el-dialog>
     <el-dialog
       title="转让(卡号或卡段)"
@@ -597,6 +600,9 @@ export default {
     type: String
   },
   computed: {
+    userId() {
+      return JSON.parse(localStorage.getItem('userInfo')).id;
+    },
     simIds() {
       const simIds = [];
       for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -653,6 +659,10 @@ export default {
   },
 
   methods: {
+    checkAllMySim() {
+      const len = this.multipleSelection.filter(item => item.uid != this.userId).length;
+      return !len;
+    },
     handleSizeChange(val) {
       this.pageSize = val;
       this.getlist();
@@ -665,6 +675,14 @@ export default {
           type: 'warning',
         })
         return;
+      } else {
+        if (!this.checkAllMySim()) {
+          this.$message({
+            message: '只能转让自己名下的卡',
+            type: 'warning',
+          })
+          return;
+        }
       }
       this.userDialog = true;
     },
@@ -700,9 +718,14 @@ export default {
             type: 'success'
           })
           this.getlist();
+          this.handleClose();
           this.userWithSimNumOrRangeDialog = false;
         }
       });
+    },
+    handleCloseUserList() {
+      this.$refs['changeUserRef'].reset();
+      this.userDialog = false;
     },
     handleClose() {
       // this.$refs['ulistInput'].$refs['ruleForm'].resetFields();
