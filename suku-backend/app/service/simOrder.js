@@ -103,6 +103,10 @@ class SimOrderService extends BaseService {
       case 2:
         newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow ? sim.monthOverlapFlow : 0} + ${pack.monthFlow ? pack.monthFlow : 0}`);
         newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration ? sim.monthOverlapVoiceDuration : 0} + ${pack.monthVoice ? pack.monthVoice : 0}`); 
+        const shengyuFlow = calc(`${sim.monthFlow} + ${newSim.monthOverlapFlow} - ${sim.monthUsedFlow || 0} * ${sim.virtualMult}`)
+        if (shengyuFlow > 0) {
+          newSim.flowServStatus = SIM_FLOW_SERV_STATUS.ON;
+        }
         await this.ctx.service.sim.configLimtValueBySim(sim);
         break;
     }
