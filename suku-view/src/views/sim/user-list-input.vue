@@ -137,7 +137,7 @@ export default {
                         return { uid: item.value, uname: item.key}
                       })
         this.$emit("save", {...user, ...params});
-        this.reset();
+        // this.reset();
       })
     },
     getUserList() {

@@ -690,7 +690,13 @@ class SimController extends BaseController {
     // 续费增价
     if (!_.isNil(privateMoney)) data.privateMoney = privateMoney;
 
+    // 转让
     if (!_.isNil(uid)) {
+      const errorMsg = await this.isAllMySims(simIds);
+      if (errorMsg) {
+        this.fail('', '', errorMsg);
+        return;
+      }
       data.uid = uid;
       data.uname = uname;
     }
@@ -804,13 +810,33 @@ class SimController extends BaseController {
     }
     const data = { uid, uname };
     let isSuccess = false;
+    let errorMsg = null;
     if (simNum) {
+      errorMsg = await this.isAllMySims(simNum.split(','));
+      if (errorMsg) {
+        this.fail('', '', errorMsg);
+        return;
+      }
       isSuccess = await service.sim.batchUpdateBySimIds(data, simNum.split(','));
     }
     if (simRange) {
+      errorMsg = await this.isAllMySims(simRange, 'simRange');
+      if (errorMsg) {
+        this.fail('', '', errorMsg);
+        return;
+      }
       isSuccess = await service.sim.batchUpdateByLikeSimId(data, simRange);
     }
     isSuccess ? this.success(null, '批量更换用户成功') : this.fail(null, null, '批量更换用户失败');
+  }
+
+  async isAllMySims(simIds, type) {
+    const isAllMySims = await this.ctx.service.sim.checkAllMySims(simIds, type);
+    let errorMsg = null;
+    if (!isAllMySims) {
+      errorMsg = '只有自己名下的卡才能转让';
+    }
+    return errorMsg;
   }
 }
 module.exports = SimController;

@@ -62,6 +62,10 @@ export default {
         this.$emit("save", {...user});
       })
     },
+    // 父组件调用
+    reset() {
+      this.$refs['ruleForm'].resetFields();
+    },
     getUserList() {
       this.axios({
         method: "get",
