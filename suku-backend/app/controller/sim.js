@@ -511,10 +511,15 @@ class SimController extends BaseController {
     if (!simData) {
       this.fail(null, null, '此卡号不是本平台的卡！');
       return;
+    } else {
+      if (simIdOrIccid) {
+        this.success(simData, '');
+        return;
+      }
     }
     const sId = simData.simId;
-    const openStatus = await service.chinaMobile.queryOnOffStatus(sId);
-    await service.sim.updateBySimId({ openStatus }, sId);
+    await service.sim.syncUpdate(simData);
+    // await service.sim.updateBySimId({ openStatus }, sId);
     const result = await service.sim.getSimBySimId(sId);
     this.success(result, '');
   }
