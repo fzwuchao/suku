@@ -241,6 +241,7 @@
       </el-table-column>
       <el-table-column
         align="left"
+        v-if="isSysManager"
         label="已用流量(M)"
         min-width="100px"
         show-overflow-tooltip
@@ -249,6 +250,7 @@
       </el-table-column>
       <el-table-column
         align="left"
+        v-if="isSysManager"
         label="虚拟倍数"
         min-width="100px"
         show-overflow-tooltip
