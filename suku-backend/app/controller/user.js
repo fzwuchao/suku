@@ -62,11 +62,11 @@ class UserController extends BaseController {
     const curUser = this.getCurUser();
     const user = request.body;
     if (id && id !== null) {
-      user.pid = curUser.id;
-      user.pname = curUser.name;
       const result = await ctx.service.user.update(user);
       this.success(result, '');
     } else {
+      user.pid = curUser.id;
+      user.pname = curUser.name;
       const result = await ctx.service.user.create(user);
       this.success(result, '');
     }
