@@ -1,8 +1,8 @@
 <template>
   <div class="withdrawal-list">
     <div class="btn-list">
-      <el-button type="primary" size="mini">导出查询结果</el-button>
-      <el-button type="primary" size="mini">完成查询结果</el-button>
+      <el-button type="primary" v-if="isSysManager" size="mini" @click="handleExport">导出查询结果</el-button>
+      <!-- <el-button type="primary" size="mini">完成查询结果</el-button> -->
     </div>
 
     <el-table
@@ -20,181 +20,185 @@
       <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
-      <el-table-column
-        align="left"
-        fixed="left"
-        label="流水号"
-        min-width="120px"
-        show-overflow-tooltip
-      >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
-      </el-table-column>
+      
 
       <el-table-column align="left" min-width="120px" label="用户" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.uname }}</template>
       </el-table-column>
       <el-table-column align="left" label="提现金额" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.amount}}</template>
       </el-table-column>
       <el-table-column align="left" label="账户号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.account}}</template>
       </el-table-column>
       <el-table-column align="left" label="账户名" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.accName}}</template>
       </el-table-column>
       <el-table-column align="left" label="开户行" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.accAddr}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="提现时间" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.monthFlow}}</template>
+        <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
       <el-table-column align="left" min-width="120px" label="状态" show-overflow-tooltip>
-        <template>{{ "1:待处理；2:处理中；3:完成"}}</template>
+        <template slot-scope="scope">{{ scope.row.status | status}}</template>
+      </el-table-column>
+      <el-table-column  label="操作" width="120">
+        <template slot-scope="scope">
+          <el-button type="text" @click="checkOrders(scope.row)" size="small">核对订单</el-button>
+        </template>
       </el-table-column>
     </el-table>
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
-        :current-page="data.pageNum"
+        :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[20, 30, 50, 100]"
+        @size-change="handleSizeChange"
+        :page-sizes="[50, 100, 200, 300]"
         background
-        layout="total,prev, pager, next"
+        layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
     <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+    <el-dialog title="核对订单" :visible.sync="checkOrdersDialog">
+      <checkOrders :wId="wId" ></checkOrders>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import API from "@/api";
 import searchBar from "@/components/SearchBar";
-import { getTableHeight } from "@/utils";
+import checkOrders from "./checkOrders"
 export default {
+  components: {
+    searchBar,
+    checkOrders,
+  },
   data() {
     return {
       pageNum: 1,
-      simType: "A",
       pageTotal: 1,
-      pageSize: 30,
-      importDialog: false,
+      pageSize: 50,
       tableHeight: null,
       list: [],
-      data: null,
+      wId: null,
+      isSysManager: false,
+      checkOrdersDialog: false,
+      searchParams: {},
       searchData: [
         {
-          name: "simId1",
-          title: "提现流水号",
+          name: "uname",
+          title: "用户",
           type: "inputText",
           value: ""
         },
         {
-          name: "netStatus",
-          title: "用户",
-          type: "multiple",
-          values: [
-            { value: 1, key: "激活套餐" },
-            { value: 2, key: "叠加套餐" },
-            { value: 3, key: "特惠套餐" }
-          ],
-          active: [1, 2, 3]
-        },
-        {
-          name: "netStatus",
+          name: "status",
           title: "状态",
-          type: "multiple",
+          type: "select",
           values: [
-            { value: 1, key: "待处理" },
-            { value: 2, key: "处理中" },
-            { value: 3, key: "完成" }
+            { value: "", key: "全部" },
+            { value: "1", key: "未处理" },
+            { value: "2", key: "已处理" },
           ],
-          active: [1, 2, 3]
+          active: [1, 2]
         }
-      ]
-    };
-  },
-  props: {
-    type: String
-  },
-  components: {
-    searchBar
+      ],
+      data: null,
+      ids: [],
+    }
   },
   filters: {
-    comboType(type) {
-      type = type - 0;
-      let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
-        case 2:
-          returnStr = "叠加套餐";
-          break;
-        case 3:
-          returnStr = "特惠套餐";
-          break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
-      }
-      return returnStr;
+    status(status) {
+      return {
+        1: '未处理',
+        2: '已处理',
+      }[status]
     }
   },
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getlist();
+    },
     pageChange() {
       this.getlist();
     },
-    editCombo(row) {
-      this.$router.push(`/simcombo/editinfo/${row.id}`);
+    checkOrders(row) {
+      this.wId = row.id;
+      this.checkOrdersDialog = true;
     },
-    getlist() {
+    getRoleType() {
+      this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
+    },
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
+      }
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams
         },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        url: API.WITHDRAWAL.GET_WD_RECORD
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = r.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
+      this.ids = this.multipleSelection.map(item => item.id)
     },
-    viewItem(item, column, event) {
-      const { type } = event;
-      // type === 'selection'表示是点击了选择框
-      type !== "selection" &&
-        this.$router.push(`/demand/demanddetail/${item.id}`);
-    }
+    handleExport() {
+      if (this.ids.length === 0) {
+        this.$message({
+          message: '请勾选要提现的记录',
+          type: 'warning',
+        })
+        return;
+      }
+
+      
+      this.axios({
+        method: "post",
+        data: {
+          ids: this.ids.join(',')
+        },
+        responseType: "blob",
+        url: API.WITHDRAWAL.EXPORT
+      }).then(r => {
+        this.download(r, '提现记录', "xlsx");
+        this.getlist();
+      });
+    },
+    download(data, fileName, suffix) {
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.style.display = "none";
+      link.href = url;
+      link.setAttribute("download", fileName + "." + suffix);
+      document.body.appendChild(link);
+      link.click();
+      //释放资源
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    },
   },
   mounted() {
     this.getlist();
+    this.getRoleType();
   },
-  watch: {
-    type: function(newVal) {
-      this.simType = newVal;
-    }
-  },
-  created() {
-    this.simType = this.type;
-    this.tableHeight = getTableHeight();
-  }
 };
 </script>
 <style lang="scss">

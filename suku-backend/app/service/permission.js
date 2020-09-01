@@ -68,6 +68,9 @@ class PermissionService extends BaseService {
       if (parent) {
         !parent.subMenuList && (parent.subMenuList = []);
         parent.subMenuList.push(permission);
+      } else {
+        // 没有子菜单的一级菜单，子菜单列表为空数组
+        permission.subMenuList = [];
       }
     });
     return permissions;

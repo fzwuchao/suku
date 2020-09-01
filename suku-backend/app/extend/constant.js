@@ -134,6 +134,11 @@ const WRITELIST_STATUS = {
   DEALING: '2'
 }
 
+const WITHDRAWAL_RECORD_STATUS = {
+  UNTREATED: 1,
+  PROCESSED: 2
+}
+
 module.exports = () => {
   return {
     SERV_STATUS,
@@ -159,6 +164,7 @@ module.exports = () => {
     VOICE_GROUPID,
     WRITELIST_STATUS,
     FLOW_GROUP,
-    FLOW_GROUP_TYPE
+    FLOW_GROUP_TYPE,
+    WITHDRAWAL_RECORD_STATUS
   };
 };

@@ -1,8 +1,7 @@
 <template>
   <div class="withdrawal-list">
     <div class="btn-list">
-      <el-button type="primary" size="mini">新增</el-button>
-      <el-button type="primary" size="mini">删除</el-button>
+      <el-button type="primary" size="mini" @click="addAccount">新增</el-button>
     </div>
 
     <el-table
@@ -19,48 +18,59 @@
     >
       <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
-
       <el-table-column
         align="left"
-        fixed="left"
+        label="别名"
+        min-width="120px"
+        show-overflow-tooltip
+      >
+        <template slot-scope="scope">{{ scope.row.aliasName}}</template>
+      </el-table-column>
+      <el-table-column
+        align="left"
         label="账户名"
         min-width="120px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">{{ scope.row.comboName}}</template>
+        <template slot-scope="scope">{{ scope.row.acName}}</template>
       </el-table-column>
 
       <el-table-column align="left" min-width="120px" label="账户号" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.simType | simType }}</template>
+        <template slot-scope="scope">{{ scope.row.account }}</template>
       </el-table-column>
       <el-table-column align="left" label="开户行" show-overflow-tooltip>
-        <template slot-scope="scope">{{ scope.row.type | comboType}}</template>
+        <template slot-scope="scope">{{ scope.row.acAddr }}</template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="editUser(scope.row)" size="small">编辑</el-button>
+          <el-button type="text" @click="editAccount(scope.row)" size="small">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
-        :current-page="data.pageNum"
+        :current-page="pageNum"
         @current-change="pageChange"
         :page-sizes="[20, 30, 50, 100]"
         background
         layout="total,prev, pager, next"
         :page-size="data.pageSize"
-        :total="data.recordTotal"
+        :total="data.totalRecords"
       ></el-pagination>
     </div>
-    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+
+    <el-dialog title="账户信息" @close="cancelAccount" :visible.sync="dialogFormVisible">
+      <edit-account :dataAccount="account" ref="editAccount" @complateAc="complateAc"></edit-account>
+    </el-dialog>
+
+
   </div>
 </template>
 
 <script>
 import API from "@/api";
-import searchBar from "@/components/SearchBar";
+import editAccount from "./editAccount";
 import { getTableHeight } from "@/utils";
 export default {
   data() {
@@ -68,99 +78,58 @@ export default {
       pageNum: 1,
       simType: "A",
       pageTotal: 1,
-      pageSize: 10,
+      pageSize: 30,
       importDialog: false,
       tableHeight: null,
+      account:null,
       list: [],
       data: null,
-      searchData: [
-        {
-          name: "simId1",
-          title: "提现流水号",
-          type: "inputText",
-          value: ""
-        },
-        {
-          name: "netStatus",
-          title: "用户",
-          type: "multiple",
-          values: [
-            { value: 1, key: "激活套餐" },
-            { value: 2, key: "叠加套餐" },
-            { value: 3, key: "特惠套餐" }
-          ],
-          active: [1, 2, 3]
-        },
-        {
-          name: "netStatus",
-          title: "状态",
-          type: "multiple",
-          values: [
-            { value: 1, key: "待处理" },
-            { value: 2, key: "处理中" },
-            { value: 3, key: "完成" }
-          ],
-          active: [1, 2, 3]
-        }
-      ]
+      dialogFormVisible: false,
     };
   },
   props: {
     type: String
   },
-  components: {
-    searchBar
-  },
-  filters: {
-    comboType(type) {
-      type = type - 0;
-      let returnStr = "";
-      switch (type) {
-        case 1:
-          returnStr = "激活套餐";
-          break;
-        case 2:
-          returnStr = "叠加套餐";
-          break;
-        case 3:
-          returnStr = "特惠套餐";
-          break;
-      }
-      return returnStr;
-    },
-    simType(val) {
-      let types = val.split(",");
-      let returnStr = "";
-      for (let i = 0; i < types.length; i++) {
-        if (types[i] == "A") {
-          returnStr += "被叫卡";
-        }
-        if (types[i] == "B") {
-          returnStr += " 主叫卡";
-        }
-      }
-      return returnStr;
-    }
+  components:{
+    editAccount
   },
   methods: {
     pageChange() {
       this.getlist();
     },
-    editUser(row) {
-      this.$router.push(`/withdrawal/editAccount/${row.id}`);
+    editAccount(row) {
+      this.account = row;
+      this.dialogFormVisible = true;
+    },
+    addAccount() {
+      this.account= {
+        id: null,
+        aliasName: '',
+        acName: '',
+        account: '',
+        acAddr: ''
+      }
+      this.dialogFormVisible = true;
+    },
+    cancelAccount() {
+      this.$refs["editAccount"].resetForm();
+    },
+    complateAc() {
+      this.dialogFormVisible = false;
+      this.getlist();
     },
     getlist() {
       this.axios({
         method: "get",
         params: {
-          page: this.pageNum,
-          limit: this.pageSize
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
         },
-        url: API.SIMCOMBO.SIM_COMBO_LIST
+        url: API.WITHDRAWAL.GET_ACCOUNT_LIST
       }).then(r => {
-        this.data = r;
-        this.list = r.data;
-        this.pageTotal = r.data.count;
+        this.data = r.data;
+        this.list = this.data.list;
+        this.pageTotal = this.data.totalRecords;
       });
     },
     handleSelectionChange(val) {

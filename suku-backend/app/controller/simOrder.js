@@ -44,5 +44,18 @@ class MessageSendController extends BaseController {
     });
     this.success(result, '');
   }
+
+  async getWithdrawalOrderList() {
+    const { ctx } = this;
+    const { request, helper } = ctx;
+    const { pageRules } = helper.rules;
+
+    const rule = {
+      ...pageRules,
+    };
+    ctx.validate(rule, request.query);
+    const result = await ctx.service.simOrder.getWithdrawalSimOrder(request.query);
+    this.success(result, '');
+  }
 }
 module.exports = MessageSendController;
