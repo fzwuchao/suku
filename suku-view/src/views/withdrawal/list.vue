@@ -1,7 +1,7 @@
 <template>
   <div class="withdrawal-list">
     <div class="btn-list">
-      <el-button type="primary" v-if="isSysManager" size="mini" @click="handleExport">导出查询结果</el-button>
+      <el-button type="primary" v-if="isSysManager" size="mini" @click="handleExport">导出处理</el-button>
       <!-- <el-button type="primary" size="mini">完成查询结果</el-button> -->
     </div>
 
