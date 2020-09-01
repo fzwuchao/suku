@@ -35,7 +35,7 @@ class ScheduleService extends BaseService {
     updateSql += ' month_overlap_flow=0'; // 叠加流量清零
     // updateSql += ' where shengyu_money > 0';
     // updateSql += '  and is_active = 1';
-    updateSql += '  where is_active = 1';
+    updateSql += '  where month_used_flow > 0 || month_overlap_flow > 0';
     await this.app.model.query(updateSql);
 
     // 已过期的被叫卡进行停机处理
