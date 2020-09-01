@@ -47,6 +47,18 @@ class WithdrawalRecordController extends BaseController {
     this.success(result, '');
   }
 
+  async checkOrders() {
+    const { ctx } = this;
+    const { request, helper } = ctx;
+    const { pageRules } = helper.rules;
+
+    const rule = {
+      ...pageRules,
+    };
+    ctx.validate(rule, request.query);
+    const result = await ctx.service.withdrawalRecord.getOrderByWithdrawalId(request.query);
+    this.success(result, '');
+  }
   async exportExcel() {
     const { ctx } = this;
     const { request, service, helper } = ctx;

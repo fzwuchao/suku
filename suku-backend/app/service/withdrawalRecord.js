@@ -29,10 +29,21 @@ class WithdrawalRecordService extends BaseService {
     }
   }
   async getWithdRecordListPage(query) {
-    const { pageSize, pageNum } = query;
+    const Op = this.getOp();
+    const { pageSize, pageNum, uname, status } = query;
     const where = {};
     const curUser = this.getCurUser();
-    where.uid = curUser.id;
+    if(curUser.roleLevel > 1) {
+      where.uid = curUser.id;
+    }
+    if(uname) {
+      where['uname'] = {
+        [Op.substring]: uname,
+      };
+    }
+    if(status) {
+      where.status = status;
+    }
     const result = await this.findAndCountAll('WithdrawalRecord', pageSize, pageNum, {
       where,
     });
@@ -56,16 +67,22 @@ class WithdrawalRecordService extends BaseService {
       return false;
     }
   }
+  async getOrderByWithdrawalId(query) {
+    const { withdrawalId } = query;
+    const { service } = this.ctx;
+    const orderIds = await service.orderWithdrawalMap.getOrderIdsByWithdrawalId(withdrawalId);
+    const results = await service.simOrder.getOrdersByids(orderIds, query);
+    return results;
+
+  }
   async getWithdRecords(ids) {
     const Op = this.getOp();
     const attributes = [
-      ['id', 'ID'],
       ['uname', '用户名'],
-      ['amount', '提现金额'],
+      [this.app.model.fn('SUM', this.app.model.col('amount')), '提现金额'],
       ['account', '账户号'],
       ['acc_name', '账户名'],
-      ['acc_addr', '开户行'],
-      ['updated_at', '提现时间']
+      ['acc_addr', '开户行']
     ];
     const result = await this.app.model.WithdrawalRecord.findAll({
       attributes,
@@ -73,7 +90,8 @@ class WithdrawalRecordService extends BaseService {
         id: {
           [Op.in]: ids
         }
-      }
+      },
+      group: ['uname','account','acc_name','acc_addr']
     })
     const newRes = [];
     result.forEach(res => {

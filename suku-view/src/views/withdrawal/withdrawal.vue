@@ -70,7 +70,8 @@ export default {
             },
             url: API.WITHDRAWAL.WITHDRAWAL
           }).then(() => {
-            this.$router.push("/withdrawal/withdrawal-list");
+            // this.$router.push("/withdrawal/withdrawal-list");
+            this.$emit("complate")
           });
         } else {
           return false;

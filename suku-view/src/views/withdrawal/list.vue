@@ -1,7 +1,7 @@
 <template>
   <div class="withdrawal-list">
     <div class="btn-list">
-      <el-button type="primary" size="mini" @click="handleExport">导出查询结果</el-button>
+      <el-button type="primary" v-if="isSysManager" size="mini" @click="handleExport">导出查询结果</el-button>
       <!-- <el-button type="primary" size="mini">完成查询结果</el-button> -->
     </div>
 
@@ -20,15 +20,7 @@
       <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
       <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
 
-      <el-table-column
-        align="left"
-        fixed="left"
-        label="ID"
-        min-width="120px"
-        show-overflow-tooltip
-      >
-        <template slot-scope="scope">{{ scope.row.id}}</template>
-      </el-table-column>
+      
 
       <el-table-column align="left" min-width="120px" label="用户" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.uname }}</template>
@@ -51,32 +43,71 @@
       <el-table-column align="left" min-width="120px" label="状态" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.status | status}}</template>
       </el-table-column>
+      <el-table-column  label="操作" width="120">
+        <template slot-scope="scope">
+          <el-button type="text" @click="checkOrders(scope.row)" size="small">核对订单</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <div class="page">
       <el-pagination
         v-if="data && data.pageSize"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[20, 30, 50, 100]"
+        @size-change="handleSizeChange"
+        :page-sizes="[50, 100, 200, 300]"
         background
-        layout="total,prev, pager, next"
+        layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
         :total="data.totalRecords"
       ></el-pagination>
     </div>
+    <search-bar :searchData="searchData" @handleGetList="getlist"></search-bar>
+    <el-dialog title="核对订单" :visible.sync="checkOrdersDialog">
+      <checkOrders :wId="wId" ></checkOrders>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import API from "@/api";
+import searchBar from "@/components/SearchBar";
+import checkOrders from "./checkOrders"
 export default {
+  components: {
+    searchBar,
+    checkOrders,
+  },
   data() {
     return {
       pageNum: 1,
       pageTotal: 1,
-      pageSize: 30,
+      pageSize: 50,
       tableHeight: null,
       list: [],
+      wId: null,
+      isSysManager: false,
+      checkOrdersDialog: false,
+      searchParams: {},
+      searchData: [
+        {
+          name: "uname",
+          title: "用户",
+          type: "inputText",
+          value: ""
+        },
+        {
+          name: "status",
+          title: "状态",
+          type: "select",
+          values: [
+            { value: "", key: "全部" },
+            { value: "1", key: "未处理" },
+            { value: "2", key: "已处理" },
+          ],
+          active: [1, 2]
+        }
+      ],
       data: null,
       ids: [],
     }
@@ -90,15 +121,33 @@ export default {
     }
   },
   methods: {
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getlist();
+    },
     pageChange() {
       this.getlist();
     },
-    getlist() {
+    checkOrders(row) {
+      this.wId = row.id;
+      this.checkOrdersDialog = true;
+    },
+    getRoleType() {
+      this.curUser = JSON.parse(localStorage.getItem('userInfo'));
+      this.isSysManager =(this.curUser.roleLevel === 1 || this.curUser.roleLevel === 0);
+    },
+    getlist(val) {
+      let pageNum = this.pageNum;
+      if (val) {
+        this.searchParams = val;
+        pageNum = 1;
+      }
       this.axios({
         method: "get",
         params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize
+          pageNum: pageNum,
+          pageSize: this.pageSize,
+          ...this.searchParams
         },
         url: API.WITHDRAWAL.GET_WD_RECORD
       }).then(r => {
@@ -119,6 +168,8 @@ export default {
         })
         return;
       }
+
+      
       this.axios({
         method: "post",
         data: {
@@ -146,6 +197,7 @@ export default {
   },
   mounted() {
     this.getlist();
+    this.getRoleType();
   },
 };
 </script>

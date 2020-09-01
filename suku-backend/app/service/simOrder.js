@@ -67,6 +67,25 @@ class SimOrderService extends BaseService {
     }, queryKey);
     return result;
   }
+
+  async getOrdersByids (ids, query) {
+    const attributes = [ 'id', 'orderId', 'simId', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'cpname', 'wxSerialNum', 'orderStatus', 'createdAt' ];
+    const { pageSize, pageNum} = query;
+    const Op = this.getOp();
+    const where = {};
+    
+    where.id = {
+      [Op.in]: ids,
+    }
+    
+    const result = await this.findAndCountAll('SimOrder', pageSize, pageNum, {
+      attributes,
+      where,
+    });
+    return result;
+  }
+
+
   async getWithdrawalSimOrder(query) {
     const attributes = [ 'id', 'orderId', 'simId', 'uid', 'uname', 'cname', 'dealAmount', 'renewIncrAmount', 'cpname', 'wxSerialNum', 'orderStatus', 'createdAt' ];
     const { pageSize, pageNum } = query;
@@ -82,8 +101,8 @@ class SimOrderService extends BaseService {
     const orderIds = await this.ctx.service.orderWithdrawalMap.getOrderIdsByUids([curUser.id]);
     let uids = [];
     let rateAmount = 0;
-    let total = 0;
-    let rate = 0;
+    let totalA = 0;
+    let tRate = 0;
     
     if (roleId === 7) {
       // 经销商
@@ -105,32 +124,32 @@ class SimOrderService extends BaseService {
         if (rateStr) {
           rate = Number(rateStr);
         }
-        count += (1 - rate) * total;
+        count = calc(`${count} + (${total} * ${rate})`); // (1 - rate) * total;
 
       });
       const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ], orderIds);
       if (curUserAmount && curUserAmount.length > 0) {
         const totalStr = curUserAmount[0].dataValues['total'];
-        total = Number(totalStr ? totalStr : 0);
+        totalA = Number(totalStr ? totalStr : 0);
       }
       const rateStr = userToRateMap[curUser.id];
       if (rateStr) {
-        rate = Number(rateStr);
+        tRate = Number(rateStr);
       }
-      rateAmount = total * rate + count; 
+      rateAmount = calc(`${totalA} * ${tRate} - ${count}`) // totalA * rate + count; 
     } else if (roleId === 6) {
       // 分销商
       uids = [ curUser.id ];
       const curUserAmount = await this.getWithdrawalOrderAmountGroupByUid([ curUser.id ], orderIds);
       if (curUserAmount && curUserAmount.length > 0) {
         const totalStr = curUserAmount[0].dataValues['total'];
-        total = Number(totalStr ? totalStr : 0);
+        totalA = Number(totalStr ? totalStr : 0);
       }
       const rateStr = userToRateMap[curUser.id];
       if (rateStr) {
-        rate = Number(rateStr);
+        tRate = Number(rateStr);
       }
-      rateAmount = total * rate;
+      rateAmount = calc(`${totalA} * ${tRate}`);
     }
     where.uid = {
       [Op.in]: uids,
@@ -152,14 +171,22 @@ class SimOrderService extends BaseService {
       const dealAmountStr = order.dataValues['dealAmount'];
       const rateStr = userToRateMap[order.dataValues['uid']];
       const dealAmount = dealAmountStr ? Number(dealAmountStr) : 0;
-      const rate = rateStr ? Number(rateStr) : 0;
-      list.push({
-        ...order.dataValues,
-        rateAmount:  dealAmount * rate
-      })
+      const rate = rateStr && curUserInfo.id !== order.dataValues['uid'] ? Number(rateStr) : 0;
+      if (roleId === 7) {
+        list.push({
+          ...order.dataValues,
+          rateAmount:  calc(`${dealAmount} * ${tRate} - ${dealAmount} * ${rate}`)
+        })
+      } else if (roleId === 6) {
+        list.push({
+          ...order.dataValues,
+          rateAmount:  calc(`${dealAmount} * ${tRate}`)
+        })
+      }
+      
     })
     const newRes = { ...result, list };
-    return { ...newRes, rateAmount };
+    return { ...newRes, rateAmount, totalA };
   }
 
   async getWithdrawalOrderAmountGroupByUid(uids, orderIds) {

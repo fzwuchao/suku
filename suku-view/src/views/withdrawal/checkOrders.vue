@@ -1,9 +1,6 @@
 <template>
-  <div class="sim-list" id="order-list">
+  <div class="sim-list" id="check-order-list">
     <div class="btn-list">
-     <span :style="{marginRight: '20px'}">{{`交易金额：${totalMoney}`}}</span>
-     <span :style="{marginRight: '20px'}">{{`可提现金额：${totalWithdrawalMoney}`}}</span>
-     <el-button type="primary" size="mini" @click="openWithdrawal">提现</el-button>
     </div>
 
     <el-table
@@ -16,11 +13,7 @@
       stripe
       size="mini"
       style="width: 100%"
-      @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" align="center" fixed="left" width="55"></el-table-column>
-      <!-- <el-table-column type="index"   label="#"  align="left"></el-table-column> -->
-
       <el-table-column
         align="left"
         fixed="left"
@@ -58,6 +51,7 @@
       <el-table-column align="left" label="创建时间" show-overflow-tooltip>
         <template slot-scope="scope">{{ scope.row.createdAt }}</template>
       </el-table-column>
+      
     </el-table>
     <div class="page">
       <el-pagination
@@ -65,44 +59,34 @@
         @size-change="handleSizeChange"
         :current-page="pageNum"
         @current-change="pageChange"
-        :page-sizes="[50, 100, 200, 300, 400]"
+        :page-sizes="[30, 100, 200, 300, 400]"
         background
         layout="total,prev, pager, next, sizes"
         :page-size="data.pageSize"
         :total="data.totalRecords"
       ></el-pagination>
     </div>
-    <el-dialog title="提现" :visible.sync="withdrawalDialog">
-      <withdrawal :money="withdrawalMoney" @complate="closeDialog" :orderIds="orderIds"></withdrawal>
-    </el-dialog>
-    
   </div>
 </template>
 
 <script>
 import API from "@/api";
 import { getTableHeight } from "@/utils";
-import Withdrawal from "./withdrawal";
-import calc from "calculatorjs";
 export default {
   data() {
     return {
       pageNum: 1,
+      orderType: 1,
       pageTotal: 1,
-      pageSize: 50,
-      withdrawalDialog: false,
+      pageSize: 30,
+      withdrawalId: null,
       tableHeight: null,
       list: [],
-      withdrawalMoney: 0,
-      totalWithdrawalMoney: 0,
-      totalMoney: 0,
       data: null,
-      multipleSelection: [],
-      orderIds: '',
-    }
+    };
   },
-  components: {
-    Withdrawal
+  props: {
+    wId: Number
   },
   filters: {
     orderStatus(val) {
@@ -126,34 +110,9 @@ export default {
       this.pageSize = val;
       this.getlist();
     },
-    closeDialog() {
-      this.withdrawalDialog = false;
-      this.getlist();
-    },
     pageChange(page) {
       this.pageNum = page;
       this.getlist();
-    },
-    check() {
-      const isOpen = (this.multipleSelection || []).length > 0;
-      if (!isOpen) {
-        this.$message({
-          message: '请先勾选要提现的订单',
-          type: 'warning',
-        })
-      }
-
-      if(this.pageTotal > 10 && (this.multipleSelection || []).length < 10) {
-        this.$message({
-          message: '请勾选10条以上的记录进行提现',
-          type: 'warning',
-        })
-        return;
-      }
-      return isOpen;
-    },
-    openWithdrawal() {
-      this.check() && (this.withdrawalDialog = true);
     },
     getlist(val) {
       let pageNum = this.pageNum;
@@ -163,41 +122,32 @@ export default {
       }
       this.axios({
         method: "get",
+        loadEl: "#check-order-list",
         params: {
           pageNum: pageNum,
-          pageSize: this.pageSize,
+          withdrawalId: this.withdrawalId,
+          pageSize: this.pageSize
         },
-        url: API.WITHDRAWAL.GET_WD_LIST
+        url: API.WITHDRAWAL.CHECK_ORDERS
       }).then(r => {
         this.data = r.data;
         this.list = this.data.list;
         this.pageTotal = this.data.totalRecords;
-        this.totalWithdrawalMoney = this.data.rateAmount || 0;
-        this.totalMoney = this.data.totalA || 0;
       });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    
-  },
-  watch: {
-    multipleSelection(val) {
-      let orderIds = [];
-      let amount = val.reduce((acc, current) => {
-        orderIds.push(current['id'])
-        acc = calc(`${acc}+${current['rateAmount']}`);
-        return acc;
-      }, 0);
-      this.withdrawalMoney = amount;
-      this.orderIds = orderIds.join(',');
     }
   },
   mounted() {
     this.getlist();
   },
+  watch: {
+    wId: function(newVal) {
+      this.pageNum = 1;
+      this.withdrawalId = newVal;
+      this.getlist()
+    }
+  },
   created() {
-    this.orderType = this.type;
+    this.withdrawalId = this.wId;
     this.tableHeight = getTableHeight();
   }
 };
