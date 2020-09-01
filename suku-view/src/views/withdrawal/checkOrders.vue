@@ -16,7 +16,6 @@
     >
       <el-table-column
         align="left"
-        fixed="left"
         label="SIM卡号"
         min-width="120px"
         show-overflow-tooltip
