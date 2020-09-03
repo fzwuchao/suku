@@ -50,6 +50,7 @@ class ScheduleService extends BaseService {
     const callQuery = {
       overdueTime: { [OP.lt]: new Date() },
       cardStatus: SIM_CARD_STATUS.ACTIVE,
+      simType: SIM_TYPE.CALL,
     };
     await service.sim.updateFlowServStatusBatch(SIM_FLOW_SERV_STATUS.OFF, callQuery);
     await service.sim.updateVoiceServStatusBatch(SIM_VOICE_SERV_STATUS.OFF, callQuery);

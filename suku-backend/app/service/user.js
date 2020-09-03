@@ -146,7 +146,7 @@ class UserService extends BaseService {
     const user = this.getCurUser();
     const attributes = [ 'id', 'pid', 'pname', 'name', 'phone', 'openMsg', 'autoTransfer', 'username', 'email', 'mchId', 'createdAt', 'updatedAt' ];
     const where = {};
-    if (user.roleLevel === 0) {
+    if (user.roleLevel === 0 || user.roleType === 5) {
       attributes.push('rate');
     }
     let ids = [];

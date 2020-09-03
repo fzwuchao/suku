@@ -32,7 +32,7 @@
         <el-input v-model="user.email"></el-input>
       </el-form-item>
       <el-form-item
-        v-if="isSysManager"
+        v-if="(isSysManager || curUser.roleType == 5) && user.id !== curUser.id"
         label="分成率"
         prop="rate"
       >
