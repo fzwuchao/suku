@@ -496,7 +496,7 @@ class SimService extends BaseService {
     if(isBatch) { //如果是批量更新，则返回需要更新的信息，不直接更新
       return params;
     }
-    logger.info('--------------- 定位问题用 --------- comment:', comment, ' , simId:', simId, ' , sim:', sim);
+    // logger.info('--------------- 定位问题用 --------- comment:', comment, ' , simId:', simId, ' , sim:', sim);
     await service.sim.updateBySimId(params, simId);
     if(sim.cardStatus === SIM_CARD_STATUS.STOP) {
       await service.chinaMobile.changeSimStatus(simId, OPER_TYPE_SINGLE.RECOVER);// 1: 停机转已激活
