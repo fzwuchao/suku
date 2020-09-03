@@ -605,6 +605,10 @@ export default {
     userId() {
       return JSON.parse(localStorage.getItem('userInfo')).id;
     },
+    isAdmin() {
+      const roleType = JSON.parse(localStorage.getItem('userInfo')).roleType;
+      return roleType == 1;
+    },
     simIds() {
       const simIds = [];
       for (let i = 0; i < this.multipleSelection.length; i++) {
@@ -662,6 +666,7 @@ export default {
 
   methods: {
     checkAllMySim() {
+      if (this.isAdmin) return true;
       const len = this.multipleSelection.filter(item => item.uid != this.userId).length;
       return !len;
     },

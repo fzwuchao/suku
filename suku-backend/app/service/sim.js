@@ -6,6 +6,9 @@
 const BaseService = require('../core/baseService');
 const moment = require('moment');
 const calc = require('calculatorjs');
+const isAdmin = (roleType) => {
+  return roleType == 1;
+}
 const { SIM_CARD_STATUS, SIM_FLOW_SERV_STATUS,OPER_TYPE_SINGLE, LIMT_OPTY, SIM_VOICE_SERV_STATUS, SIM_TYPE, OPER_TYPE_BATCH, SERV_OP_BATCH, SERVICE_TYPE } = require('../extend/constant')();
 class SimService extends BaseService {
   async update(sim) {
@@ -748,6 +751,7 @@ class SimService extends BaseService {
 
   async checkAllMySims(simIds, type) {
     const curUser = this.getCurUser();
+    if (isAdmin(curUser.roleType)) return true;
     const curUid = curUser.id;
     const Op = this.getOp();
     let condition = {}
