@@ -518,7 +518,8 @@ class SimController extends BaseController {
       }
     }
     const sId = simData.simId;
-    await service.sim.syncUpdate(simData);
+    const onOff = await service.onOff.getWxControllerSimOnOff();
+    if (onOff === 'on') await service.sim.syncUpdate(simData);
     // await service.sim.updateBySimId({ openStatus }, sId);
     const result = await service.sim.getSimBySimId(sId);
     this.success(result, '');
