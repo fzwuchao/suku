@@ -3,6 +3,7 @@
 const { Service } = require('egg');
 const { Op } = require('sequelize');
 const uniqid = require('uniqid');
+const { createdAt } = require('../extend/rules/user');
 class BaseService extends Service {
   async getTransaction() {
     return await this.ctx.model.transaction();
@@ -28,13 +29,13 @@ class BaseService extends Service {
       const redisKey = `${modelNmale}:${JSON.stringify(queryKey)}:${pageSize}:${pageNum}`;
       result = await this.app.redis.get(redisKey);
       if (!result) {
-        result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
+        result = await this.app.model[modelNmale].findAndCountAll({ ...query,  order:[['createdAt', 'DESC']], ...helper.pageQueryModel(pageSize, pageNum) });
         this.app.redis.set(redisKey, JSON.stringify(result));
       } else {
         result = JSON.parse(result);
       }
     } else {
-      result = await this.app.model[modelNmale].findAndCountAll({ ...query, ...helper.pageQueryModel(pageSize, pageNum) });
+      result = await this.app.model[modelNmale].findAndCountAll({ ...query, order:[['createdAt', 'DESC']], ...helper.pageQueryModel(pageSize, pageNum) });
     }
     return helper.pageModel(result, pageSize, pageNum);
   }

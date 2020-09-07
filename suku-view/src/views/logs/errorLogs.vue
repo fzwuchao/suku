@@ -41,11 +41,8 @@
       <el-table-column align="left" label="平台名称" >
         <template slot-scope="scope">{{ scope.row.onelink.name}}</template>
       </el-table-column>
-      <el-table-column align="left" label="appId" >
-        <template slot-scope="scope">{{ scope.row.onelink.appId}}</template>
-      </el-table-column>
-      <el-table-column align="left" label="secretKey" >
-        <template slot-scope="scope">{{ scope.row.onelink.secretKey}}</template>
+      <el-table-column align="left" label="创建时间" >
+        <template slot-scope="scope">{{ scope.row.createdAt}}</template>
       </el-table-column>
     </el-table>
     <div class="page">
@@ -90,6 +87,13 @@ export default {
         {
           name: "status",
           title: "接口返回状态码",
+          type: "inputText",
+          value: ""
+        }
+        ,
+        {
+          name: "params",
+          title: "simID",
           type: "inputText",
           value: ""
         }

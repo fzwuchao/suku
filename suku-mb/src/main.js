@@ -36,7 +36,8 @@ import {
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import { getOpenId } from './utils/index'
+import { getOpenId } from './utils';
+
 import axios from './utils/axiosPlugin';
 let vantComponents = [
     Button,
@@ -70,7 +71,7 @@ Vue.use(axios);
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 router.beforeEach((to, from, next) => {
-  if (to.query.preview === 'yes') {
+  if (to.query.preview === 'yes' || to.path === '/index/wechat/test-index') {
     next();
   } else {
     getOpenId().then(() => {

@@ -396,8 +396,16 @@ class SimService extends BaseService {
 
   async configLimtValueBySim(sim) {
     const monthOverlapFlow = sim.monthOverlapFlow || 0;
-    const limtValue = calc(`(${sim.monthFlow}+${monthOverlapFlow})/${sim.virtualMult}`).toFixed(3);
-    const res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId, sim.netStatus);
+    let limtValue = calc(`(${sim.monthFlow}+${monthOverlapFlow})/${sim.virtualMult}`).toFixed(3);
+    const simId = sim.simId+''
+    let res = null
+    if(simId.length < 13){
+      res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.DEL, limtValue, sim.simId, sim.netStatus);
+    } else {
+      res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId, sim.netStatus);
+    }
+    // const limtValue = calc(`(${sim.monthFlow}+${monthOverlapFlow})/${sim.virtualMult}`).toFixed(3);
+    
     if(res.errorCode === '12077') {
       await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.UPDATE, limtValue, sim.simId, sim.netStatus);
     }

@@ -17,8 +17,8 @@ class ErrorLogController extends BaseController {
       ...pageRules,
     };
     ctx.validate(rule, request.query);
-    const { pageNum, pageSize, name, status } = request.query;
-    const result = await ctx.service.errorLog.getErrorLogPage(pageSize, pageNum, status, name);
+    const { pageNum, pageSize, name, status, params } = request.query;
+    const result = await ctx.service.errorLog.getErrorLogPage(pageSize, pageNum, status, name, params);
     this.success(result, '');
   }
   async deal() {

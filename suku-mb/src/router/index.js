@@ -29,6 +29,11 @@ const routes = [{
     name: "Pay",
     component: () =>
         import ( /* webpackChunkName: "about" */ "../views/pay.vue")
+}, {
+  path: "/index/wechat/test-index",
+  name: "TestIndex",
+  component: () =>
+      import ( /* webpackChunkName: "about" */ "../views/testIndex.vue")
 }];
 
 const router = new VueRouter({

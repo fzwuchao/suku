@@ -13,16 +13,20 @@ const BaseService = require('../core/baseService');
 class ErrorLogService extends BaseService {
 
 
-  async getErrorLogPage(pageSize, pageNum, status, name) {
+  async getErrorLogPage(pageSize, pageNum, status, name, params) {
     const attributes = [ 'id', 'params', 'name', 'status', 'message', 'url', 'source', 'type', 'result', 'isExec', 'createdAt' ];
     const Op = this.getOp();
     const where = { isExec: 0 };
     if (name) {
       where.name = { [Op.substring]: name };
     }
+    if (params) {
+      where.params = { [Op.substring]: params };
+    }
     if (status) {
       where.status = status;
     }
+
     const result = await this.findAndCountAll('ErrorLog', pageSize, pageNum, {
       attributes,
       where,
