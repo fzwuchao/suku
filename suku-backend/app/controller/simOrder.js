@@ -39,7 +39,7 @@ class MessageSendController extends BaseController {
     const result = await payApi.getPayParams({
       out_trade_no: newOrdere.orderId,
       body: 'sim pay',
-      total_fee: newOrdere.dealAmount * 100,
+      total_fee: calc(`${newOrdere.dealAmount} * 100`),
       openid: order.openid,
     });
     this.success(result, '');
