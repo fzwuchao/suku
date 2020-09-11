@@ -490,8 +490,10 @@ class SimService extends BaseService {
     if(baseInfo.iccid) {
       params.iccid = baseInfo.iccid;
     }
-
-    params.cardStatus = cardStatus;
+    if(sim.isActive !== 1){
+      params.cardStatus = cardStatus;
+    }
+    
     // params.imei = imei;
     params.openStatus = openStatus;
     
