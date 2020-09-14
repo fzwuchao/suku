@@ -101,8 +101,8 @@ class SimService extends BaseService {
    * }
    * @return {{count, rows}} - 总条数，一页的数据
    */
-  async getSimPageData({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, iccid, pageSize, pageNum }) {
-    const result = await this.getWhereCondition({ simId, simIdRange, username, cardStatus, isActive, simType, activeMenuName, iccid });
+  async getSimPageData({ simId, simIdRange, uname, cardStatus, isActive, simType, activeMenuName, iccid, pageSize, pageNum }) {
+    const result = await this.getWhereCondition({ simId, simIdRange, uname, cardStatus, isActive, simType, activeMenuName, iccid });
     const simData = await this.findAndCountAll('Sim', pageSize, pageNum, result.whereCondition, result.queryKey);
 
     return simData;
@@ -490,7 +490,7 @@ class SimService extends BaseService {
     if(baseInfo.iccid) {
       params.iccid = baseInfo.iccid;
     }
-    if(sim.isActive !== 1){
+    if(sim.isActive !== 1 && sim.cardStatus !== 2){
       params.cardStatus = cardStatus;
     }
     

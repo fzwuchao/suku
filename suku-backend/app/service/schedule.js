@@ -73,17 +73,14 @@ class ScheduleService extends BaseService {
   /**
  * 批量同步更新卡状态
  */
-  async syncUpdateBatch() {
+  async syncUpdateBatch(query) {
     const { service, logger } = this.ctx;
     const OP = this.getOp();
     logger.info('********************批量同步卡基本信息*********************');
 
     const startTime = moment().milliseconds();
     const isMigrat = false;
-    const { oneLinkSims } = await service.sim.getOnelinkSimIds({
-      // cardStatus: {[OP.in]:[2,4]}
-      isActive : 1
-    }, 200);
+    const { oneLinkSims } = await service.sim.getOnelinkSimIds(query, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
       let j = 0

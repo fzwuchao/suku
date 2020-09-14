@@ -78,7 +78,13 @@ class JobLogService extends BaseService {
     const { service, logger } = this.ctx;
     await service.chinaMobile.operateSimApnFunction('0', data.simId);
     const sim = await service.sim.getSimBySimId(data.simId);
-    await service.sim.syncUpdate(sim, false, false, '[service->jobLog->openFlowServ]');
+    this.app.queue.create('syncUpdateAfterPay', sim).priority('high').ttl(1000*60*2).delay(10000*6*2) // 延时多少毫秒
+        .removeOnComplete( true ).save();
+    done();
+  }
+
+  async syncUpdateAfterPay(data, done){
+    await service.sim.syncUpdate(data, false, false, '[service->jobLog->openFlowServ]');
     done();
   }
 

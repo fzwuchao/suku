@@ -250,7 +250,6 @@ class SimOrderService extends BaseService {
         if (shengyuFlow > 0) {
           newSim.flowServStatus = SIM_FLOW_SERV_STATUS.ON;
         }
-        await this.ctx.service.sim.configLimtValueBySim(sim);
         break;
     }
     if (order.orderType === 1) {
@@ -258,7 +257,10 @@ class SimOrderService extends BaseService {
       await this.ctx.service.sim.configLimtValueBySim(sim);;
     }
     await this.ctx.service.sim.updateBySimId(newSim, sim.simId);
-
+    if(order.orderType === 2 && order.simId > 100000000000) {
+      const newsim = await service.sim.getSimBySimId(order.simId);
+      await this.ctx.service.sim.configLimtValueBySim(newsim);
+    }
     
   }
   async update(order) {

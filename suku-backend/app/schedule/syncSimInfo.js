@@ -15,7 +15,13 @@ class SyncSimInfo extends Subscription {
   async subscribe() {
     const { service } = this.ctx;
     this.ctx.logger.info('********************总同步更新*********************');
-    await service.schedule.syncUpdateBatch();
+    await service.schedule.syncUpdateBatch({
+      isActive: 1,
+      simType: 'B'
+    });
+    await service.schedule.syncUpdateBatch({
+      simType: 'A'
+    });
   }
 }
 
