@@ -1,5 +1,6 @@
 // app.js
 'use strict';
+const kue = require('kue');
 class AppBootHook {
   constructor(app) {
     this.app = app;
@@ -118,6 +119,17 @@ class AppBootHook {
         done();
       });
     });
+
+    this.app.queue.on('job complete', function(id, result){
+      kue.Job.get(id, function(err, job){
+        if (err) return;
+        job.remove(function(err){
+          if (err) throw err;
+          console.log('removed completed job #%d', job.id);
+        });
+      });
+    });
+
   }
 
 }

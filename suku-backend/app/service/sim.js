@@ -377,12 +377,13 @@ class SimService extends BaseService {
 
   async configLimtValue(simType) {
     const { logger } = this.ctx;
-    // const OP = this.getOp();
+    const Op = this.getOp();
     logger.info('********************【手动设置阀值】*********************');
     const startTime = moment().milliseconds();
     const isMigrat = true;
     const { oneLinkSims } = await this.getOnelinkSimIds({
       simType,
+      simId:{[Op.gt]: 100000000000}
     }, 200);
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
@@ -421,27 +422,30 @@ class SimService extends BaseService {
     const startTime = moment().milliseconds();
     const { simId, simType, activeComboId, onelinkId } = sim;
     const params = {id: sim.id};
-    
     // 被叫卡有激活时间，主叫卡有语音使用量
     const promiseList = [];
     // await service.chinaMobile.querySimBasicInfo(simId, onelinkId)
-    // 激活时间
-    promiseList.push(service.chinaMobile.querySimBasicInfo(simId, onelinkId));
     // 状态信息
     promiseList.push(service.chinaMobile.querySimStatus(simId, onelinkId));
     // imei
     // promiseList.push(service.chinaMobile.querySimImei(simId));
-    // 开关机状态
-    promiseList.push(service.chinaMobile.queryOnOffStatus(simId, onelinkId));
     // 通信功能开通
     promiseList.push(service.chinaMobile.querySimCommunicationFunctionStatus(simId, onelinkId));
     // 流量累计使用量
     promiseList.push(service.chinaMobile.querySimDataUsage(simId, onelinkId));
+    if(!sim.activeTime) {
+      // 激活时间
+      promiseList.push(service.chinaMobile.querySimBasicInfo(simId, onelinkId));
+    }
+    if(!isBatch){
+      // 开关机状态
+      promiseList.push(service.chinaMobile.queryOnOffStatus(simId, onelinkId));
+    }
     // 语音累计使用量
     if (simType === SIM_TYPE.CALL) {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId, onelinkId));
     }
-    const [ baseInfo, cardStatus, openStatus, servStatus, monthUsedFlow, monthUsedVoiceDuration ] = await Promise.all(promiseList);
+    const [ cardStatus, servStatus, monthUsedFlow, baseInfo, openStatus, monthUsedVoiceDuration ] = await Promise.all(promiseList);
     if(isBatch){
       params.simId = sim.simId;
       params.overdueTime = sim.overdueTime;
@@ -490,12 +494,15 @@ class SimService extends BaseService {
     if(baseInfo.iccid) {
       params.iccid = baseInfo.iccid;
     }
-    if(sim.isActive !== 1 && sim.cardStatus !== 2){
+    if(sim.isActive !== 1 || sim.cardStatus != 2){
       params.cardStatus = cardStatus;
     }
     
     // params.imei = imei;
-    params.openStatus = openStatus;
+    if(openStatus) {
+      params.openStatus = openStatus;
+    }
+    
     
     for (const key in servStatus) {
       params[key] = servStatus[key];
