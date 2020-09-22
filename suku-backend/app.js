@@ -120,7 +120,7 @@ class AppBootHook {
       });
     });
 
-    this.app.queue.on('job complete', function(id, result){
+    this.app.queue.on('job failed', function(id, result){
       kue.Job.get(id, function(err, job){
         if (err) return;
         job.remove(function(err){

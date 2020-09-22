@@ -49,11 +49,11 @@ class WechatController extends BaseController {
         await service.chinaMobile.changeSimStatus(simId, OPER_TYPE_SINGLE.RECOVER);// 1: 停机转已激活
         await ctx.service.sim.syncUpdate(sim, false, false, '[controller->wechat->payBack]');
       }
-      if (order.orderType === 2 && sim.monthShengyuFlow > 0) {
+      if (order.orderType === 2) {
         this.app.queue.create('openFlowServ', { simId }).priority('high').ttl(1000*60*2).delay(10000*6*2) // 延时多少毫秒
         .removeOnComplete( true ).save(); // 开启数据服务
       }
-      if (order.orderType === 2 && sim.monthShengyuVoiceDuration > 0) {
+      if (order.orderType === 2) {
         await service.chinaMobile.operateSimCallFunction('0', simId); // 开启语音服务
       }
     } else {

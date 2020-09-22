@@ -81,9 +81,9 @@ class ScheduleService extends BaseService {
     const startTime = moment().milliseconds();
     const isMigrat = false;
     const { oneLinkSims } = await service.sim.getOnelinkSimIds(query, 200);
+    let j = 0
     for (const key in oneLinkSims) {
       const simsList = oneLinkSims[key];
-      let j = 0
       for (let i = 0; i < simsList.length; i++) {
         this.app.queue.create('BatchSyncUpdate', { sims: simsList[i], isMigrat }).delay((i+j)*20000+100).ttl(1000*60*3) // 延时多少毫秒
         .removeOnComplete( true ).save();
