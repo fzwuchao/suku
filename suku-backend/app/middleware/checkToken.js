@@ -4,7 +4,7 @@ const ERRORMSG = require('../extend/errorCode')();
 module.exports = (options, app) => {
   return async function checkToken(ctx, next) {
     const { header, url } = ctx.request;
-    const whiteList = [ '/login', '/logout', '/getCaptcha',
+    const whiteList = [ '/login', '/logout', '/getCaptcha','/sim/getSimIdByIccid',
       '/sim/getSim', '/simCombo/getSimComboByIds',
       '/simOrder/save', '/messageSend/save',
       '/messageSend/getSendlistBySimId', '/writeList/save',

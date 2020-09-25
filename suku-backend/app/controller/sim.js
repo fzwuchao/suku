@@ -525,6 +525,29 @@ class SimController extends BaseController {
     this.success(result, '');
   }
 
+  async getSimIdByIccid() {
+    const ctx = this.ctx;
+    const { request, service, helper } = ctx;
+    const { sim } = helper.rules;
+    const rule = {
+      ...sim(),
+    };
+    const { iccid } = {...request.body};
+    const params = {};
+    params.iccid = iccid;
+    ctx.validate(rule, params);
+    const simData = await service.sim.getSimBySimIdOrIccid(params);
+    if (!simData) {
+      this.fail(400, null, '此卡号不是本平台的卡！');
+      return;
+    } else {
+      if (iccid) {
+        this.success({simId: simData.simId}, '');
+        return;
+      }
+    }
+  }
+
   /**
    * 同步更新
    * 都需要同步的字段有：状态信息、开关机状态、通信功能开通、流量累计使用量

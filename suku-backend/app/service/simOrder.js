@@ -223,6 +223,7 @@ class SimOrderService extends BaseService {
     
     const operType = LIMT_OPTY.UPDATE;
     let limtValue = 0;
+    let shengyuFlow = sim.shengyuFlow;
     // pack.months = packMonths;
     // pack.money = calc(`${pack.money ? pack.money : 0}+(${this.sim.privateMoney ? this.sim.privateMoney : 0}*${packMonths})`).toFixed(2);
     switch (order.orderType) {
@@ -246,7 +247,8 @@ class SimOrderService extends BaseService {
       case 2:
         newSim.monthOverlapFlow = calc(`${sim.monthOverlapFlow ? sim.monthOverlapFlow : 0} + ${pack.monthFlow ? pack.monthFlow : 0}`);
         newSim.monthOverlapVoiceDuration = calc(`${sim.monthOverlapVoiceDuration ? sim.monthOverlapVoiceDuration : 0} + ${pack.monthVoice ? pack.monthVoice : 0}`); 
-        const shengyuFlow = calc(`${sim.monthFlow} + ${newSim.monthOverlapFlow} - ${sim.monthUsedFlow || 0} * ${sim.virtualMult}`)
+        shengyuFlow = calc(`${sim.monthFlow} + ${newSim.monthOverlapFlow} - ${sim.monthUsedFlow || 0} * ${sim.virtualMult}`)
+        
         if (shengyuFlow > 0) {
           newSim.flowServStatus = SIM_FLOW_SERV_STATUS.ON;
         }
@@ -257,9 +259,16 @@ class SimOrderService extends BaseService {
       await this.ctx.service.sim.configLimtValueBySim(sim);;
     }
     await this.ctx.service.sim.updateBySimId(newSim, sim.simId);
+    if (order.orderType === 2 && shengyuFlow >0) {
+      this.app.queue.create('openFlowServ', { simId }).priority('high').ttl(1000*60*2).delay(10000*6*2) // 延时多少毫秒
+      .removeOnComplete( true ).save(); // 开启数据服务
+    }
+    if (order.orderType === 2) {
+      await service.chinaMobile.operateSimCallFunction('0', simId); // 开启语音服务
+    }
     if(order.orderType === 2 && order.simId > 100000000000) {
       const newsim = await service.sim.getSimBySimId(order.simId);
-      await this.ctx.service.sim.configLimtValueBySim(newsim);
+      await this.ctx.service.sim.configLimtValueBySim(newsim, true);
     }
     
   }

@@ -398,12 +398,12 @@ class SimService extends BaseService {
     logger.info(`【手动设置阀值，接口总响应时间：】:${endTime - startTime} ms`);
   }
 
-  async configLimtValueBySim(sim) {
+  async configLimtValueBySim(sim, isDel) {
     const monthOverlapFlow = sim.monthOverlapFlow || 0;
     let limtValue = calc(`(${sim.monthFlow}+${monthOverlapFlow})/${sim.virtualMult}`).toFixed(3);
     const simId = sim.simId+''
     let res = null
-    if(simId.length < 13){
+    if(simId.length < 13 || isDel){
       res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.DEL, limtValue, sim.simId, sim.netStatus);
     } else {
       res = await this.ctx.service.chinaMobile.configLimtValue(LIMT_OPTY.ADD, limtValue, sim.simId, sim.netStatus);
@@ -424,28 +424,44 @@ class SimService extends BaseService {
     const params = {id: sim.id};
     // 被叫卡有激活时间，主叫卡有语音使用量
     const promiseList = [];
+    let resultList = [];
     // await service.chinaMobile.querySimBasicInfo(simId, onelinkId)
     // 状态信息
     promiseList.push(service.chinaMobile.querySimStatus(simId, onelinkId));
+    resultList.push('cardStatus');
     // imei
     // promiseList.push(service.chinaMobile.querySimImei(simId));
     // 通信功能开通
     promiseList.push(service.chinaMobile.querySimCommunicationFunctionStatus(simId, onelinkId));
+    
+    resultList.push('servStatus');
     // 流量累计使用量
     promiseList.push(service.chinaMobile.querySimDataUsage(simId, onelinkId));
+    
+    resultList.push('monthUsedFlow');
+
     if(!sim.activeTime) {
       // 激活时间
       promiseList.push(service.chinaMobile.querySimBasicInfo(simId, onelinkId));
+      resultList.push('baseInfo');
     }
+
     if(!isBatch){
       // 开关机状态
       promiseList.push(service.chinaMobile.queryOnOffStatus(simId, onelinkId));
+      resultList.push('openStatus');
     }
     // 语音累计使用量
     if (simType === SIM_TYPE.CALL) {
       promiseList.push(service.chinaMobile.querySimVoiceUsage(simId, onelinkId));
+      resultList.push('monthUsedVoiceDuration');
     }
-    const [ cardStatus, servStatus, monthUsedFlow, baseInfo, openStatus, monthUsedVoiceDuration ] = await Promise.all(promiseList);
+    const results = await Promise.all(promiseList);
+    const result = {}
+    for (let i = 0;i<resultList.length;i++){
+      result[resultList[i]] = results[i];
+    }
+    const {cardStatus, servStatus, monthUsedFlow, baseInfo, openStatus, monthUsedVoiceDuration} = result;
     if(isBatch){
       params.simId = sim.simId;
       params.overdueTime = sim.overdueTime;
@@ -470,7 +486,7 @@ class SimService extends BaseService {
       params.monthUsedVoiceDuration = monthUsedVoiceDuration;
     }
     
-    if (baseInfo.activeDt) {
+    if (baseInfo && baseInfo.activeDt) {
       const activeTime = baseInfo.activeDt;
       params.activeTime = activeTime;
       params.isActive = 1;
@@ -491,7 +507,7 @@ class SimService extends BaseService {
       params.shengyuMoney = calc(`${remainMonths}*${sim.monthRent}`);
     }
 
-    if(baseInfo.iccid) {
+    if(baseInfo && baseInfo.iccid) {
       params.iccid = baseInfo.iccid;
     }
     if(sim.isActive !== 1 || sim.cardStatus != 2){

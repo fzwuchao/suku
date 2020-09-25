@@ -40,6 +40,8 @@ module.exports = app => {
 
   // 查询sim卡
   router.post('/sim/search', controller.sim.search);
+  router.post('/sim/getSimIdByIccid', controller.sim.getSimIdByIccid);
+  
   // 导入物联卡
   // router.post('/sim/importSims', controller.sim.importSims);
   router.post('/sim/importSims', controller.sim.importSimsWithHeadField);
