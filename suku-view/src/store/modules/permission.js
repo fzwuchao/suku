@@ -14,6 +14,8 @@ import common from '@/router/common'
 //   return true   } }
 const _import = require('../../router/_import_' + process.env.NODE_ENV)
 import Layout from '../../views/layout/Layout'
+import Statistics from '../../views/dashboard/statistics'
+import SecondLayout from '../../views/layout/secondLayout'
 /*
  * 根据后台回过来的菜单创建一个路由
  */
@@ -121,7 +123,44 @@ const permission = {
                         router.redirect = '/homepage'
                     }
 
+                    // mock数据，之后删除掉
+                    let dashboard = {
+                        path: '/dashboard',
+                        component: Layout,
+                        name: '资源看板',
+                        redirect: '/dashboard/statistics',
+                        meta: {
+                            title: '资源看板',
+                            icon: 'system',
+                        },
+                        showChild: true,
+                        children: [
+                            {
+                                path: '/dashboard/statistics',
+                                component: SecondLayout,
+                                name: '统计',
+                                meta: {
+                                    activeName: 'dashboard/statistics',
+                                    title: '统计',
+                                },
+                                children: [
+                                    {
+                                        path: '/dashboard/statistics',
+                                        component: Statistics,
+                                        name: '统计图',
+                                        meta: {
+                                            activeName: 'dashboard/statistics',
+                                            title: '统计图',
+                                            icon: 'f',
+                                        },
+                                        hidden: true,
+                                    }
+                                ]
+                            }
+                        ]
+                    }
                     accessedRouters.push(router)
+                    accessedRouters.push(dashboard)
                     accessedRouters = accessedRouters.concat(common)
                     commit('SET_ROUTERS', accessedRouters)
                     resolve()
